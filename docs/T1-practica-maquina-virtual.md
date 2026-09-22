@@ -15,6 +15,9 @@ Reescrita a partir de debian.md del repo original. Cambios respecto al original:
   - AVISO Debian 13: sshd usa activación por socket. "systemctl reload ssh" FALLA
     ("Cannot bind any address"). Hay que usar "restart". Está explicado en el paso 8.
   - Añadidos objetivos, criterios de evaluación, cuestiones y checklist de entrega.
+  - Hostname obligatorio "debian-apellido": firma cada salida de comando y delata las copias.
+  - Sección "Entrega": PDF de evidencias (40 %) + demostración en clase (60 %).
+    Las evidencias se piden en TEXTO, no en capturas, para poder compararlas entre entregas.
 
 CAPTURAS A REHACER (las actuales son de Debian 11/12; el flujo es idéntico pero cambia el aspecto):
   debian3 (menú del instalador), debian4, debian5, debian6, debian7 (tasksel), debian12 (GRUB en disco).
@@ -99,7 +102,18 @@ Puedes instalar tanto en modo gráfico como en modo texto. Se recomienda el grá
 
 Los pasos que importan:
 
-**Nombre de la máquina (*hostname*).** Ponle un nombre corto, porque aparecerá en el *prompt* de la terminal (`usuario@nombredemaquina`):
+**Nombre de la máquina (*hostname*).** Aquí no eliges libremente: el nombre de tu máquina debe ser
+
+```
+debian-tuapellido
+```
+
+en minúsculas, sin acentos, sin espacios y sin la ñ (por ejemplo, `debian-garcia`). Si tienes dos apellidos, usa solo el primero.
+
+!!! warning "Esto no es un capricho"
+    El *hostname* aparece en el *prompt* de cada comando que ejecutes (`usuario@debian-tuapellido`), así que **firma automáticamente toda tu entrega**. Una práctica entregada con el nombre de otra persona en el prompt es una práctica copiada, y se corrige sola.
+
+    Si te equivocas al instalar, se arregla después con `sudo hostnamectl set-hostname debian-tuapellido` y reiniciando.
 
 ![](img/debian4.png)
 
@@ -351,28 +365,85 @@ A lo largo del módulo vas a instalar, configurar y romper muchas cosas. Poder v
 !!! question "Cuestión 5"
     Explica, con lo visto en la teoría, qué cifrado (simétrico o asimétrico) interviene en cada momento cuando te conectas por SSH con un par de claves.
 
-## Checklist de entrega
+## Entrega
 
-Antes de entregar, comprueba que puedes demostrar cada punto:
+El resultado de esta práctica es una máquina virtual, y una máquina no se puede entregar.
+Lo que entregas son **las pruebas de que esa máquina existe y está bien configurada**.
 
-- ☐ La máquina virtual arranca **sin entorno gráfico** y muestra el *login* en terminal.
-- ☐ Tiene una IP del rango de la red local (captura de `ip a`).
-- ☐ Tu usuario ejecuta `sudo` correctamente (captura de `sudo -v` o de `sudo id`).
-- ☐ Te conectas por SSH desde tu equipo **sin que te pida contraseña**.
-- ☐ El acceso por contraseña y el acceso de *root* están desactivados (captura del intento rechazado).
-- ☐ Existe la instantánea `base-limpia`.
-- ☐ Documento con las respuestas a las cinco cuestiones finales.
+La entrega tiene dos partes, y las dos son obligatorias.
 
-## Criterios de evaluación
+### Parte 1 — Documento de evidencias (40 %)
+
+Un único **PDF** llamado `P1.1-Apellido-Nombre.pdf` que contenga, en este orden:
+
+1. **Portada** con tu nombre, el grupo y el *hostname* de tu máquina.
+2. **Las evidencias** de la tabla de abajo.
+3. **Las respuestas a las cinco cuestiones finales**, con tus palabras.
+
+!!! danger "Texto, no capturas"
+    La salida de los comandos se entrega **copiada como texto**, dentro de un bloque o con
+    tipografía de ancho fijo. **No** valen fotos ni capturas de la terminal.
+
+    Solo hay dos excepciones, porque ahí sí hace falta ver la pantalla: la configuración del
+    adaptador de red en VirtualBox y la instantánea creada.
+
+Evidencias que debe contener el documento:
+
+| # | Qué hay que demostrar | Comando cuya salida se pega |
+|---|---|---|
+| 1 | La máquina es tuya y el *hostname* es el correcto | `hostnamectl` |
+| 2 | Tu usuario y sus grupos | `id` |
+| 3 | El sistema arranca sin entorno gráfico | `systemctl get-default` (debe responder `multi-user.target`) |
+| 4 | La red está en puente y tiene IP local | `ip a` |
+| 5 | El servidor SSH está activo | `systemctl status ssh` |
+| 6 | Tu usuario tiene permisos de administración | `sudo id` |
+| 7 | Entras con par de claves | `ssh -v usuario@IP` — señala la línea `Authenticated using "publickey"` |
+| 8 | El acceso por contraseña está cerrado | `ssh -o PreferredAuthentications=password usuario@IP` — debe responder `Permission denied (publickey)` |
+| 9 | Configuración de red de la máquina | **Captura** de VirtualBox con el adaptador puente |
+| 10 | Instantánea creada | **Captura** de la instantánea `base-limpia` |
+
+Cada evidencia debe ir acompañada de **una frase tuya** explicando qué demuestra.
+Una tanda de comandos pegados sin explicar no puntúa.
+
+### Parte 2 — Demostración en clase (60 %)
+
+En dos minutos, en tu puesto:
+
+1. Te conectas por SSH desde tu equipo a tu máquina virtual.
+2. Ejecutas el comando que se te pida en ese momento.
+3. Explicas en voz alta **una** de las decisiones que tomaste (por qué el adaptador puente, por qué sin escritorio, por qué desactivamos la contraseña…).
+
+Esta parte no se puede preparar de memoria ni copiar: o la máquina funciona, o no funciona.
+
+!!! info "Cómo se califica"
+    La demostración pesa más que el documento porque es lo que de verdad acredita el
+    resultado de aprendizaje. **Una demostración que no funciona no se compensa con un
+    documento impecable**: en ese caso la práctica queda pendiente hasta que la máquina
+    funcione, y se vuelve a demostrar.
+
+### Criterios de evaluación
 
 | Criterio | Peso |
 |---|---|
-| La máquina virtual está instalada y configurada según lo pedido (sin escritorio, red en puente, recursos adecuados) | 25 % |
+| La máquina está instalada y configurada según lo pedido (sin escritorio, red en puente, recursos adecuados) | 25 % |
 | El usuario tiene permisos de administración correctamente configurados | 15 % |
-| La conexión por SSH con contraseña funciona y está documentada | 15 % |
+| La conexión por SSH funciona y está documentada | 15 % |
 | La autenticación por par de claves funciona | 25 % |
 | El servidor SSH está endurecido y se justifica cada directiva modificada | 10 % |
-| Las cuestiones finales están respondidas con corrección y con criterio propio | 10 % |
+| Las cuestiones finales están respondidas con corrección y criterio propio | 10 % |
+
+### Antes de entregar, comprueba que…
+
+- ☐ El *hostname* es `debian-tuapellido` y aparece en todas las salidas.
+- ☐ La máquina arranca **sin entorno gráfico** y muestra el *login* en terminal.
+- ☐ Tiene una IP del rango de la red local.
+- ☐ Tu usuario ejecuta `sudo` correctamente.
+- ☐ Te conectas por SSH **sin que te pida contraseña**.
+- ☐ El acceso por contraseña y el de *root* están desactivados.
+- ☐ Existe la instantánea `base-limpia`.
+- ☐ Las diez evidencias están en el PDF, en texto y comentadas.
+- ☐ Las cinco cuestiones están respondidas.
+- ☐ El archivo se llama `P1.1-Apellido-Nombre.pdf`.
 
 ## Referencias
 
