@@ -2,8 +2,8 @@ site_name: Despliegue de aplicaciones web
 site_description: Apuntes y prácticas del módulo 0614 - 2º DAW
 site_author: Dustin de Lara
 # Cuando crees el repositorio en GitHub, sustituye USUARIO y NOMBRE-DEL-REPO:
-site_url: https://USUARIO.github.io/NOMBRE-DEL-REPO/
-repo_url: https://github.com/USUARIO/NOMBRE-DEL-REPO
+site_url: https://DustinRandel.github.io/despliegue-aplicaciones-web/
+repo_url: https://github.com/DustinRandel/despliegue-aplicaciones-web
 edit_uri: edit/main/docs/
 
 copyright: >
