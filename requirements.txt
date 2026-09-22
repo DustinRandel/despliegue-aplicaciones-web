@@ -1,0 +1,5 @@
+# Versiones fijadas a propósito: MkDocs 2.0 romperá los plugins y los temas,
+# así que nos quedamos en la serie 1.x hasta que haya un camino de migración.
+mkdocs>=1.6,<2.0
+mkdocs-material>=9.5,<10
+mkdocs-awesome-pages-plugin>=2.9,<3

@@ -1,0 +1,13 @@
+nav:
+    - Inicio: index.md
+    - Tema 1:
+      - Teoría:
+        - T1-introduccion.md
+      - Prácticas:
+        - T1-practica-maquina-virtual.md
+    - Créditos: creditos.md
+
+# Cómo funciona este fichero:
+#   - Define el menú lateral. Si una página .md no aparece aquí, NO se ve en el menú.
+#   - "... | P2.*.md" incluye de golpe todos los ficheros que encajen con ese patrón.
+#   - Los temas se van añadiendo aquí según se vayan adaptando.

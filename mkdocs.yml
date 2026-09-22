@@ -1,0 +1,71 @@
+site_name: Despliegue de aplicaciones web
+site_description: Apuntes y prácticas del módulo 0614 - 2º DAW
+site_author: Dustin de Lara
+# Cuando crees el repositorio en GitHub, sustituye USUARIO y NOMBRE-DEL-REPO:
+site_url: https://USUARIO.github.io/NOMBRE-DEL-REPO/
+repo_url: https://github.com/USUARIO/NOMBRE-DEL-REPO
+edit_uri: edit/main/docs/
+
+copyright: >
+  Material docente del módulo 0614. Contiene obras derivadas de terceros; ver la página de Créditos.
+
+theme:
+  name: material
+  language: es
+  font:
+    code: Roboto Mono
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      primary: green
+      accent: blue
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Cambiar a modo oscuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/toggle-switch
+        name: Cambiar a modo claro
+  features:
+    - navigation.top
+    - navigation.footer
+    - toc.integrate
+    - search.highlight
+    - search.suggest
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+
+markdown_extensions:
+  - meta
+  - tables
+  - admonition
+  - attr_list
+  - md_in_html
+  - footnotes
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.keys
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+plugins:
+  - search:
+      lang: es
+  - awesome-pages:
+      collapse_single_pages: true
+
+extra_css:
+  - stylesheets/extra.css

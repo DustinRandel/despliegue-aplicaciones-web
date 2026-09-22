@@ -1,0 +1,16 @@
+# Sitio generado por MkDocs: se construye solo, no se sube
+site/
+
+# Cachés y entornos
+.pheasant_cache/
+__pycache__/
+.venv/
+venv/
+
+# Basura del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Imágenes de sistemas operativos (pesan demasiado para git)
+*.iso
