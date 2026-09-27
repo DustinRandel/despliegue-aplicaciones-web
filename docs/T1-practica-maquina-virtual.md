@@ -22,6 +22,12 @@ Reescrita a partir de debian.md del repo original. Cambios respecto al original:
 CAPTURAS A REHACER (las actuales son de Debian 11/12; el flujo es idéntico pero cambia el aspecto):
   debian3 (menú del instalador), debian4, debian5, debian6, debian7 (tasksel), debian12 (GRUB en disco).
   Se pueden dejar para este curso y sustituirlas al hacer la instalación en clase.
+
+ACTUALIZADO (capturas reales, instalación en curso):
+  - debian1: sustituida. VirtualBox 7.2 unifica nombre + tipo de SO + selección de ISO en una sola
+    pantalla; el texto del paso 2 se ha reescrito para reflejarlo.
+  - debian2.png: ya NO se usa (ese paso ha quedado fusionado dentro de debian1). Se puede borrar
+    el fichero cuando se confirme que no lo referencia nada más.
 -->
 
 # Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
@@ -62,16 +68,12 @@ Descárgala desde aquí, eligiendo el archivo `debian-XX.X.X-amd64-netinst.iso`:
 
 ## 2. Crear la máquina virtual
 
-Crea una máquina virtual nueva indicando su nombre, su ubicación y el tipo de sistema operativo (Linux / Debian 64-bit):
+Desde VirtualBox 7.2, crear una máquina nueva es una sola pantalla: nombre, tipo de sistema operativo e imagen ISO van juntos. Ponle un nombre identificable y selecciona como **ISO Image** el fichero *netinst* que acabas de descargar; si el nombre del fichero contiene "debian", VirtualBox suele detectar solo el tipo de sistema (**Linux / Debian**) y su versión:
 
 ![](img/debian1.png)
 
-Monta como unidad de CD la ISO *netinst* que acabas de descargar:
-
-![](img/debian2.png)
-
 !!! warning "Desactiva la instalación desatendida"
-    Si VirtualBox te ofrece la "instalación automática/desatendida" al detectar la ISO, **desmárcala**. Queremos instalar a mano para ver y entender cada decisión.
+    Con la ISO ya seleccionada, VirtualBox te ofrece la casilla **Proceed with Unattended Installation**. **Déjala desmarcada**: queremos instalar a mano para ver y entender cada decisión.
 
 **Recursos recomendados:**
 
