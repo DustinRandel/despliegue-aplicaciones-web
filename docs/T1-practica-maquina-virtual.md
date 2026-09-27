@@ -662,14 +662,15 @@ Esta parte no se puede preparar de memoria ni copiar: o la máquina funciona, o 
 
 ### Criterios de evaluación
 
-| Criterio | Peso |
-|---|---|
-| La máquina está instalada y configurada según lo pedido (sin escritorio, red NAT + Host-only, recursos adecuados) | 25 % |
-| Los permisos de administración están correctamente configurados | 15 % |
-| La conexión por SSH funciona y está documentada | 15 % |
-| La autenticación por par de claves funciona | 25 % |
-| El servidor SSH está endurecido y se justifica cada directiva modificada | 10 % |
-| Las cuestiones finales están respondidas con corrección y criterio propio | 10 % |
+| Parte | Criterio | Peso |
+|---|---|---|
+| Documento | Las diez evidencias están completas, en texto y cada una con su frase explicativa | 25 % |
+| Documento | Las cinco cuestiones finales están respondidas con corrección y criterio propio | 15 % |
+| Demostración | Te conectas por SSH con clave desde tu equipo, y el acceso por contraseña está cerrado | 20 % |
+| Demostración | Ejecutas el comando que se te pide y la salida es la esperada | 20 % |
+| Demostración | Explicas una de tus decisiones con tus palabras y respondes a las preguntas sobre ella | 20 % |
+
+Si en la demostración aparece una máquina que no es la tuya (el *hostname*, la huella del servidor o la clave de otra persona), la demostración entera cuenta como no superada.
 
 ### Antes de entregar, comprueba que…
 
