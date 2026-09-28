@@ -17,6 +17,8 @@ Reescrita a partir de debian.md del repo original. Cambios respecto al original:
   - Añadidos objetivos, criterios de evaluación, cuestiones y checklist de entrega.
   - Hostname obligatorio "debian-apellido": firma cada salida de comando y delata las copias.
   - Sección "Entrega": PDF de evidencias (40 %) + demostración en clase (60 %).
+    La demostración es una mini entrevista individual en la mesa del profesor, con el
+    portátil del alumno (no se hace en su puesto).
     Las evidencias se piden en TEXTO, no en capturas, para poder compararlas entre entregas.
 
 RED: NAT + Host-only (antes era adaptador puente).
@@ -646,7 +648,8 @@ Una tanda de comandos pegados sin explicar no puntúa.
 
 ### Parte 2 — Demostración en clase (60 %)
 
-En dos minutos, en tu puesto:
+Es una mini entrevista individual. Cuando se te llame, vienes a la mesa del profesor con
+**tu ordenador** y la máquina virtual preparada para arrancar. En unos dos minutos:
 
 1. Te conectas por SSH desde tu equipo a tu máquina virtual.
 2. Ejecutas el comando que se te pida en ese momento.
