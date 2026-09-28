@@ -604,7 +604,7 @@ A lo largo del módulo vas a instalar, configurar y romper muchas cosas. Poder v
     A `enp0s8` le hemos puesto una IP fija en lugar de dejar que la asigne un servidor DHCP. ¿Qué ventajas tiene eso en un servidor? ¿Por qué todos los compañeros podéis usar la misma IP sin que haya conflictos?
 
 !!! question "Cuestión 5"
-    Explica, con lo visto en la teoría, qué cifrado (simétrico o asimétrico) interviene en cada momento cuando te conectas por SSH con un par de claves.
+    Explica, con lo visto en la teoría, qué interviene en cada momento cuando te conectas por SSH con un par de claves: Diffie-Hellman, firmas asimétricas o cifrado simétrico.
 
 ## Entrega
 

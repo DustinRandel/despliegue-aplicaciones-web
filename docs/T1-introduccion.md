@@ -7,6 +7,10 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
 - Página reescrita a partir de debian_teoria.md del repo original.
 - Imágenes reutilizadas: img/vps.gif, img/ssh.webp, img/simetrico.png, img/asimetrico.png (todas existen ya en docs/img).
 - Duración estimada: 4-5 h de teoría. La práctica asociada es T1-practica-maquina-virtual.md.
+- Apartado 6 corregido para que sea riguroso: SSH NO cifra la clave de sesión con asimétrico y la
+  envía. La acuerda con Diffie-Hellman (nunca viaja) y usa el asimétrico para FIRMAR (clave de host
+  y clave del usuario). Con ed25519 no existe "cifrar con la pública".
+- Animación paso a paso: animaciones/ssh.html, incrustada en el apartado 6 con un iframe.
 -->
 
 # Tema 1 - Introducción: el escenario del despliegue
@@ -16,7 +20,7 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
     - Qué es un VPS y en qué se diferencia de un hosting compartido, de la nube y de un PaaS.
     - Por qué en este módulo trabajaremos sobre una máquina virtual y no sobre tu portátil.
     - Cómo conectarse de forma remota y segura a un servidor mediante SSH.
-    - Qué son el cifrado simétrico y el asimétrico, y por qué SSH usa los dos.
+    - Qué son el cifrado simétrico y el asimétrico, qué es Diffie-Hellman y cómo los combina SSH.
 
 ---
 
@@ -117,19 +121,21 @@ Usa **la misma clave** para cifrar y para descifrar. Por eso la clave debe ser s
 
 ### Cifrado asimétrico (o de clave pública)
 
-Cada usuario tiene **un par de claves**: una pública y una privada. Lo que se cifra con la clave pública solo puede descifrarse con su clave privada correspondiente, y al revés.
+Cada usuario tiene **un par de claves**: una pública y una privada, relacionadas matemáticamente. Lo que se hace con una solo se puede deshacer o comprobar con la otra.
 
 ![](img/asimetrico.png)
 
 - La **clave pública** puede verla cualquiera. No hace falta transmitirla por un canal seguro.
 - La **clave privada** solo la conoce su dueño, y no sale nunca de su máquina.
 
-**Funcionamiento:**
+Se usa de dos formas:
 
-1. El emisor cifra el mensaje con la clave **pública** del receptor.
-2. El receptor lo recibe y es el único capaz de descifrarlo, porque es el único que tiene la clave **privada** asociada.
+- **Para cifrar.** El emisor cifra el mensaje con la clave **pública** del receptor. Solo el receptor puede descifrarlo, porque es el único que tiene la clave **privada** asociada.
+- **Para firmar.** El dueño firma un mensaje con su clave **privada**, y cualquiera puede comprobar la firma con la **pública**. Nadie puede fabricar una firma válida sin la privada, así que la firma demuestra *quién* envía el mensaje y que nadie lo ha cambiado.
 
-**Ventaja:** resuelve el problema del intercambio de claves.
+No todos los algoritmos sirven para las dos cosas. RSA sí, pero `ed25519`, el que usarás en la práctica, solo sirve para firmar.
+
+**Ventaja:** permite comunicarse de forma segura, o demostrar la identidad, sin haber compartido antes ningún secreto.
 
 **Inconvenientes:**
 
@@ -137,11 +143,19 @@ Cada usuario tiene **un par de claves**: una pública y una privada. Lo que se c
 - Hay que proteger muy bien la clave privada y tenerla siempre disponible.
 - Hay que asegurarse de que una clave pública es de quien dice ser, y no de un impostor.
 
-### Cifrado híbrido: lo que hace SSH en realidad
+### Lo que hace SSH en realidad
 
-SSH combina los dos. Usa el **cifrado asimétrico al principio**, solo para ponerse de acuerdo de forma segura sobre una clave de sesión; y a partir de ahí usa esa clave con **cifrado simétrico**, que es rápido, para todo el tráfico de la conexión.
+SSH quiere usar cifrado simétrico, que es el rápido, pero antes tiene que resolver el problema difícil: que cliente y servidor tengan la misma clave sin que nadie más la vea. Para eso combina tres herramientas:
 
-Es decir: lo lento se usa una vez, para resolver el problema difícil; lo rápido se usa siempre.
+1. **Diffie-Hellman para acordar la clave de sesión.** Cada lado genera un número secreto que no envía nunca y manda solo un valor público calculado a partir de él. Con su secreto y el valor público del otro, **cada lado calcula por su cuenta el mismo secreto compartido**. La clave de sesión **no se cifra ni se envía**: no viaja nunca por la red. Quien escucha la conversación ve los valores públicos, pero no puede obtener el secreto a partir de ellos.
+2. **Firmas asimétricas para saber con quién hablas.** Diffie-Hellman no dice nada de quién está al otro lado. Por eso el servidor **firma** el intercambio con su clave de host privada, y tu cliente comprueba la firma y la **huella** de esa clave (el fichero `known_hosts`). Más tarde tú también firmarás, con tu clave privada, para demostrar al servidor que eres tú.
+3. **Cifrado simétrico para todo lo demás.** A partir del secreto compartido, cada lado deriva las claves de sesión, y con ellas se cifra todo el tráfico de la conexión.
+
+Es decir: lo lento (Diffie-Hellman y las firmas) se usa una vez, al principio; lo rápido (el simétrico) se usa siempre.
+
+Recorre la conexión paso a paso, mensaje a mensaje, en esta animación:
+
+<iframe src="../animaciones/ssh.html" title="Animación: cómo funciona una conexión SSH" loading="lazy" style="width:100%; height:900px; border:1px solid var(--md-default-fg-color--lightest); border-radius:8px;"></iframe>
 
 ## 7. Autenticarse en SSH: contraseña o par de claves
 
@@ -153,7 +167,7 @@ Hay dos formas habituales de demostrarle al servidor que eres tú:
 
 === "Con par de claves (recomendado)"
 
-    Tú generas un par de claves. Dejas tu clave **pública** en el servidor y guardas la **privada** en tu ordenador. Al conectarte, el servidor te plantea un reto que solo puede resolver quien tenga la clave privada. Nadie puede adivinar una clave de este tipo por fuerza bruta.
+    Tú generas un par de claves. Dejas tu clave **pública** en el servidor y guardas la **privada** en tu ordenador. Al conectarte, tu cliente **firma** con la clave privada un dato que es único para esa conexión, y el servidor comprueba la firma con tu clave pública. La clave privada no sale nunca de tu ordenador: solo viaja la firma, que no sirve para ninguna otra conexión. Y nadie puede adivinar una clave de este tipo por fuerza bruta.
 
 !!! note "Cómo lo haremos en clase"
     Para la primera conexión y para comprobar que hay conectividad usaremos **contraseña**.
@@ -168,7 +182,7 @@ Hay dos formas habituales de demostrarle al servidor que eres tú:
     ¿Por qué se dice que un VPS es "privado" si la máquina física se comparte entre varios clientes?
 
 !!! question "Cuestión 2"
-    Si el cifrado asimétrico resuelve el problema del intercambio de claves, ¿por qué SSH no lo usa para toda la conexión?
+    Si Diffie-Hellman y la criptografía asimétrica resuelven el problema de acordar una clave, ¿por qué SSH no los usa para cifrar toda la conexión?
 
 !!! question "Cuestión 3"
     Tu clave privada está en tu portátil y tu clave pública en el servidor. Te roban el portátil. ¿Qué haces?
