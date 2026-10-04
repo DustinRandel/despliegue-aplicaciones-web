@@ -40,6 +40,9 @@ CAPTURAS: todas rehechas con Debian 13.7 + VirtualBox 7.2 (debian1, debian3-7, d
 VALIDADA DE PRINCIPIO A FIN el 27/09/2026 en el portátil (Debian 13.7.0, VirtualBox 7.2).
   El .ova de respaldo está exportado (739 MB) en C:\Users\darkd\Documents\DAW-debian.ova.
   PENDIENTE: subirlo a Drive/aula virtual y poner el enlace en el recuadro "Máquina de respaldo" (paso 3).
+
+04/10/2026: añadido el cambio de /etc/hosts al cambiar el hostname. Con solo hostnamectl, la línea
+  127.0.1.1 conserva el nombre viejo y sudo avisa "unable to resolve host" (detectado al validar la P2.1).
 -->
 
 # Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
@@ -164,7 +167,12 @@ en minúsculas, sin acentos, sin espacios y sin la ñ (por ejemplo, `debian-garc
 !!! warning "Esto no es un capricho"
     El *hostname* aparece en el *prompt* de cada comando que ejecutes (`usuario@debian-tuapellido`), así que **firma automáticamente toda tu entrega**. Una práctica entregada con el nombre de otra persona en el prompt es una práctica copiada, y se corrige sola.
 
-    Si te equivocas al instalar, se arregla después con `sudo hostnamectl set-hostname debian-tuapellido` y reiniciando.
+    Si te equivocas al instalar, se arregla después con estos dos comandos y reiniciando. El segundo cambia también el nombre en `/etc/hosts`; si te lo saltas, `sudo` se quejará en cada uso con `unable to resolve host` (el propio segundo comando todavía mostrará ese aviso una última vez; es normal):
+
+    ```sh
+    sudo hostnamectl set-hostname debian-tuapellido
+    sudo sed -i 's/^127\.0\.1\.1.*/127.0.1.1	debian-tuapellido/' /etc/hosts
+    ```
 
 ![](img/debian4.png)
 
@@ -231,7 +239,7 @@ Al terminar aparecerá **Installation complete**: pulsa **Continue** y la máqui
     Si tu instalación falla y no hay tiempo para repetirla, el profesor te facilitará una máquina ya instalada (`DAW-debian.ova`). Impórtala con **File → Import Appliance** y, en **MAC Address Policy**, elige **Generate new MAC addresses for all network adapters**.
 
     - Usuario: `alumno` · Contraseña: `daw1234`
-    - Nada más entrar, **cambia la contraseña** con `passwd` y **el *hostname*** con `sudo hostnamectl set-hostname debian-tuapellido`.
+    - Nada más entrar, **cambia la contraseña** con `passwd` y **el *hostname*** con los dos comandos del recuadro "Esto no es un capricho" (el de `hostnamectl` y el de `/etc/hosts`).
     - **Regenera las claves del servidor SSH.** Todas las copias de la máquina de respaldo tienen las mismas, así que todas tendrían la misma huella (lo entenderás en el paso 5):
 
         ```sh
