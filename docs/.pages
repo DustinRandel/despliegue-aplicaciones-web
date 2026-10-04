@@ -5,6 +5,11 @@ nav:
         - T1-introduccion.md
       - Prácticas:
         - T1-practica-maquina-virtual.md
+    - Tema 2:
+      - Teoría:
+        - T2-arquitectura-web.md
+      - Prácticas:
+        - T2-practica-nginx.md
     - Créditos: creditos.md
 
 # Cómo funciona este fichero:
