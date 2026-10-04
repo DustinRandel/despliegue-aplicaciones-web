@@ -58,7 +58,7 @@ AULA: editar el hosts de Windows exige ser administrador. Si en los PC del aula 
     6. Diagnosticar problemas con los registros (*logs*) de Nginx.
 
 !!! tip "Cuándo se hace"
-    Al terminar el **bloque 2** de la [teoría del Tema 2](T2-arquitectura-web.md): virtual hosts, Apache y Nginx, Nginx por dentro y FTP/SFTP. Duración orientativa: unas 5 h de clase.
+    Al terminar el **bloque 2** de la [teoría del Tema 2](T2-arquitectura-web.md): virtual hosts, Apache y Nginx, Nginx por dentro y FTP/SFTP.
 
 !!! info "Antes de empezar"
     - Tienes la **práctica 1.1** terminada: la máquina virtual con IP `192.168.56.10` y acceso por SSH con clave.

@@ -47,14 +47,12 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
 
 La teoría y las prácticas van intercaladas, en cuatro bloques. Cada bloque termina con unas cuestiones de repaso y un recuadro **Ahora toca** que indica la práctica que se hace en ese momento.
 
-| Bloque | Teoría | Al terminar | Horas orientativas |
-|---|---|---|---|
-| 1. La web por dentro | Apartados 1, 2 y 3 | Actividad en clase con `curl` y el navegador | 2 h de teoría + 1 h de actividad |
-| 2. Montar un servidor web | Apartados 4, 5, 6 y 7 | [Práctica 2.1](T2-practica-nginx.md): Nginx, sitios virtuales y SFTP | 2,5 h de teoría + 5 h de práctica |
-| 3. Cifrar | Apartado 8 | Práctica 2.2: HTTPS y redirección | 1,5 h de teoría + 3 h de práctica |
-| 4. Proteger y escalar | Repaso de los apartados 1 y 3.3 | Prácticas 2.3, 2.4 y 2.5 | 10 h de práctica |
-
-Las horas son una referencia para unas 25 h de tema: cada grupo lleva su ritmo.
+| Bloque | Teoría | Al terminar |
+|---|---|---|
+| 1. La web por dentro | Apartados 1, 2 y 3 | Actividad en clase con `curl` y el navegador |
+| 2. Montar un servidor web | Apartados 4, 5, 6 y 7 | [Práctica 2.1](T2-practica-nginx.md): Nginx, sitios virtuales y SFTP |
+| 3. Cifrar | Apartado 8 | Práctica 2.2: HTTPS y redirección |
+| 4. Proteger y escalar | Repaso de los apartados 1 y 3.3 | Prácticas 2.3, 2.4 y 2.5 |
 
 ---
 
@@ -263,7 +261,7 @@ Hoy los navegadores y los grandes sitios usan sobre todo HTTP/2 y HTTP/3, y lo n
 !!! question "Cuestión 2"
     ¿Qué cabecera HTTP permite que varios sitios compartan servidor, y desde qué versión de HTTP es obligatoria?
 
-!!! example "Ahora toca: actividad en clase (1 h, sin entrega)"
+!!! example "Ahora toca: actividad en clase (sin entrega)"
     Antes de instalar nada, mira HTTP en directo desde tu ordenador. En PowerShell:
 
     1. `curl.exe -v http://github.com -o NUL`. Identifica la línea de petición, la cabecera `Host` y el código de estado. ¿Por qué responde `301` y adónde te manda la cabecera `Location`?
@@ -528,7 +526,7 @@ Clientes habituales: **FileZilla** y **WinSCP** (gráficos), y los comandos **`s
 !!! question "Cuestión 4"
     ¿Por qué los procesos trabajadores de Nginx se ejecutan como `www-data` y no como `root`? ¿Y por qué no conviene que `www-data` sea el propietario de los ficheros de la web?
 
-!!! example "Ahora toca: Práctica 2.1 - Servidor web Nginx (unas 5 h)"
+!!! example "Ahora toca: Práctica 2.1 - Servidor web Nginx"
     **[Ir a la práctica 2.1](T2-practica-nginx.md).** Instalarás Nginx en tu máquina virtual, montarás dos sitios virtuales con tu apellido (uno clonado de Git y otro subido por SFTP) y diagnosticarás errores con los registros. Usa los apartados 4, 6 y 7.
 
 ---
@@ -609,7 +607,7 @@ Un certificado autofirmado cifra **exactamente igual de bien** que uno de una CA
 !!! question "Cuestión 6"
     Un compañero dice: "En HTTPS, el navegador cifra la clave de sesión con la clave pública del servidor y se la envía". ¿Qué hay de cierto y qué no? ¿Qué problema tenía ese método?
 
-!!! example "Ahora toca: Práctica 2.2 - HTTPS en Nginx (unas 3 h)"
+!!! example "Ahora toca: Práctica 2.2 - HTTPS en Nginx"
     Generarás un certificado autofirmado, pondrás tus dos sitios en HTTPS y redirigirás automáticamente las peticiones HTTP a HTTPS. La práctica se publicará en esta web antes de que termines la 2.1.
 
 ---
@@ -618,7 +616,7 @@ Un certificado autofirmado cifra **exactamente igual de bien** que uno de una CA
 
 Este bloque es práctico. Usa lo que ya sabes de los códigos de estado (apartado 3.3) y de las funciones de un servidor web además de servir ficheros (apartado 1).
 
-!!! example "Ahora toca: prácticas 2.3, 2.4 y 2.5 (unas 10 h en total)"
+!!! example "Ahora toca: prácticas 2.3, 2.4 y 2.5"
     - **Práctica 2.3, autenticación:** pedir usuario y contraseña para una zona de la web (código `401`) y limitar el acceso por IP.
     - **Práctica 2.4, proxy inverso:** un Nginx delante que reenvía las peticiones a otro servidor (código `502` si el de detrás no responde).
     - **Práctica 2.5, balanceo de carga:** repartir las peticiones entre varios servidores y comprobar qué pasa cuando uno se cae.
