@@ -51,8 +51,8 @@ La teoría y las prácticas van intercaladas, en cuatro bloques. Cada bloque ter
 |---|---|---|
 | 1. La web por dentro | Apartados 1, 2 y 3 | Actividad en clase con `curl` y el navegador |
 | 2. Montar un servidor web | Apartados 4, 5, 6 y 7 | [Práctica 2.1](T2-practica-nginx.md): Nginx, sitios virtuales y SFTP |
-| 3. Cifrar | Apartado 8 | Práctica 2.2: HTTPS y redirección |
-| 4. Proteger y escalar | Repaso de los apartados 1 y 3.3 | Prácticas 2.3, 2.4 y 2.5 |
+| 3. Cifrar | Apartado 8 | [Práctica 2.2](T2-practica-https.md): HTTPS y redirección |
+| 4. Proteger y escalar | Repaso de los apartados 1 y 3.3 | Prácticas [2.3](T2-practica-autenticacion.md), [2.4](T2-practica-proxy.md) y [2.5](T2-practica-balanceo.md) |
 
 ---
 
@@ -608,7 +608,7 @@ Un certificado autofirmado cifra **exactamente igual de bien** que uno de una CA
     Un compañero dice: "En HTTPS, el navegador cifra la clave de sesión con la clave pública del servidor y se la envía". ¿Qué hay de cierto y qué no? ¿Qué problema tenía ese método?
 
 !!! example "Ahora toca: Práctica 2.2 - HTTPS en Nginx"
-    Generarás un certificado autofirmado, pondrás tus dos sitios en HTTPS y redirigirás automáticamente las peticiones HTTP a HTTPS. La práctica se publicará en esta web antes de que termines la 2.1.
+    **[Ir a la práctica 2.2](T2-practica-https.md).** Generarás un certificado autofirmado, pondrás tus dos sitios en HTTPS y redirigirás automáticamente las peticiones HTTP a HTTPS.
 
 ---
 
@@ -617,11 +617,9 @@ Un certificado autofirmado cifra **exactamente igual de bien** que uno de una CA
 Este bloque es práctico. Usa lo que ya sabes de los códigos de estado (apartado 3.3) y de las funciones de un servidor web además de servir ficheros (apartado 1).
 
 !!! example "Ahora toca: prácticas 2.3, 2.4 y 2.5"
-    - **Práctica 2.3, autenticación:** pedir usuario y contraseña para una zona de la web (código `401`) y limitar el acceso por IP.
-    - **Práctica 2.4, proxy inverso:** un Nginx delante que reenvía las peticiones a otro servidor (código `502` si el de detrás no responde).
-    - **Práctica 2.5, balanceo de carga:** repartir las peticiones entre varios servidores y comprobar qué pasa cuando uno se cae.
-
-    Se publicarán en esta web a medida que avance el tema.
+    - **[Práctica 2.3, autenticación](T2-practica-autenticacion.md):** pedir usuario y contraseña para una zona de la web (código `401`) y limitar el acceso por IP.
+    - **[Práctica 2.4, proxy inverso](T2-practica-proxy.md):** un Nginx delante que reenvía las peticiones a otro servidor (código `502` si el de detrás no responde).
+    - **[Práctica 2.5, balanceo de carga](T2-practica-balanceo.md):** repartir las peticiones entre varios servidores y comprobar qué pasa cuando uno se cae.
 
 ---
 

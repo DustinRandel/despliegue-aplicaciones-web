@@ -10,6 +10,10 @@ nav:
         - T2-arquitectura-web.md
       - Prácticas:
         - T2-practica-nginx.md
+        - T2-practica-https.md
+        - T2-practica-autenticacion.md
+        - T2-practica-proxy.md
+        - T2-practica-balanceo.md
     - Créditos: creditos.md
 
 # Cómo funciona este fichero:

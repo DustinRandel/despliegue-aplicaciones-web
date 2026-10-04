@@ -68,3 +68,7 @@ plugins:
 
 extra_css:
   - stylesheets/extra.css
+
+# Quita las notas para el profesor (comentarios HTML) de la web publicada
+hooks:
+  - hooks/notas_profesor.py
