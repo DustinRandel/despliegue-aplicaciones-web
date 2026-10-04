@@ -20,9 +20,17 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
   Debian, ciclo editar -> nginx -t -> reload, permisos de www-data, FTP/FTPS/SFTP.
 - Las salidas de terminal son REALES, capturadas el 04/10/2026 en la VM de validación de la P2.1
   (Debian 13.7, nginx 1.26.3) desde el Windows anfitrión.
-- Duración estimada: 5-6 h de teoría. Práctica asociada: T2-practica-nginx.md (P2.1).
-  Las prácticas 2.2 (HTTPS), 2.3 (autenticación), 2.4 (proxy inverso) y 2.5 (balanceo) se citan en la
-  tabla del apartado 1; quedan pendientes de adaptar (parten de old.P1.2 a old.P1.5).
+- ORGANIZACIÓN POR BLOQUES (05/10/2026): teoría y prácticas intercaladas. Orden de apartados:
+  1 servidor web, 2 arquitectura, 3 HTTP | 4 virtual hosts, 5 Apache/Nginx, 6 Nginx por dentro, 7 FTP/SFTP
+  -> P2.1 | 8 HTTPS -> P2.2 | P2.3-2.5. El recuadro SNI pasó de virtual hosts a HTTPS (se explica tras TLS).
+  Las diapositivas siguen el mismo orden, con una diapositiva "Ahora toca" en cada práctica.
+- Prácticas 2.2 (HTTPS), 2.3 (autenticación), 2.4 (proxy inverso) y 2.5 (balanceo): pendientes de
+  adaptar (parten de old.P1.2 a old.P1.5). Cuando existan, enlazarlas en la tabla de bloques y en los
+  recuadros "Ahora toca".
+- Corregido 05/10/2026: la frase "un servicio es un programa que escucha en un puerto" no estaba en el
+  Tema 1 (ahora enlaza con el puerto 22 de SSH); los métodos de las API REST son GET, POST, PUT, PATCH y
+  DELETE; aclarado por qué HTTP/2 y HTTP/3 van cifrados; example.com no resolvía en la red del centro y
+  se sustituye por github.com en los ejemplos.
 -->
 
 # Tema 2 - Arquitectura web: implantación y administración de servidores web
@@ -31,9 +39,22 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
     - Qué es exactamente un servidor web y qué lugar ocupa en la arquitectura de una aplicación.
     - Cómo es por dentro una conversación HTTP: peticiones, respuestas, códigos de estado, cabeceras y tipos MIME.
     - Cómo un solo servidor puede alojar muchas webs distintas (*virtual hosts*).
-    - Qué añade HTTPS y cómo funciona TLS, conectándolo con lo que ya sabes de SSH.
     - En qué se diferencian Apache y Nginx, y cómo está organizado Nginx en Debian.
     - Cómo se suben ficheros a un servidor: FTP, FTPS y SFTP.
+    - Qué añade HTTPS y cómo funciona TLS, conectándolo con lo que ya sabes de SSH.
+
+## Cómo se organiza este tema
+
+La teoría y las prácticas van intercaladas, en cuatro bloques. Cada bloque termina con unas cuestiones de repaso y un recuadro **Ahora toca** que indica la práctica que se hace en ese momento.
+
+| Bloque | Teoría | Al terminar | Horas orientativas |
+|---|---|---|---|
+| 1. La web por dentro | Apartados 1, 2 y 3 | Actividad en clase con `curl` y el navegador | 2 h de teoría + 1 h de actividad |
+| 2. Montar un servidor web | Apartados 4, 5, 6 y 7 | [Práctica 2.1](T2-practica-nginx.md): Nginx, sitios virtuales y SFTP | 2,5 h de teoría + 5 h de práctica |
+| 3. Cifrar | Apartado 8 | Práctica 2.2: HTTPS y redirección | 1,5 h de teoría + 3 h de práctica |
+| 4. Proteger y escalar | Repaso de los apartados 1 y 3.3 | Prácticas 2.3, 2.4 y 2.5 | 10 h de práctica |
+
+Las horas son una referencia para unas 25 h de tema: cada grupo lleva su ritmo.
 
 ---
 
@@ -44,7 +65,7 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
 - **La máquina**: el ordenador (físico o virtual) que aloja las webs. Tu máquina virtual Debian es una.
 - **El programa**: el software que se queda escuchando en un puerto de esa máquina, recibe peticiones HTTP y devuelve respuestas. Nginx y Apache son servidores web en este sentido.
 
-En este tema hablamos casi siempre del segundo. Y si recuerdas una idea del Tema 1 (*un servicio es un programa que escucha en un puerto*), ya tienes la mitad: un servidor web es un servicio que escucha normalmente en el **puerto 80** (HTTP) y en el **443** (HTTPS).
+En este tema hablamos casi siempre del segundo. En el Tema 1 viste que el servidor SSH es un programa que se queda escuchando en el **puerto 22**, esperando conexiones. Un servidor web es lo mismo con otro protocolo: escucha normalmente en el **puerto 80** (HTTP) y en el **443** (HTTPS).
 
 ![](img/funcionamiento-http.png)
 
@@ -88,7 +109,7 @@ Las combinaciones clásicas tienen nombre propio. **LAMP** es *Linux + Apache + 
 ### Qué pasa cuando escribes una URL
 
 1. **Resolución del nombre.** El navegador necesita la IP del servidor. Se la pregunta al DNS (Tema 4) o, como harás en la práctica, la encuentra en el fichero `hosts` de tu equipo.
-2. **Conexión.** Abre una conexión TCP con esa IP en el puerto 80 o 443. Si es HTTPS, además negocia el cifrado TLS (apartado 5).
+2. **Conexión.** Abre una conexión TCP con esa IP en el puerto 80 o 443. Si es HTTPS, además negocia el cifrado TLS (apartado 8).
 3. **Petición.** Envía una petición HTTP: qué recurso quiere, de qué sitio y con qué características.
 4. **Elección del sitio.** El servidor web mira a qué sitio va dirigida la petición (apartado 4) y busca el recurso.
 5. **Respuesta.** Devuelve un código de estado, unas cabeceras y, normalmente, el contenido.
@@ -136,7 +157,7 @@ Esta es una petición real a uno de los sitios que montarás en la práctica 2.1
     Windows trae `curl` de serie. En PowerShell escribe **`curl.exe`** (con la extensión: en algunas versiones de PowerShell, `curl` a secas es un alias de otro comando que no hace lo mismo):
 
     ```powershell
-    curl.exe -v http://example.com -o NUL
+    curl.exe -v http://github.com -o NUL
     ```
 
     También puedes verlo en el navegador: **F12 → pestaña Red (*Network*)**, recarga la página y pincha en cualquier petición.
@@ -155,7 +176,7 @@ El método indica qué quiere hacer el cliente con el recurso:
 | **DELETE** | Borrar el recurso |
 | **OPTIONS** | Preguntar qué métodos admite el servidor para esa URL |
 
-En un servidor web que solo sirve ficheros estáticos, en la práctica solo verás `GET` y `HEAD`. El resto cobra sentido cuando hay una aplicación detrás (las API REST que programas en otros módulos usan los cinco primeros).
+En un servidor web que solo sirve ficheros estáticos, en la práctica solo verás `GET` y `HEAD`. El resto cobra sentido cuando hay una aplicación detrás (las API REST que programas en otros módulos usan GET, POST, PUT, PATCH y DELETE).
 
 ### 3.3 Códigos de estado
 
@@ -232,6 +253,26 @@ El problema que resuelve HTTP/3 se llama **bloqueo de cabeza de línea** (*head-
 
 Hoy los navegadores y los grandes sitios usan sobre todo HTTP/2 y HTTP/3, y lo negocian solos. HTTP/1.1 sigue siendo el idioma común que todos entienden, y es el que verás con `curl` en tus prácticas.
 
+---
+
+## Cierre del bloque 1
+
+!!! question "Cuestión 1"
+    Explica la diferencia entre un error `4xx` y un error `5xx`. Pon un ejemplo de cada uno que podría darse en un servidor web.
+
+!!! question "Cuestión 2"
+    ¿Qué cabecera HTTP permite que varios sitios compartan servidor, y desde qué versión de HTTP es obligatoria?
+
+!!! example "Ahora toca: actividad en clase (1 h, sin entrega)"
+    Antes de instalar nada, mira HTTP en directo desde tu ordenador. En PowerShell:
+
+    1. `curl.exe -v http://github.com -o NUL`. Identifica la línea de petición, la cabecera `Host` y el código de estado. ¿Por qué responde `301` y adónde te manda la cabecera `Location`?
+    2. `curl.exe -I https://github.com`. ¿Qué código devuelve ahora? ¿Qué dicen `Content-Type` y `Server`?
+    3. `curl.exe -I https://github.com/noexiste-xyz-123`. ¿Qué código devuelve, y de quién es el error, del cliente o del servidor?
+    4. En el navegador, abre <https://www.wikipedia.org>, pulsa **F12 → Red** y recarga. ¿Cuántas peticiones ha hecho para una sola página? Busca un fichero `text/css` y una imagen. Vuelve a recargar: ¿aparece algún `304`?
+
+---
+
 ## 4. Virtual hosts: muchas webs en un solo servidor
 
 Tu máquina virtual tiene **una** IP, `192.168.56.10`. Y en la práctica 2.1 vas a alojar en ella **dos** webs distintas. ¿Cómo sabe Nginx cuál tiene que devolver?
@@ -260,73 +301,7 @@ Hay tres formas de distinguir sitios virtuales:
 !!! info "¿Y si la petición no coincide con ningún sitio?"
     Si alguien accede por la IP, o con un nombre que no has configurado, el servidor responde con su **sitio por defecto** (*default server*). En Debian es la página "Welcome to nginx!", que verás al instalarlo.
 
-!!! info "Virtual hosts con HTTPS: SNI"
-    Con HTTPS hay un problema: el servidor tiene que presentar el certificado del sitio **antes** de recibir la petición HTTP y, por tanto, antes de ver la cabecera `Host`. Se resuelve con **SNI** (*Server Name Indication*): el cliente anuncia el nombre del sitio en el primer mensaje del saludo TLS, y así el servidor sabe qué certificado enviar.
-
-## 5. HTTPS: HTTP sobre TLS
-
-HTTP viaja en **texto plano**. Cualquiera que esté en el camino (la wifi del aula, el router de una cafetería, un proveedor de Internet) puede leer las peticiones, las respuestas, las contraseñas de los formularios y las cookies, y puede incluso **modificarlas**.
-
-**HTTPS** es exactamente el mismo HTTP, pero dentro de un canal cifrado con **TLS** (*Transport Layer Security*, heredero de SSL). Escucha por defecto en el **puerto 443** y aporta tres garantías:
-
-- **Confidencialidad**: nadie en el camino puede leer el contenido.
-- **Integridad**: nadie puede modificarlo sin que se detecte.
-- **Autenticación**: estás hablando con el servidor auténtico de ese dominio, no con un impostor.
-
-Hoy HTTPS es la norma: los navegadores marcan como **"No es seguro"** cualquier web servida por HTTP, y HTTP/2 y HTTP/3 solo se usan con cifrado en la práctica.
-
-### Lo que ya sabes de SSH te sirve aquí
-
-TLS resuelve el mismo problema que SSH en el Tema 1, y lo resuelve **con las mismas tres herramientas**:
-
-| | En SSH | En TLS (HTTPS) |
-|---|---|---|
-| Acordar la clave de sesión | Diffie-Hellman | Diffie-Hellman efímero |
-| Demostrar quién es el servidor | Firma con la clave de host | Firma con la clave privada del **certificado** |
-| Cifrar los datos | Cifrado simétrico | Cifrado simétrico |
-
-### Cómo es el saludo TLS 1.3
-
-TLS 1.3 (2018) es la versión actual. Su saludo inicial (*handshake*) necesita **un solo viaje de ida y vuelta**:
-
-```
- Cliente                                              Servidor
-    │                                                     │
-    │── ClientHello ─────────────────────────────────────►│  versiones y algoritmos que admite,
-    │     + valor público Diffie-Hellman                  │  y el nombre del sitio (SNI)
-    │                                                     │
-    │◄──────────────────────────────────── ServerHello ───│  algoritmos elegidos
-    │                 + valor público Diffie-Hellman      │  ── desde aquí, todo va cifrado ──
-    │                 + certificado                       │
-    │                 + firma del intercambio             │  firmado con la clave privada
-    │                 + Finished                          │  del certificado
-    │                                                     │
-    │── Finished ────────────────────────────────────────►│
-    │                                                     │
-    │◄═══════════ HTTP cifrado con clave simétrica ══════►│
-```
-
-1. Con los dos valores públicos, cliente y servidor calculan por su cuenta **el mismo secreto**, del que derivan las claves simétricas de la sesión. Igual que en SSH, la clave **nunca viaja** por la red.
-2. El servidor **firma** el intercambio con la clave privada de su certificado. El cliente comprueba la firma con la clave pública que viene en el certificado: así sabe que el servidor posee esa clave privada.
-3. A partir de ahí, todo el tráfico HTTP va cifrado con cifrado simétrico, que es el rápido.
-
-!!! warning "Una explicación que leerás a menudo y ya no es cierta"
-    Muchos apuntes y diagramas dicen que "el cliente genera una clave simétrica, la cifra con la clave pública del servidor y se la envía". Así funcionaba el intercambio **RSA** de versiones antiguas, y **TLS 1.3 lo eliminó**. El motivo: si algún día alguien robaba la clave privada del servidor, podía descifrar **todo el tráfico grabado en el pasado**. Con Diffie-Hellman efímero, cada sesión usa secretos nuevos que se destruyen al acabar, y robar la clave del servidor no sirve para descifrar sesiones antiguas. A esa propiedad se la llama **secreto hacia adelante** (*forward secrecy*), y en TLS 1.3 es obligatoria.
-
-### Certificados: la diferencia con SSH
-
-En SSH, la primera vez que te conectas **tú** compruebas la huella del servidor y la guardas en `known_hosts`. En la web eso es impensable: nadie va a comprobar a mano la huella de cada sitio que visita.
-
-La solución son los **certificados digitales**. Un certificado es un documento que dice "*esta clave pública pertenece al dominio `ejemplo.com`*", y que va **firmado por una Autoridad de Certificación** (CA). Tu navegador y tu sistema operativo traen de fábrica una lista de CA en las que confían. Si el certificado de un sitio está firmado por una de ellas (directamente o a través de una cadena de certificados intermedios), el navegador lo acepta y muestra el candado.
-
-| Tipo de certificado | Quién lo firma | Qué hace el navegador | Uso |
-|---|---|---|---|
-| **De una CA reconocida** | Una CA de la lista del navegador (por ejemplo, **Let's Encrypt**, que los emite gratis y de forma automática) | Lo acepta sin avisos | Cualquier web pública |
-| **Autofirmado** | El propio servidor | Muestra un aviso de seguridad a pantalla completa | Laboratorios y redes internas |
-
-Un certificado autofirmado cifra **exactamente igual de bien** que uno de una CA. Lo que no puede es demostrar tu identidad a un desconocido, porque nadie de confianza respalda que esa clave sea tuya. Para obtener uno de Let's Encrypt hace falta un dominio real, accesible desde Internet, así que en la práctica 2.2 usarás uno autofirmado.
-
-## 6. Servidores web: Apache, Nginx y compañía
+## 5. Servidores web: Apache, Nginx y compañía
 
 ### Quién sirve la web hoy
 
@@ -361,7 +336,7 @@ Otros servidores que conviene conocer: **Caddy** (obtiene y renueva certificados
 
 En este módulo usaremos **Nginx**: es el servidor web más usado, es ligero, su configuración es clara y es la pieza que vas a encontrarte delante de casi cualquier aplicación, haciendo de proxy inverso.
 
-## 7. Nginx por dentro
+## 6. Nginx por dentro
 
 ### Procesos
 
@@ -523,7 +498,7 @@ Si falta cualquiera de los dos, Nginx responde **`403 Forbidden`** y deja en el 
 
 Muchos tutoriales hacen que `www-data` sea el **propietario** de los ficheros de la web. No es buena idea: el servidor solo necesita **leer**, y si alguien consiguiera aprovechar un fallo en la aplicación, con permiso de escritura podría modificar tu web. El dueño debe ser tu usuario (o un usuario de despliegue); `www-data` se queda con permiso de lectura. Es el **principio de mínimo privilegio**.
 
-## 8. Subir ficheros al servidor: FTP, FTPS y SFTP
+## 7. Subir ficheros al servidor: FTP, FTPS y SFTP
 
 Para poner una web en un servidor, primero hay que hacer llegar los ficheros hasta él. Durante décadas, la forma estándar ha sido **FTP**.
 
@@ -545,6 +520,113 @@ Clientes habituales: **FileZilla** y **WinSCP** (gráficos), y los comandos **`s
 
 ---
 
+## Cierre del bloque 2
+
+!!! question "Cuestión 3"
+    Un mismo servidor, con una sola IP, aloja `tienda.com` y `blog.com`. ¿Cómo sabe qué web tiene que devolver en cada petición? ¿Qué ocurriría con un navegador que solo hablara HTTP/1.0?
+
+!!! question "Cuestión 4"
+    ¿Por qué los procesos trabajadores de Nginx se ejecutan como `www-data` y no como `root`? ¿Y por qué no conviene que `www-data` sea el propietario de los ficheros de la web?
+
+!!! example "Ahora toca: Práctica 2.1 - Servidor web Nginx (unas 5 h)"
+    **[Ir a la práctica 2.1](T2-practica-nginx.md).** Instalarás Nginx en tu máquina virtual, montarás dos sitios virtuales con tu apellido (uno clonado de Git y otro subido por SFTP) y diagnosticarás errores con los registros. Usa los apartados 4, 6 y 7.
+
+---
+
+## 8. HTTPS: HTTP sobre TLS
+
+HTTP viaja en **texto plano**. Cualquiera que esté en el camino (la wifi del aula, el router de una cafetería, un proveedor de Internet) puede leer las peticiones, las respuestas, las contraseñas de los formularios y las cookies, y puede incluso **modificarlas**.
+
+**HTTPS** es exactamente el mismo HTTP, pero dentro de un canal cifrado con **TLS** (*Transport Layer Security*, heredero de SSL). Escucha por defecto en el **puerto 443** y aporta tres garantías:
+
+- **Confidencialidad**: nadie en el camino puede leer el contenido.
+- **Integridad**: nadie puede modificarlo sin que se detecte.
+- **Autenticación**: estás hablando con el servidor auténtico de ese dominio, no con un impostor.
+
+Hoy HTTPS es la norma: los navegadores marcan como **"No es seguro"** cualquier web servida por HTTP. Además, las versiones modernas de HTTP lo exigen. El estándar de HTTP/2 permite usarlo sin cifrar, pero ningún navegador lo implementa así: solo hablan HTTP/2 por HTTPS. Y HTTP/3 va siempre cifrado, porque QUIC lleva TLS 1.3 incorporado.
+
+### Lo que ya sabes de SSH te sirve aquí
+
+TLS resuelve el mismo problema que SSH en el Tema 1, y lo resuelve **con las mismas tres herramientas**:
+
+| | En SSH | En TLS (HTTPS) |
+|---|---|---|
+| Acordar la clave de sesión | Diffie-Hellman | Diffie-Hellman efímero |
+| Demostrar quién es el servidor | Firma con la clave de host | Firma con la clave privada del **certificado** |
+| Cifrar los datos | Cifrado simétrico | Cifrado simétrico |
+
+### Cómo es el saludo TLS 1.3
+
+TLS 1.3 (2018) es la versión actual. Su saludo inicial (*handshake*) necesita **un solo viaje de ida y vuelta**:
+
+```
+ Cliente                                              Servidor
+    │                                                     │
+    │── ClientHello ─────────────────────────────────────►│  versiones y algoritmos que admite,
+    │     + valor público Diffie-Hellman                  │  y el nombre del sitio (SNI)
+    │                                                     │
+    │◄──────────────────────────────────── ServerHello ───│  algoritmos elegidos
+    │                 + valor público Diffie-Hellman      │  ── desde aquí, todo va cifrado ──
+    │                 + certificado                       │
+    │                 + firma del intercambio             │  firmado con la clave privada
+    │                 + Finished                          │  del certificado
+    │                                                     │
+    │── Finished ────────────────────────────────────────►│
+    │                                                     │
+    │◄═══════════ HTTP cifrado con clave simétrica ══════►│
+```
+
+1. Con los dos valores públicos, cliente y servidor calculan por su cuenta **el mismo secreto**, del que derivan las claves simétricas de la sesión. Igual que en SSH, la clave **nunca viaja** por la red.
+2. El servidor **firma** el intercambio con la clave privada de su certificado. El cliente comprueba la firma con la clave pública que viene en el certificado: así sabe que el servidor posee esa clave privada.
+3. A partir de ahí, todo el tráfico HTTP va cifrado con cifrado simétrico, que es el rápido.
+
+!!! warning "Una explicación que leerás a menudo y ya no es cierta"
+    Muchos apuntes y diagramas dicen que "el cliente genera una clave simétrica, la cifra con la clave pública del servidor y se la envía". Así funcionaba el intercambio **RSA** de versiones antiguas, y **TLS 1.3 lo eliminó**. El motivo: si algún día alguien robaba la clave privada del servidor, podía descifrar **todo el tráfico grabado en el pasado**. Con Diffie-Hellman efímero, cada sesión usa secretos nuevos que se destruyen al acabar, y robar la clave del servidor no sirve para descifrar sesiones antiguas. A esa propiedad se la llama **secreto hacia adelante** (*forward secrecy*), y en TLS 1.3 es obligatoria.
+
+### Certificados: la diferencia con SSH
+
+En SSH, la primera vez que te conectas **tú** compruebas la huella del servidor y la guardas en `known_hosts`. En la web eso es impensable: nadie va a comprobar a mano la huella de cada sitio que visita.
+
+La solución son los **certificados digitales**. Un certificado es un documento que dice "*esta clave pública pertenece al dominio `ejemplo.com`*", y que va **firmado por una Autoridad de Certificación** (CA). Tu navegador y tu sistema operativo traen de fábrica una lista de CA en las que confían. Si el certificado de un sitio está firmado por una de ellas (directamente o a través de una cadena de certificados intermedios), el navegador lo acepta y muestra el candado.
+
+| Tipo de certificado | Quién lo firma | Qué hace el navegador | Uso |
+|---|---|---|---|
+| **De una CA reconocida** | Una CA de la lista del navegador (por ejemplo, **Let's Encrypt**, que los emite gratis y de forma automática) | Lo acepta sin avisos | Cualquier web pública |
+| **Autofirmado** | El propio servidor | Muestra un aviso de seguridad a pantalla completa | Laboratorios y redes internas |
+
+Un certificado autofirmado cifra **exactamente igual de bien** que uno de una CA. Lo que no puede es demostrar tu identidad a un desconocido, porque nadie de confianza respalda que esa clave sea tuya. Para obtener uno de Let's Encrypt hace falta un dominio real, accesible desde Internet, así que en la práctica 2.2 usarás uno autofirmado.
+
+!!! info "Virtual hosts con HTTPS: SNI"
+    Con HTTPS hay un problema: el servidor tiene que presentar el certificado del sitio **antes** de recibir la petición HTTP y, por tanto, antes de ver la cabecera `Host`. Se resuelve con **SNI** (*Server Name Indication*): el cliente anuncia el nombre del sitio en el primer mensaje del saludo TLS, y así el servidor sabe qué certificado enviar.
+
+---
+
+## Cierre del bloque 3
+
+!!! question "Cuestión 5"
+    Compara cómo comprueba tu cliente la identidad del servidor en SSH y en HTTPS. ¿Por qué en la web no se usa el sistema de SSH?
+
+!!! question "Cuestión 6"
+    Un compañero dice: "En HTTPS, el navegador cifra la clave de sesión con la clave pública del servidor y se la envía". ¿Qué hay de cierto y qué no? ¿Qué problema tenía ese método?
+
+!!! example "Ahora toca: Práctica 2.2 - HTTPS en Nginx (unas 3 h)"
+    Generarás un certificado autofirmado, pondrás tus dos sitios en HTTPS y redirigirás automáticamente las peticiones HTTP a HTTPS. La práctica se publicará en esta web antes de que termines la 2.1.
+
+---
+
+## Bloque 4: proteger y escalar
+
+Este bloque es práctico. Usa lo que ya sabes de los códigos de estado (apartado 3.3) y de las funciones de un servidor web además de servir ficheros (apartado 1).
+
+!!! example "Ahora toca: prácticas 2.3, 2.4 y 2.5 (unas 10 h en total)"
+    - **Práctica 2.3, autenticación:** pedir usuario y contraseña para una zona de la web (código `401`) y limitar el acceso por IP.
+    - **Práctica 2.4, proxy inverso:** un Nginx delante que reenvía las peticiones a otro servidor (código `502` si el de detrás no responde).
+    - **Práctica 2.5, balanceo de carga:** repartir las peticiones entre varios servidores y comprobar qué pasa cuando uno se cae.
+
+    Se publicarán en esta web a medida que avance el tema.
+
+---
+
 ??? info "Para saber más: más allá de tu propio servidor"
     **CDN (*Content Delivery Network*).** Una red de servidores repartidos por todo el mundo que guardan copias del contenido de una web. El usuario recibe el contenido del nodo más cercano, lo que reduce la latencia: la luz tarda unos 50 ms solo en recorrer la fibra entre Europa y la costa oeste de Estados Unidos, y una página hace decenas de peticiones. Cloudflare, Akamai o Fastly son CDN. Además de acercar el contenido, absorben ataques de denegación de servicio y terminan las conexiones TLS cerca del usuario.
 
@@ -553,23 +635,6 @@ Clientes habituales: **FileZilla** y **WinSCP** (gráficos), y los comandos **`s
     **Edge computing.** Un paso más allá: ejecutar código en los propios nodos de la CDN (Cloudflare Workers, Vercel Edge Functions…), para generar respuestas personalizadas sin llegar al servidor de origen.
 
     Todo esto funciona muy bien… y es una caja negra si no sabes qué hace un servidor web por dentro. Por eso empezamos por Nginx.
-
-## Para repasar
-
-!!! question "Cuestión 1"
-    Explica la diferencia entre un error `4xx` y un error `5xx`. Pon un ejemplo de cada uno que podría darse en tu servidor Nginx.
-
-!!! question "Cuestión 2"
-    Un mismo servidor, con una sola IP, aloja `tienda.com` y `blog.com`. ¿Cómo sabe qué web tiene que devolver en cada petición? ¿Qué ocurriría con un navegador que solo hablara HTTP/1.0?
-
-!!! question "Cuestión 3"
-    Compara cómo comprueba tu cliente la identidad del servidor en SSH y en HTTPS. ¿Por qué en la web no se usa el sistema de SSH?
-
-!!! question "Cuestión 4"
-    Un compañero dice: "En HTTPS, el navegador cifra la clave de sesión con la clave pública del servidor y se la envía". ¿Qué hay de cierto y qué no? ¿Qué problema tenía ese método?
-
-!!! question "Cuestión 5"
-    ¿Por qué los procesos trabajadores de Nginx se ejecutan como `www-data` y no como `root`? ¿Y por qué no conviene que `www-data` sea el propietario de los ficheros de la web?
 
 ## Referencias
 
