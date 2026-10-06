@@ -39,8 +39,12 @@ VALIDADA DE PRINCIPIO A FIN el 04/10/2026 en una VM importada de DAW-debian.ova
     Corregido también en la P1.1 (paso 3 y recuadro de la máquina de respaldo).
   - Justo tras un reload, una petición inmediata puede llegar aún a los workers viejos (milisegundos).
 
-PENDIENTE: capturas de FileZilla (Gestor de sitios con "Archivo de claves" y la transferencia). El texto
-  describe los menús de FileZilla 3.x en español; conviene revisarlos con la versión del aula.
+REVISADA POR EL PROFESOR el 06/10/2026 en su VM DAW-debian (capturas reales de navegador, hosts y FileZilla 3.71.1).
+  Correcciones de esa revisión: "sudo nginx -v" (/usr/sbin no está en el PATH del usuario), aviso de las dos
+  terminales (curl.exe lanzado en la sesión SSH), FileZilla lee claves OpenSSH sin convertir a .ppk pero hay
+  que poner el filtro en "All files", "Do not save passwords", "Always trust this host".
+  FileZilla sale en el idioma de Windows: la guía da los nombres en español con el inglés entre paréntesis.
+  Los nombres en español NO se han visto (Windows del profesor en inglés): revisarlos con un equipo en español.
 AULA: editar el hosts de Windows exige ser administrador. Si en los PC del aula no lo son, que lo hagan en
   su portátil, o que usen curl.exe -H "Host: ..." / --resolve (apartado 3.4), que no necesita permisos.
 -->
@@ -98,24 +102,52 @@ Nginx arranca solo al instalarse y queda habilitado para arrancar con la máquin
 systemctl status nginx
 ```
 
-Debe aparecer `active (running)` y, en la línea `Loaded`, `enabled`. Sal de la vista con **q**.
+!!! tip "Para salir, pulsa **q**"
+    Cuando la salida no cabe en la pantalla, `systemctl` la muestra en un visor que se queda esperando (abajo verás `lines 1-15/15 (END)`). Puedes moverte con las flechas y salir con la tecla **q**. Si prefieres que no se quede esperando, añade `--no-pager`: `systemctl status nginx --no-pager`.
+
+```
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-10-06 11:36:16 CEST; 17s ago
+ Invocation: 2c8e0c8516ad428e93334fab6c2848cb
+       Docs: man:nginx(8)
+    Process: 1257 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; ...
+    Process: 1263 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, ...
+   Main PID: 1310 (nginx)
+      Tasks: 3 (limit: 2317)
+     Memory: 3M (peak: 6.6M)
+        CPU: 51ms
+     CGroup: /system.slice/nginx.service
+             ├─1310 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"
+             ├─1313 "nginx: worker process"
+             └─1314 "nginx: worker process"
+```
+
+Debe aparecer `active (running)` y, en la línea `Loaded`, `enabled`. Fíjate también en los procesos: un proceso **maestro**, que lee la configuración, y los **trabajadores** (*worker*), que atienden las peticiones; es lo que viste en el apartado 6 de la teoría.
 
 Comprueba también que escucha en el puerto 80, y la versión instalada:
 
 ```sh
 sudo ss -tlnp | grep nginx
-nginx -v
+sudo nginx -v
 ```
 
 ```
-LISTEN 0      511          0.0.0.0:80        0.0.0.0:*    users:(("nginx",pid=1911,fd=5),("nginx",pid=1908,fd=5),("nginx",pid=1087,fd=5))
-LISTEN 0      511             [::]:80           [::]:*    users:(("nginx",pid=1911,fd=6),("nginx",pid=1908,fd=6),("nginx",pid=1087,fd=6))
+LISTEN 0      511          0.0.0.0:80        0.0.0.0:*    users:(("nginx",pid=1314,fd=5),("nginx",pid=1313,fd=5),("nginx",pid=1310,fd=5))
+LISTEN 0      511             [::]:80           [::]:*    users:(("nginx",pid=1314,fd=6),("nginx",pid=1313,fd=6),("nginx",pid=1310,fd=6))
 nginx version: nginx/1.26.3
 ```
+
+Los tres `pid` son los mismos procesos que viste en `systemctl status`: el maestro y los dos trabajadores.
+
+!!! info "¿Por qué `sudo nginx -v`?"
+    Sin `sudo`, obtendrás `-bash: nginx: command not found`, aunque Nginx esté instalado. El programa está en `/usr/sbin`, la carpeta de los comandos de administración, y en Debian esa carpeta solo está en el `PATH` de `root`. Con `sudo` se encuentra. También funcionaría escribir la ruta completa: `/usr/sbin/nginx -v`.
 
 Por último, abre el navegador de **tu ordenador** y entra en `http://192.168.56.10`. Verás la página de bienvenida de Nginx:
 
 ![](img/T2-nginx-default.png)
+
+El aviso **No seguro** (*Not secure*) de la barra de direcciones es normal: la página viaja por HTTP, sin cifrar. Lo resolverás en la práctica 2.2, con HTTPS.
 
 !!! question "Comprueba antes de seguir"
     Si el navegador no carga la página, revisa en este orden: que la máquina esté encendida, que respondas al `ping 192.168.56.10` desde PowerShell y que `systemctl status nginx` diga `active`. Es el mismo orden que seguirás siempre que algo no cargue: **¿está la máquina?, ¿está el servicio?, ¿escucha en el puerto?**
@@ -130,14 +162,18 @@ ls -l /etc/nginx/sites-available/ /etc/nginx/sites-enabled/
 ```
 
 ```
+conf.d        fastcgi_params  koi-win            modules-available  nginx.conf    scgi_params      sites-enabled  uwsgi_params
+fastcgi.conf  koi-utf         mime.types         modules-enabled    proxy_params  sites-available  snippets       win-utf
 /etc/nginx/sites-available/:
+total 4
 -rw-r--r-- 1 root root 2412 Jun 27 22:25 default
 
 /etc/nginx/sites-enabled/:
-lrwxrwxrwx 1 root root   34 Oct  4 19:43 default -> /etc/nginx/sites-available/default
+total 0
+lrwxrwxrwx 1 root root 34 Oct  6 11:36 default -> /etc/nginx/sites-available/default
 ```
 
-En `sites-available` está el fichero `default`, que es el sitio que acabas de ver en el navegador. En `sites-enabled` hay un **enlace simbólico** que apunta a él (la `l` del principio y la flecha `->`): por eso está activo.
+Ahí están el fichero principal, `nginx.conf`, y las carpetas que viste en la teoría. En `sites-available` está el fichero `default`, que es el sitio que acabas de ver en el navegador. En `sites-enabled` hay un **enlace simbólico** que apunta a él (la `l` del principio y la flecha `->`): por eso está activo.
 
 Mira cómo es ese sitio, sin los comentarios:
 
@@ -173,7 +209,9 @@ sudo mkdir -p /var/www/web1.garcia.test
 sudo chown -R $USER:$USER /var/www/web1.garcia.test
 ```
 
-`$USER` es una variable que contiene tu nombre de usuario, así que no tienes que escribirlo.
+La opción `-p` (de *parents*) crea también las carpetas intermedias que falten y no da error si la carpeta ya existe, así que puedes repetir el comando sin miedo.
+
+`chown` cambia el propietario. Se escribe `usuario:grupo`, y `$USER` es una variable que contiene tu nombre de usuario, así que no tienes que escribirlo (en Debian, cada usuario tiene además un grupo propio con su mismo nombre). La opción `-R` (recursivo) lo aplica también a todo lo que haya dentro de la carpeta.
 
 Ahora clona dentro, en la subcarpeta `html`, una web de ejemplo. Como la carpeta es tuya, **no necesitas `sudo`**:
 
@@ -188,7 +226,48 @@ chmod -R u=rwX,go=rX /var/www/web1.garcia.test
 ls -la /var/www/web1.garcia.test/html
 ```
 
+```
+total 64
+drwxr-xr-x 6 alumno alumno  4096 Oct  6 11:51 .
+drwxr-xr-x 3 alumno alumno  4096 Oct  6 11:51 ..
+drwxr-xr-x 6 alumno alumno  4096 Oct  6 11:51 assets
+drwxr-xr-x 2 alumno alumno  4096 Oct  6 11:51 error
+drwxr-xr-x 8 alumno alumno  4096 Oct  6 11:51 .git
+drwxr-xr-x 2 alumno alumno  4096 Oct  6 11:51 images
+-rw-r--r-- 1 alumno alumno 14522 Oct  6 11:51 index.html
+-rw-r--r-- 1 alumno alumno 17128 Oct  6 11:51 LICENSE.MD
+-rw-r--r-- 1 alumno alumno   648 Oct  6 11:51 README.MD
+```
+
+Todo es de tu usuario (en el ejemplo, `alumno`), y ahí está el `index.html` que servirá Nginx. Fíjate también en la carpeta `.git`: volverás a ella en el apartado 5.
+
 Ese `chmod` significa: el propietario (`u`) puede leer y escribir; el grupo y el resto (`go`), solo leer. La `X` **mayúscula** da permiso de ejecución **solo a las carpetas**, que lo necesitan para poder entrar en ellas. El resultado son carpetas con `755` (`drwxr-xr-x`) y ficheros con `644` (`-rw-r--r--`).
+
+!!! info "Cómo se leen los permisos: `drwxr-xr-x` y `755`"
+    `drwxr-xr-x` es la forma en que `ls -l` muestra los permisos de una **carpeta**. Se lee por trozos:
+
+    | Trozo | A quién afecta | Significa |
+    |---|---|---|
+    | `d` | — | Es una carpeta (*directory*). Si fuera un fichero, saldría `-`; si fuera un enlace, `l` |
+    | `rwx` | El propietario (tú) | Puede leer, escribir y entrar |
+    | `r-x` | El grupo | Puede leer y entrar, pero no escribir |
+    | `r-x` | El resto (aquí, `www-data`) | Puede leer y entrar, pero no escribir |
+
+    Cada posición es siempre la misma letra: `r` leer, `w` escribir, `x` ejecutar (en una carpeta, **entrar** en ella). Un guion significa que **falta** ese permiso: en `r-x` falta la `w`.
+
+    En resumen, `drwxr-xr-x` dice: "es una carpeta; tú puedes hacer de todo y los demás pueden mirar dentro, pero no cambiar nada". Es justo lo que necesita Nginx, que lee la web pero no debe poder modificarla.
+
+    Los mismos permisos se escriben también con **tres cifras**, una por grupo. Cada permiso vale un número y se suman: **`r` = 4, `w` = 2, `x` = 1**.
+
+    | Letras | Suma | Cifra |
+    |---|---|---|
+    | `rwx` | 4 + 2 + 1 | **7** |
+    | `rw-` | 4 + 2 | **6** |
+    | `r-x` | 4 + 1 | **5** |
+    | `r--` | 4 | **4** |
+    | `---` | 0 | **0** |
+
+    Así, `rwxr-xr-x` es **755** (tú lo haces todo; los demás leen y entran) y `rw-r--r--` es **644** (tú lees y escribes; los demás solo leen). En el apartado 7 usarás `chmod 700`: `rwx------`, solo tú.
 
 !!! warning "¿Por qué no `www-data` como propietario?"
     Muchos tutoriales, y la versión anterior de esta práctica, hacen `chown www-data:www-data` sobre la web. **No lo hagas.** Nginx se ejecuta como `www-data` y solo necesita **leer** los ficheros. Si `www-data` fuera el dueño, también podría modificarlos, y un fallo en el servidor permitiría a un atacante cambiar tu web. El dueño eres tú; `www-data` lee gracias a los permisos del "resto" (`r-x` en las carpetas y `r--` en los ficheros). Es el principio de **mínimo privilegio**.
@@ -201,7 +280,7 @@ Crea el fichero del sitio en `sites-available`. Es costumbre llamarlo igual que 
 sudo nano /etc/nginx/sites-available/web1.garcia.test
 ```
 
-Con este contenido (cambia `garcia` en las cuatro líneas en las que aparece):
+Con este contenido (cambia `garcia` en las dos líneas en las que aparece, `server_name` y `root`):
 
 ```nginx
 server {
@@ -221,6 +300,8 @@ server {
     }
 }
 ```
+
+Guarda y sal de `nano` con **Ctrl+O**, **Enter** y **Ctrl+X**, como en la práctica 1.1.
 
 | Directiva | Qué hace |
 |---|---|
@@ -267,13 +348,26 @@ nginx: configuration file /etc/nginx/nginx.conf test is successful
 
 Tu ordenador todavía no sabe que `web1.garcia.test` es `192.168.56.10`. Pero recuerda cómo elige Nginx el sitio: por la cabecera `Host`. Puedes enviarla tú a mano con `curl`. Desde **PowerShell, en tu ordenador**:
 
+!!! warning "Dos terminales: la de la Debian y la de tu ordenador"
+    Desde aquí vas a alternar entre dos ventanas. Mira siempre el *prompt* antes de escribir:
+
+    - `alumno@debian-garcia:~$` es tu **sesión SSH**: los comandos se ejecutan en la Debian.
+    - `PS C:\Users\...>` es **PowerShell en tu ordenador**: los comandos se ejecutan en Windows.
+
+    Deja abierta la sesión SSH y abre **otra** ventana de PowerShell para los comandos de tu ordenador. Si escribes `curl.exe` en la sesión SSH, obtendrás `-bash: curl.exe: command not found`, porque `curl.exe` y `Select-String` solo existen en Windows.
+
 ```powershell
 curl.exe -s http://192.168.56.10/ | Select-String "<title>"
 curl.exe -s -H "Host: web1.garcia.test" http://192.168.56.10/ | Select-String "<title>"
 ```
 
 ```
+PS C:\Users\alumno> curl.exe -s http://192.168.56.10/ | Select-String "<title>"
+
 <title>Welcome to nginx!</title>
+
+PS C:\Users\alumno> curl.exe -s -H "Host: web1.garcia.test" http://192.168.56.10/ | Select-String "<title>"
+
 		<title>Welcome</title>
 ```
 
@@ -294,11 +388,17 @@ Para usar el navegador hace falta que tu ordenador traduzca el nombre a la IP. D
     notepad C:\Windows\System32\drivers\etc\hosts
     ```
 
-    Al final del fichero, añade una línea con tus dos nombres:
+    Al final del fichero, en una línea nueva, añade tus dos nombres:
 
     ```
     192.168.56.10    web1.garcia.test    web2.garcia.test
     ```
+
+    Las líneas que empiezan por `#` son comentarios y no hacen nada: la tuya **no** debe llevarlo. Si tienes Docker Desktop, verás un bloque que acaba en `# End of section`: pon tu línea **después**, porque Docker reescribe lo que hay dentro de su bloque.
+
+    ![](img/T2-hosts-windows.png)
+
+    Fíjate en el título de la terminal: **Administrator**.
 
     Guarda (**Ctrl+S**) y cierra el Bloc de notas. Si al guardar te dice que no tienes permiso, es que no lo abriste desde una terminal de administrador.
 
@@ -316,7 +416,7 @@ Para usar el navegador hace falta que tu ordenador traduzca el nombre a la IP. D
 
 Ya puedes añadir el segundo nombre aunque todavía no exista el sitio: lo crearás en el apartado 6.
 
-Comprueba que el nombre se resuelve:
+Comprueba que **tu ordenador** resuelve el nombre. Desde PowerShell (cualquier ventana, no hace falta que sea de administrador):
 
 ```powershell
 ping web1.garcia.test
@@ -367,7 +467,7 @@ curl.exe http://web1.garcia.test/.git/config
 
 **Tu servidor está regalando el repositorio.** Con herramientas automáticas, cualquiera puede descargar la carpeta `.git` entera y reconstruir todo el código fuente, incluidas las versiones antiguas. Si alguna vez se subió al repositorio una contraseña o una clave, aunque luego se borrara, sigue en la historia. No es un caso de laboratorio: es uno de los fallos más frecuentes en webs reales, y los robots que rastrean Internet lo buscan a diario.
 
-Ciérralo. Edita la configuración del sitio:
+Ciérralo. Vuelve a tu **sesión SSH** y edita la configuración del sitio:
 
 ```sh
 sudo nano /etc/nginx/sites-available/web1.garcia.test
@@ -387,7 +487,18 @@ Y añade este bloque **dentro** del bloque `server`, después del `location /`:
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-Vuelve a probar con `curl.exe` y en el navegador. Ahora el servidor responde **`403 Forbidden`**:
+Vuelve a probar **desde tu ordenador**, con `curl.exe` en PowerShell y en el navegador. Ahora el servidor responde **`403 Forbidden`**:
+
+```
+PS C:\Users\alumno> curl.exe http://web1.garcia.test/.git/config
+<html>
+<head><title>403 Forbidden</title></head>
+<body>
+<center><h1>403 Forbidden</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>
+```
 
 ![](img/T2-git-403.png)
 
@@ -407,37 +518,44 @@ sudo chown -R $USER:$USER /var/www/web2.garcia.test
 
 ### 6.2 Descargar la web en tu ordenador
 
-Descarga en tu ordenador la plantilla **Phantom** de HTML5 UP desde [https://html5up.net/phantom](https://html5up.net/phantom) (botón **Download**). Obtendrás el fichero `html5up-phantom.zip`, que quedará en tu carpeta **Descargas**. No lo descomprimas: subirás el `.zip` y lo descomprimirás en el servidor.
+Descarga en tu ordenador la plantilla **Phantom** de HTML5 UP desde [https://html5up.net/phantom](https://html5up.net/phantom), con el botón **Download** de arriba a la derecha:
+
+![](img/T2-phantom-download.png)
+
+Obtendrás el fichero `html5up-phantom.zip` (unos 1,5 MB), que quedará en tu carpeta **Descargas**. No lo descomprimas: subirás el `.zip` y lo descomprimirás en el servidor.
 
 ### 6.3 Subir el fichero
 
-=== "FileZilla"
+Tienes tres formas de hacerlo, y las tres usan SSH por debajo. **Elige una**:
 
-    Descarga el **cliente** de FileZilla desde [filezilla-project.org](https://filezilla-project.org/download.php?type=client).
+| Forma | Qué es | ¿Hay que instalar algo? |
+|---|---|---|
+| **`scp`** | Un solo comando que copia el fichero y termina. La más rápida | No |
+| **`sftp`** | Una sesión interactiva en modo texto: te mueves, listas, subes y bajas varios ficheros | No |
+| **FileZilla** | Un programa gráfico: arrastras los ficheros de una ventana a otra | Sí |
 
-    !!! warning "Cuidado con el instalador"
-        El botón de descarga principal ofrece un instalador que incluye programas patrocinados. Pulsa en **Show additional download options** y descarga el instalador normal, o fíjate bien en cada pantalla y rechaza las ofertas.
+`scp` y `sftp` vienen con el cliente OpenSSH de Windows, el mismo que te da el comando `ssh`, y usan tu clave igual que él.
 
-    En la práctica 1.1 desactivaste el acceso por contraseña, así que FileZilla tendrá que usar **tu clave privada**. Abre **Archivo → Gestor de sitios… → Nuevo sitio** y rellena:
+=== "scp (la más rápida)"
 
-    | Campo | Valor |
-    |---|---|
-    | **Protocolo** | `SFTP - SSH File Transfer Protocol` |
-    | **Servidor** | `192.168.56.10` |
-    | **Puerto** | `22` |
-    | **Modo de acceso** | `Archivo de claves` |
-    | **Usuario** | tu usuario de la Debian |
-    | **Archivo de claves** | `C:\Users\tuusuario\.ssh\id_ed25519` |
+    Desde PowerShell, colócate en tu carpeta de Descargas y copia el fichero al servidor:
 
-    Al elegir el archivo de claves, cambia el filtro del explorador a **Todos los archivos**, porque FileZilla busca por defecto ficheros `.ppk` (el formato de PuTTY). Te preguntará si quieres **convertir** la clave a ese formato: acepta y guarda la copia convertida junto a la original.
+    ```powershell
+    cd $env:USERPROFILE\Downloads
+    scp html5up-phantom.zip usuario@192.168.56.10:/var/www/web2.garcia.test/
+    ```
 
-    Pulsa **Conectar**. La primera vez, FileZilla te mostrará la **huella** del servidor y te preguntará si confías en él: es la misma comprobación que hiciste en la práctica 1.1 con `ssh`, y debe coincidir con aquella.
+    ```
+    html5up-phantom.zip                                   100% 1490KB  39.3MB/s   00:00
+    ```
 
-    Una vez conectado, verás tu ordenador a la izquierda y el servidor a la derecha. En el campo **Sitio remoto** de la derecha escribe `/var/www/web2.garcia.test` y pulsa Enter. A la izquierda, busca tu carpeta de Descargas y **arrastra** `html5up-phantom.zip` al panel derecho.
+    El destino se escribe `usuario@servidor:carpeta`: lo que va **detrás de los dos puntos** es la ruta **en el servidor**. Si el fichero ya existía, `scp` lo sobrescribe sin preguntar.
 
-=== "Línea de comandos (sftp)"
+    Para copiar en sentido contrario, del servidor a tu ordenador, se invierte el orden: `scp usuario@192.168.56.10:/ruta/fichero .` (el punto final es "la carpeta en la que estoy").
 
-    Desde PowerShell, colócate en tu carpeta de Descargas y abre una sesión SFTP. Usará tu clave, igual que `ssh`:
+=== "sftp"
+
+    Desde PowerShell, colócate en tu carpeta de Descargas y abre una sesión SFTP:
 
     ```powershell
     cd $env:USERPROFILE\Downloads
@@ -455,15 +573,63 @@ Descarga en tu ordenador la plantilla **Phantom** de HTML5 UP desde [https://htm
 
     `put` sube un fichero; `get` haría lo contrario, descargarlo.
 
-    !!! tip "En una sola línea: `scp`"
-        Para copiar un fichero suelto, `scp` es aún más directo:
+=== "FileZilla"
 
-        ```powershell
-        scp html5up-phantom.zip usuario@192.168.56.10:/var/www/web2.garcia.test/
-        ```
+    Descarga el **cliente** de FileZilla desde [filezilla-project.org](https://filezilla-project.org/download.php?type=client).
+
+    !!! warning "Cuidado con el instalador"
+        El botón verde **Download FileZilla Client** descarga un instalador que puede incluir programas patrocinados (*bundled offers*). **No lo uses.** Pulsa en **Show additional download options**, al final de la página:
+
+        ![](img/T2-filezilla-descarga.png)
+
+        Y descarga el que acaba en **`win64-setup.exe`**, el instalador limpio:
+
+        ![](img/T2-filezilla-descarga-opciones.png)
+
+        El `.zip` de debajo es la versión **portable**: se descomprime y se ejecuta sin instalar nada. Te sirve si en tu equipo no tienes permisos para instalar programas.
+
+    Instálalo con las opciones que vienen marcadas. FileZilla se muestra en el idioma de tu Windows: aquí tienes los nombres en español y, entre paréntesis, en inglés. Al abrirlo por primera vez aparece una ventana de bienvenida; ciérrala con **OK**.
+
+    En la práctica 1.1 desactivaste el acceso por contraseña, así que FileZilla tendrá que usar **tu clave privada**. Abre **Archivo → Gestor de sitios…** (*File → Site Manager…*), pulsa **Nuevo sitio** (*New site*) y escribe un nombre para la conexión. Es libre, pero lo más claro es usar el *hostname* de tu máquina (`debian-garcia`). Elige primero el **protocolo**: al cambiarlo a SFTP desaparece el campo **Cifrado** (*Encryption*), porque SFTP va siempre cifrado dentro de SSH. Después rellena el resto:
+
+    | Campo | Valor |
+    |---|---|
+    | **Protocolo** (*Protocol*) | `SFTP - SSH File Transfer Protocol` |
+    | **Servidor** (*Host*) | `192.168.56.10` |
+    | **Puerto** (*Port*) | `22` |
+    | **Modo de acceso** (*Logon Type*) | `Archivo de claves` (*Key file*) |
+    | **Usuario** (*User*) | tu usuario de la Debian |
+    | **Archivo de claves** (*Key file*) | `C:\Users\tuusuario\.ssh\id_ed25519` |
+
+    ![](img/T2-filezilla-sitio.png)
+
+    Elige el archivo de claves con **Examinar…** (*Browse…*). Es la clave **privada**, el fichero **sin** `.pub`. Al principio no la verás: el explorador solo muestra ficheros `.ppk`. Cambia el filtro, abajo a la derecha, a **Todos los archivos** (*All files*). Las versiones actuales de FileZilla leen directamente las claves de OpenSSH; si la tuya te pregunta si quieres **convertir** la clave al formato `.ppk` (el de PuTTY), acepta y guarda la copia junto a la original.
+
+    Pulsa **Conectar** (*Connect*). Si te pregunta si quieres que recuerde las contraseñas (*Remember passwords?*), elige **No guardar contraseñas** (*Do not save passwords*): entras con la clave, así que no hay contraseña que guardar.
+
+    ![](img/T2-filezilla-contrasenas.png)
+
+    La primera vez, FileZilla te mostrará la **huella** del servidor (*Fingerprint*) y te preguntará si confías en él:
+
+    ![](img/T2-filezilla-huella.png)
+
+    Es la misma comprobación que hiciste en la práctica 1.1 con `ssh`. **Antes de aceptar**, compárala con la huella real, desde tu sesión SSH:
+
+    ```sh
+    ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+    ```
+
+    Si la cadena `SHA256:…` coincide, marca **Confiar siempre en este servidor** (*Always trust this host, add this key to the cache*) y pulsa **Aceptar** (*OK*). Sin esa casilla, FileZilla te lo volverá a preguntar en cada conexión.
+
+    Una vez conectado, verás tu ordenador a la izquierda y el servidor a la derecha. Al conectar, la parte derecha muestra tu carpeta personal en el servidor (`/home/tuusuario`): hay que cambiar a la carpeta de la web. En el campo **Sitio remoto** (*Remote site*) de la derecha escribe `/var/www/web2.garcia.test` y pulsa Enter. En el campo **Sitio local** (*Local site*) de la izquierda escribe la ruta de tu carpeta de Descargas (`C:\Users\tuusuario\Downloads`) y pulsa Enter. Por último, **arrastra** `html5up-phantom.zip` de la lista de ficheros de la izquierda a la de la derecha.
+    Cuando termine, el panel de mensajes de arriba dirá `File transfer successful`, el fichero aparecerá a la derecha junto a la carpeta `html` y la pestaña **Transferencias satisfactorias** (*Successful transfers*) de abajo lo contará:
+
+    ![](img/T2-filezilla-transferencia.png)
+
+    Para la evidencia 9 de la entrega, haz clic derecho en el panel de mensajes, elige **Copiar al portapapeles** (*Copy to clipboard*) y pega el texto en tu documento.
 
 !!! info "¿Por qué has podido subirlo sin `sudo`?"
-    SFTP entra con **tu** usuario y solo puede escribir donde **tú** puedes escribir. Has podido subir el fichero porque eres el propietario de `/var/www/web2.garcia.test`. Si intentas subirlo directamente a `/var/www`, que es de `root`, obtendrás `Permission denied`. Es el comportamiento correcto.
+    `scp`, `sftp` y FileZilla entran con **tu** usuario y solo puede escribir donde **tú** puedes escribir. Has podido subir el fichero porque eres el propietario de `/var/www/web2.garcia.test`. Si intentas subirlo directamente a `/var/www`, que es de `root`, obtendrás `Permission denied`. Es el comportamiento correcto.
 
 ### 6.4 Descomprimir en el servidor
 
@@ -477,7 +643,29 @@ chmod -R u=rwX,go=rX /var/www/web2.garcia.test
 ls -la html
 ```
 
-Debe aparecer el `index.html` directamente dentro de `html`.
+`unzip` va mostrando cada fichero que extrae (casi cien líneas) y al final verás el contenido de `html`:
+
+```
+Archive:  html5up-phantom.zip
+  inflating: html/LICENSE.txt
+   creating: html/assets/
+   creating: html/assets/webfonts/
+  ...
+  inflating: html/images/pic15.jpg
+  inflating: html/elements.html
+total 80
+drwxr-xr-x 4 alumno alumno  4096 Oct  6 12:47 .
+drwxr-xr-x 3 alumno alumno  4096 Oct  6 12:47 ..
+drwxr-xr-x 6 alumno alumno  4096 Mar  6  2022 assets
+-rw-r--r-- 1 alumno alumno 19131 Mar  6  2022 elements.html
+-rw-r--r-- 1 alumno alumno  5408 Mar  6  2022 generic.html
+drwxr-xr-x 2 alumno alumno  4096 Mar  6  2022 images
+-rw-r--r-- 1 alumno alumno  8654 Mar  6  2022 index.html
+-rw-r--r-- 1 alumno alumno 17128 Mar  6  2022 LICENSE.txt
+-rw-r--r-- 1 alumno alumno   861 Mar  6  2022 README.txt
+```
+
+El `index.html` está directamente dentro de `html`, que es lo que necesita la directiva `root`. Las fechas de 2022 no son un error: `unzip` conserva las fechas originales de los ficheros dentro del `.zip`.
 
 ### 6.5 Configurar y activar `web2`
 
@@ -489,6 +677,9 @@ sudo nano /etc/nginx/sites-available/web2.garcia.test
 ```
 
 Cambia lo que haga falta para que sea el sitio `web2` (el nombre, la carpeta y los dos registros), actívalo con su enlace simbólico, comprueba la configuración y recarga. El bloque `location ~ /\.git` puede quedarse: no estorba, y protege el sitio si algún día lo despliegas con Git.
+
+!!! warning "Son **cuatro** líneas: no te olvides de los registros"
+    `server_name`, `root`, `access_log` y `error_log`. Si dejas los registros con `web1`, `nginx -t` **no** se quejará, porque la configuración es válida, pero las peticiones de `web2` acabarán mezcladas en los registros de `web1`. Es un error silencioso: compruébalo con `cat` antes de seguir.
 
 Si tu fichero `hosts` ya tiene `web2.garcia.test`, entra en `http://web2.garcia.test`:
 
@@ -506,10 +697,11 @@ Los ficheros de `/var/log/nginx` solo los pueden leer `root` y el grupo `adm`, a
 sudo tail -f /var/log/nginx/web1.access.log
 ```
 
-Navega por `http://web1.garcia.test` desde el navegador y observa cómo aparece una línea por cada petición: el HTML, las hojas de estilo, las imágenes… Pulsa **Ctrl+C** para salir.
+Recarga `http://web1.garcia.test` en el navegador con **Ctrl+F5** y observa cómo aparece de golpe una línea por cada petición: el HTML, las hojas de estilo, los *scripts*, las imágenes… Pulsa **Ctrl+C** para salir.
 
-!!! tip "Si no aparece nada al recargar"
-    El navegador guarda en caché lo que ya ha descargado y puede no volver a pedirlo, o pedirlo y recibir un `304 Not Modified`. Prueba con **Ctrl+F5** (recarga forzada) o en una **ventana de incógnito**.
+!!! tip "Si no aparece nada"
+    - **Usa Ctrl+F5**, no F5 a secas. El navegador guarda en caché lo que ya ha descargado y puede no volver a pedirlo, o pedirlo y recibir un `304 Not Modified`. También sirve una **ventana de incógnito**.
+    - **Pulsar los botones de la web no genera peticiones.** La web de `web1` es una sola página: INTRO, WORK, ABOUT y CONTACT solo cambian la parte de la URL que va detrás de `#` y muestran contenido que ya estaba cargado. El navegador **nunca** envía al servidor lo que va detrás de `#`.
 
 ### 7.1 Un 404
 
@@ -524,16 +716,46 @@ sudo tail -n 5 /var/log/nginx/web1.access.log
 ```
 
 ```
-192.168.56.1 - - [04/Oct/2026:19:47:48 +0200] "GET /noexiste.html HTTP/1.1" 404 146 "-" "Mozilla/5.0 (...)"
+192.168.56.1 - - [06/Oct/2026:12:57:02 +0200] "GET /images/overlay.png HTTP/1.1" 200 4385 "http://web1.garcia.test/assets/css/main.css" "Mozilla/5.0 (...)"
+192.168.56.1 - - [06/Oct/2026:12:57:02 +0200] "GET /assets/fonts/fontawesome-webfont.woff2?v=4.6.3 HTTP/1.1" 200 71896 "http://web1.garcia.test/assets/css/font-awesome.min.css" "Mozilla/5.0 (...)"
+192.168.56.1 - - [06/Oct/2026:12:57:02 +0200] "GET /images/bg.jpg HTTP/1.1" 200 37864 "http://web1.garcia.test/assets/css/main.css" "Mozilla/5.0 (...)"
+192.168.56.1 - - [06/Oct/2026:12:57:02 +0200] "GET /favicon.ico HTTP/1.1" 404 181 "http://web1.garcia.test/" "Mozilla/5.0 (...)"
+192.168.56.1 - - [06/Oct/2026:12:58:41 +0200] "GET /noexiste.html HTTP/1.1" 404 181 "-" "Mozilla/5.0 (...)"
 ```
 
-La IP `192.168.56.1` es tu ordenador visto desde la red Host-only. Ahora mira el registro de errores:
+(El último campo, que aquí aparece abreviado como `Mozilla/5.0 (...)`, es largo: identifica el navegador y el sistema operativo).
+
+Cada línea es una petición. Toma la última y léela por partes:
+
+| Campo | Valor | Qué es |
+|---|---|---|
+| IP del cliente | `192.168.56.1` | Tu ordenador, visto desde la red Host-only |
+| Fecha y hora | `[06/Oct/2026:12:58:41 +0200]` | Cuándo llegó la petición |
+| Petición | `"GET /noexiste.html HTTP/1.1"` | Método, ruta y versión de HTTP |
+| Código de estado | `404` | La respuesta: no encontrado |
+| Tamaño | `181` | Bytes enviados en el cuerpo de la respuesta (la página de error) |
+| *Referer* | `"-"` | Desde qué página se llegó. `-` significa que la escribiste a mano |
+| *User-Agent* | `"Mozilla/5.0 (...)"` | El navegador del cliente |
+
+Fíjate en dos detalles de las otras líneas:
+
+- El *referer* de `overlay.png` y `bg.jpg` es `main.css`: esas imágenes no las pide el HTML, sino la **hoja de estilos**. El registro te dice quién ha provocado cada petición.
+- Hay un `404` que **tú no has pedido**: `/favicon.ico`. Es el icono de la pestaña, y el navegador lo pide por su cuenta a cualquier web. Esta no lo tiene, así que falla. Es inofensivo, y lo verás en los registros de casi todas las webs.
+
+Ahora mira el registro de errores:
 
 ```sh
 sudo tail -n 5 /var/log/nginx/web1.error.log
 ```
 
-Un `404` **no** es un error del servidor: el cliente ha pedido algo que no existe, y el servidor ha respondido correctamente. Por eso solo deja rastro en el registro de accesos.
+```
+2026/10/06 12:16:08 [error] 1545#1545: *14 access forbidden by rule, client: 192.168.56.1, server: web1.garcia.test, request: "GET /.git/config HTTP/1.1", host: "web1.garcia.test"
+2026/10/06 12:16:55 [error] 1545#1545: *16 access forbidden by rule, client: 192.168.56.1, server: web1.garcia.test, request: "GET /.git/config HTTP/1.1", host: "web1.garcia.test"
+```
+
+**El `404` no aparece.** Un `404` no es un error del servidor: el cliente ha pedido algo que no existe, y el servidor ha respondido correctamente. Por eso solo deja rastro en el registro de accesos.
+
+Lo que sí aparece son tus pruebas del apartado 5: los `403` de la carpeta `.git`, con el motivo, `access forbidden by rule` (prohibido por una regla: tu `deny all`). El registro de errores no solo dice **que** algo ha fallado, sino **por qué**.
 
 ### 7.2 Un 403 por permisos
 
@@ -543,17 +765,32 @@ Ahora provoca tú un fallo. Quita a todos, menos a ti, el permiso para entrar en
 chmod 700 /var/www/web1.garcia.test/html
 ```
 
-Recarga `http://web1.garcia.test` (con **Ctrl+F5**). Aparecerá un **403 Forbidden**. Mira el registro de errores:
+Ahora pide la **página principal**, `http://web1.garcia.test/` (con **Ctrl+F5**). Aparecerá un **403 Forbidden**:
+
+![](img/T2-403-permisos.png)
+
+Es la misma página que viste con la carpeta `.git`, pero la causa es otra. Para saber cuál, mira el registro de errores:
 
 ```sh
 sudo tail -n 3 /var/log/nginx/web1.error.log
 ```
 
 ```
-2026/10/04 19:55:10 [error] 1908#1908: *74 "/var/www/web1.garcia.test/html/index.html" is forbidden (13: Permission denied), client: 192.168.56.1, server: web1.garcia.test, request: "GET / HTTP/1.1", host: "web1.garcia.test"
+2026/10/06 13:04:34 [error] 1716#1716: *43 "/var/www/web1.garcia.test/html/index.html" is forbidden (13: Permission denied), client: 192.168.56.1, server: web1.garcia.test, request: "GET / HTTP/1.1", host: "web1.garcia.test"
 ```
 
 El registro te dice exactamente qué ha pasado: el usuario `www-data` no tiene permiso para llegar al fichero (`Permission denied`). Tú sigues pudiendo leerlo, porque eres el propietario, y por eso este error despista tanto.
+
+Compáralo con el `403` de la carpeta `.git`: el navegador mostraba la misma página, pero el registro decía `access forbidden by rule` (una regla `deny`). Aquí dice `Permission denied` (permisos del sistema de ficheros). **Mismo código, causas distintas: el registro es lo que te dice cuál es.**
+
+!!! tip "¿Te sale un 404 en vez de un 403?"
+    Es que has recargado otra dirección, por ejemplo `/noexiste.html` del apartado anterior. Nginx intenta comprobar si ese fichero existe, no puede entrar en la carpeta, y `try_files` pasa a su última opción: `=404`. El navegador dice 404, pero el registro de errores cuenta la verdad:
+
+    ```
+    2026/10/06 13:02:21 [crit] 1714#1714: *41 stat() "/var/www/web1.garcia.test/html/noexiste.html" failed (13: Permission denied), client: 192.168.56.1, server: web1.garcia.test, request: "GET /noexiste.html HTTP/1.1", host: "web1.garcia.test"
+    ```
+
+    Es una buena lección: **el código que ve el navegador no siempre cuenta toda la historia; el registro, sí.**
 
 Restaura los permisos y comprueba que la web vuelve a funcionar:
 
@@ -578,7 +815,11 @@ Apaga la máquina desde tu sesión SSH:
 sudo poweroff
 ```
 
-En VirtualBox, en la pestaña **Snapshots**, pulsa **Take** y llama a la instantánea `p2.1-nginx`. La siguiente práctica parte de aquí.
+En VirtualBox, en la pestaña **Snapshots**, pulsa **Take** y llama a la instantánea `p2.1-nginx`. Quedará colgando de la instantánea de la práctica 1.1:
+
+![](img/T2-snapshot-p21.png)
+
+La siguiente práctica parte de aquí.
 
 ---
 
@@ -622,7 +863,7 @@ Evidencias que debe contener el documento:
 
 | # | Qué hay que demostrar | Dónde | Comando cuya salida se pega |
 |---|---|---|---|
-| 1 | Nginx está instalado y funcionando, en tu máquina | Debian | `hostname`, `nginx -v` y `systemctl status nginx --no-pager` |
+| 1 | Nginx está instalado y funcionando, en tu máquina | Debian | `hostname`, `sudo nginx -v` y `systemctl status nginx --no-pager` |
 | 2 | Hay tres sitios activos | Debian | `ls -l /etc/nginx/sites-enabled/` |
 | 3 | La configuración de `web1`, con la regla de `.git` | Debian | `cat /etc/nginx/sites-available/web1.tuapellido.test` |
 | 4 | La configuración es correcta | Debian | `sudo nginx -t` |
@@ -630,7 +871,7 @@ Evidencias que debe contener el documento:
 | 6 | Tu ordenador resuelve los dos nombres | Tu ordenador | `ping -n 1 web1.tuapellido.test` y `ping -n 1 web2.tuapellido.test` |
 | 7 | Cada nombre devuelve su web | Tu ordenador | Los dos comandos que hay debajo de esta tabla |
 | 8 | La carpeta `.git` está protegida | Tu ordenador | `curl.exe -sI http://web1.tuapellido.test/.git/config` (debe responder `403`) |
-| 9 | Has subido `web2` por SFTP | Tu ordenador | La sesión de `sftp` completa o, con FileZilla, el texto del panel de mensajes de la transferencia |
+| 9 | Has subido `web2` por SSH | Tu ordenador | El comando `scp` con su salida, la sesión de `sftp` completa o, con FileZilla, el texto del panel de mensajes de la transferencia |
 | 10 | Los registros muestran tus pruebas | Debian | `sudo tail -n 8 /var/log/nginx/web1.access.log` (con peticiones `200`, `404` y `403`) y `sudo tail -n 3 /var/log/nginx/web1.error.log` (con el `Permission denied`) |
 | 11 | Las dos webs, en el navegador | Tu ordenador | **Captura** de cada una con la barra de direcciones visible |
 
