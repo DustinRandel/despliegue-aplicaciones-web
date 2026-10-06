@@ -1,0 +1,2490 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes y prácticas del módulo 0614 - 2º DAW">
+      
+      
+        <meta name="author" content="Dustin de Lara">
+      
+      
+        <link rel="canonical" href="https://dustinrandel.github.io/despliegue-aplicaciones-web/T2-arquitectura-web/">
+      
+      
+        <link rel="prev" href="../T1-practica-maquina-virtual/">
+      
+      
+        <link rel="next" href="../T2-practica-nginx/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Tema 2 - Arquitectura web - Despliegue de aplicaciones web</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tema-2-arquitectura-web-implantacion-y-administracion-de-servidores-web" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-header__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Despliegue de aplicaciones web
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Tema 2 - Arquitectura web
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="blue"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-nav__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Despliegue de aplicaciones web
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 1
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-introduccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1 - Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-practica-maquina-virtual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 2
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2 - Arquitectura web
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2 - Arquitectura web
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#como-se-organiza-este-tema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cómo se organiza este tema
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-que-es-un-servidor-web" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Qué es un servidor web
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Qué es un servidor web">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contenido-estatico-y-contenido-dinamico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contenido estático y contenido dinámico
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lo-que-hace-un-servidor-web-ademas-de-servir-ficheros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lo que hace un servidor web, además de servir ficheros
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-la-arquitectura-de-una-aplicacion-web" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. La arquitectura de una aplicación web
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. La arquitectura de una aplicación web">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#que-pasa-cuando-escribes-una-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué pasa cuando escribes una URL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-el-protocolo-http" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. El protocolo HTTP
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. El protocolo HTTP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-una-peticion-y-su-respuesta-en-crudo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Una petición y su respuesta, en crudo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-metodos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Métodos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-codigos-de-estado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Códigos de estado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-cabeceras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Cabeceras
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-tipos-mime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 Tipos MIME
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-un-protocolo-sin-estado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Un protocolo sin estado
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#37-versiones-de-http" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.7 Versiones de HTTP
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-virtual-hosts-muchas-webs-en-un-solo-servidor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Virtual hosts: muchas webs en un solo servidor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-servidores-web-apache-nginx-y-compania" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Servidores web: Apache, Nginx y compañía
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Servidores web: Apache, Nginx y compañía">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#quien-sirve-la-web-hoy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quién sirve la web hoy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apache-frente-a-nginx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Apache frente a Nginx
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-nginx-por-dentro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Nginx por dentro
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Nginx por dentro">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#procesos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Procesos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#donde-esta-cada-cosa-en-debian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dónde está cada cosa (en Debian)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#como-se-escribe-la-configuracion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cómo se escribe la configuración
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#como-elige-nginx-el-sitio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cómo elige Nginx el sitio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#el-ciclo-de-trabajo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El ciclo de trabajo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#los-registros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Los registros
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permisos-lo-que-necesita-www-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permisos: lo que necesita www-data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-subir-ficheros-al-servidor-ftp-ftps-y-sftp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Subir ficheros al servidor: FTP, FTPS y SFTP
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-https-http-sobre-tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. HTTPS: HTTP sobre TLS
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. HTTPS: HTTP sobre TLS">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lo-que-ya-sabes-de-ssh-te-sirve-aqui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lo que ya sabes de SSH te sirve aquí
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#como-es-el-saludo-tls-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cómo es el saludo TLS 1.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#certificados-la-diferencia-con-ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Certificados: la diferencia con SSH
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bloque-4-proteger-y-escalar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bloque 4: proteger y escalar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referencias
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-nginx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.1 - Servidor web Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-https/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.2 - HTTPS en Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-autenticacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.3 - Autenticación y control de acceso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.4 - Proxy inverso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-balanceo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.5 - Balanceo de carga
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../creditos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Créditos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="tema-2-arquitectura-web-implantacion-y-administracion-de-servidores-web">Tema 2 - Arquitectura web: implantación y administración de servidores web<a class="headerlink" href="#tema-2-arquitectura-web-implantacion-y-administracion-de-servidores-web" title="Permanent link">&para;</a></h1>
+<div class="admonition abstract">
+<p class="admonition-title">Qué vas a aprender en este tema</p>
+<ul>
+<li>Qué es exactamente un servidor web y qué lugar ocupa en la arquitectura de una aplicación.</li>
+<li>Cómo es por dentro una conversación HTTP: peticiones, respuestas, códigos de estado, cabeceras y tipos MIME.</li>
+<li>Cómo un solo servidor puede alojar muchas webs distintas (<em>virtual hosts</em>).</li>
+<li>En qué se diferencian Apache y Nginx, y cómo está organizado Nginx en Debian.</li>
+<li>Cómo se suben ficheros a un servidor: FTP, FTPS y SFTP.</li>
+<li>Qué añade HTTPS y cómo funciona TLS, conectándolo con lo que ya sabes de SSH.</li>
+</ul>
+</div>
+<h2 id="como-se-organiza-este-tema">Cómo se organiza este tema<a class="headerlink" href="#como-se-organiza-este-tema" title="Permanent link">&para;</a></h2>
+<p>La teoría y las prácticas van intercaladas, en cuatro bloques. Cada bloque termina con unas cuestiones de repaso y un recuadro <strong>Ahora toca</strong> que indica la práctica que se hace en ese momento.</p>
+<table>
+<thead>
+<tr>
+<th>Bloque</th>
+<th>Teoría</th>
+<th>Al terminar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. La web por dentro</td>
+<td>Apartados 1, 2 y 3</td>
+<td>Actividad en clase con <code>curl</code> y el navegador</td>
+</tr>
+<tr>
+<td>2. Montar un servidor web</td>
+<td>Apartados 4, 5, 6 y 7</td>
+<td><a href="../T2-practica-nginx/">Práctica 2.1</a>: Nginx, sitios virtuales y SFTP</td>
+</tr>
+<tr>
+<td>3. Cifrar</td>
+<td>Apartado 8</td>
+<td><a href="../T2-practica-https/">Práctica 2.2</a>: HTTPS y redirección</td>
+</tr>
+<tr>
+<td>4. Proteger y escalar</td>
+<td>Repaso de los apartados 1 y 3.3</td>
+<td>Prácticas <a href="../T2-practica-autenticacion/">2.3</a>, <a href="../T2-practica-proxy/">2.4</a> y <a href="../T2-practica-balanceo/">2.5</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="1-que-es-un-servidor-web">1. Qué es un servidor web<a class="headerlink" href="#1-que-es-un-servidor-web" title="Permanent link">&para;</a></h2>
+<p>"Servidor web" tiene dos significados, y conviene separarlos desde el principio:</p>
+<ul>
+<li><strong>La máquina</strong>: el ordenador (físico o virtual) que aloja las webs. Tu máquina virtual Debian es una.</li>
+<li><strong>El programa</strong>: el software que se queda escuchando en un puerto de esa máquina, recibe peticiones HTTP y devuelve respuestas. Nginx y Apache son servidores web en este sentido.</li>
+</ul>
+<p>En este tema hablamos casi siempre del segundo. En el Tema 1 viste que el servidor SSH es un programa que se queda escuchando en el <strong>puerto 22</strong>, esperando conexiones. Un servidor web es lo mismo con otro protocolo: escucha normalmente en el <strong>puerto 80</strong> (HTTP) y en el <strong>443</strong> (HTTPS).</p>
+<p><img alt="" src="../img/funcionamiento-http.png" /></p>
+<p>El funcionamiento básico es siempre el mismo: el navegador (el <strong>cliente</strong>) pide un recurso, y el servidor le devuelve ese recurso o un código de error. El navegador interpreta lo que recibe y, casi siempre, descubre que necesita más cosas (hojas de estilo, imágenes, scripts), así que hace más peticiones. Cargar una sola página puede suponer decenas de ellas.</p>
+<h3 id="contenido-estatico-y-contenido-dinamico">Contenido estático y contenido dinámico<a class="headerlink" href="#contenido-estatico-y-contenido-dinamico" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Contenido estático</th>
+<th>Contenido dinámico</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qué es</td>
+<td>Ficheros que ya existen en el disco: HTML, CSS, imágenes, JavaScript</td>
+<td>Una respuesta que se <strong>genera</strong> en el momento de la petición</td>
+</tr>
+<tr>
+<td>Quién lo produce</td>
+<td>El servidor web lee el fichero y lo envía tal cual</td>
+<td>Un programa (PHP, Java, Node.js, Python…) ejecuta código, a menudo consulta una base de datos y construye la respuesta</td>
+</tr>
+<tr>
+<td>Ejemplo</td>
+<td>La portada de una web corporativa</td>
+<td>Tu carrito de la compra, el muro de una red social</td>
+</tr>
+<tr>
+<td>Coste</td>
+<td>Muy bajo</td>
+<td>Mayor: hay que ejecutar código en cada petición</td>
+</tr>
+</tbody>
+</table>
+<p>Un servidor web es excelente sirviendo contenido estático. Para el dinámico se apoya en un <strong>servidor de aplicaciones</strong>, que es el protagonista del Tema 3. En la práctica, lo habitual es combinarlos: el servidor web delante, recibiendo todas las peticiones, y el de aplicaciones detrás.</p>
+<h3 id="lo-que-hace-un-servidor-web-ademas-de-servir-ficheros">Lo que hace un servidor web, además de servir ficheros<a class="headerlink" href="#lo-que-hace-un-servidor-web-ademas-de-servir-ficheros" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Función</th>
+<th>En qué consiste</th>
+<th>Dónde lo verás</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Sitios virtuales</strong></td>
+<td>Alojar muchas webs distintas en la misma máquina</td>
+<td>Práctica 2.1</td>
+</tr>
+<tr>
+<td><strong>Registro (<em>logs</em>)</strong></td>
+<td>Anotar cada petición y cada error</td>
+<td>Práctica 2.1</td>
+</tr>
+<tr>
+<td><strong>HTTPS</strong></td>
+<td>Cifrar la comunicación con el cliente</td>
+<td>Práctica 2.2</td>
+</tr>
+<tr>
+<td><strong>Redirecciones</strong></td>
+<td>Mandar al cliente a otra URL (por ejemplo, de HTTP a HTTPS)</td>
+<td>Práctica 2.2</td>
+</tr>
+<tr>
+<td><strong>Autenticación</strong></td>
+<td>Pedir usuario y contraseña para una zona de la web</td>
+<td>Práctica 2.3</td>
+</tr>
+<tr>
+<td><strong>Proxy inverso</strong></td>
+<td>Recibir la petición y reenviarla a otro servidor que está detrás</td>
+<td>Práctica 2.4 y Tema 3</td>
+</tr>
+<tr>
+<td><strong>Balanceo de carga</strong></td>
+<td>Repartir las peticiones entre varios servidores</td>
+<td>Práctica 2.5</td>
+</tr>
+<tr>
+<td><strong>Caché y compresión</strong></td>
+<td>Guardar respuestas ya generadas y comprimir lo que se envía</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-la-arquitectura-de-una-aplicacion-web">2. La arquitectura de una aplicación web<a class="headerlink" href="#2-la-arquitectura-de-una-aplicacion-web" title="Permanent link">&para;</a></h2>
+<p>Una aplicación web real rara vez es "un servidor". Es una cadena de piezas, cada una con su función:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a> Navegador ──► DNS ──► Servidor web ──► Servidor de aplicaciones ──► Base de datos
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a> (cliente)    (Tema 4)  (Nginx, Apache)   (Tomcat, Node.js…, Tema 3)   (MySQL, PostgreSQL…)
+</code></pre></div>
+<p>Las combinaciones clásicas tienen nombre propio. <strong>LAMP</strong> es <em>Linux + Apache + MySQL + PHP</em>; <strong>LEMP</strong> es lo mismo con Nginx (que se pronuncia <em>engine-x</em>, de ahí la E). A lo largo del módulo montarás cada una de estas capas por separado, y en el Tema 6 aprenderás a empaquetarlas en contenedores.</p>
+<h3 id="que-pasa-cuando-escribes-una-url">Qué pasa cuando escribes una URL<a class="headerlink" href="#que-pasa-cuando-escribes-una-url" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Resolución del nombre.</strong> El navegador necesita la IP del servidor. Se la pregunta al DNS (Tema 4) o, como harás en la práctica, la encuentra en el fichero <code>hosts</code> de tu equipo.</li>
+<li><strong>Conexión.</strong> Abre una conexión TCP con esa IP en el puerto 80 o 443. Si es HTTPS, además negocia el cifrado TLS (apartado 8).</li>
+<li><strong>Petición.</strong> Envía una petición HTTP: qué recurso quiere, de qué sitio y con qué características.</li>
+<li><strong>Elección del sitio.</strong> El servidor web mira a qué sitio va dirigida la petición (apartado 4) y busca el recurso.</li>
+<li><strong>Respuesta.</strong> Devuelve un código de estado, unas cabeceras y, normalmente, el contenido.</li>
+<li><strong>Más peticiones.</strong> El navegador interpreta el HTML y pide lo que le falta: CSS, imágenes, scripts…</li>
+</ol>
+<h2 id="3-el-protocolo-http">3. El protocolo HTTP<a class="headerlink" href="#3-el-protocolo-http" title="Permanent link">&para;</a></h2>
+<p>HTTP (<em>Hypertext Transfer Protocol</em>) es el idioma en el que hablan navegador y servidor. Lo creó Tim Berners-Lee en el CERN, entre 1989 y 1991, junto con el HTML y el primer navegador. Es un protocolo de <strong>texto</strong>, de <strong>petición-respuesta</strong> y <strong>sin estado</strong>, y lo bueno de que sea texto es que puedes leerlo tal cual.</p>
+<h3 id="31-una-peticion-y-su-respuesta-en-crudo">3.1 Una petición y su respuesta, en crudo<a class="headerlink" href="#31-una-peticion-y-su-respuesta-en-crudo" title="Permanent link">&para;</a></h3>
+<p>Esta es una petición real a uno de los sitios que montarás en la práctica 2.1, hecha con <code>curl -v</code> desde PowerShell. Las líneas que empiezan por <code>&gt;</code> son lo que <strong>envía</strong> el cliente; las que empiezan por <code>&lt;</code>, lo que <strong>responde</strong> el servidor:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>&gt; GET / HTTP/1.1
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>&gt; Host: web2.garcia.test
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>&gt; User-Agent: curl/8.21.0
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>&gt; Accept: */*
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>&gt;
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>&lt; HTTP/1.1 200 OK
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>&lt; Server: nginx
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>&lt; Date: Sun, 04 Oct 2026 17:49:29 GMT
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>&lt; Content-Type: text/html
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>&lt; Content-Length: 8654
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>&lt; Last-Modified: Sun, 06 Mar 2022 21:21:37 GMT
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>&lt; Connection: keep-alive
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>&lt; ETag: "622525e1-21ce"
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>&lt; Accept-Ranges: bytes
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>&lt;
+</code></pre></div>
+<p><strong>La petición</strong> tiene tres partes:</p>
+<ul>
+<li><strong>Línea de petición</strong>: el método (<code>GET</code>), la ruta del recurso (<code>/</code>) y la versión del protocolo (<code>HTTP/1.1</code>).</li>
+<li><strong>Cabeceras</strong>: pares <code>Nombre: valor</code> con información adicional. La más importante es <code>Host</code>, que dice <strong>a qué sitio</strong> va dirigida la petición.</li>
+<li><strong>Cuerpo</strong> (opcional): datos que se envían al servidor, por ejemplo los de un formulario. Un <code>GET</code> no lleva.</li>
+</ul>
+<p><strong>La respuesta</strong>, también tres:</p>
+<ul>
+<li><strong>Línea de estado</strong>: versión, código de estado (<code>200</code>) y su texto (<code>OK</code>).</li>
+<li><strong>Cabeceras</strong>: qué tipo de contenido es (<code>Content-Type</code>), cuánto ocupa (<code>Content-Length</code>), cuándo se modificó…</li>
+<li><strong>Cuerpo</strong>: el recurso en sí, en este caso 8.654 bytes de HTML (<code>curl -v</code> no lo muestra porque lo hemos descartado).</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Pruébalo tú</p>
+<p>Windows trae <code>curl</code> de serie. En PowerShell escribe <strong><code>curl.exe</code></strong> (con la extensión: en algunas versiones de PowerShell, <code>curl</code> a secas es un alias de otro comando que no hace lo mismo):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-v</span> <span class="n">http</span><span class="p">://</span><span class="n">github</span><span class="p">.</span><span class="n">com</span> <span class="n">-o</span> <span class="n">NUL</span>
+</code></pre></div>
+<p>También puedes verlo en el navegador: <strong>F12 → pestaña Red (<em>Network</em>)</strong>, recarga la página y pincha en cualquier petición.</p>
+</div>
+<h3 id="32-metodos">3.2 Métodos<a class="headerlink" href="#32-metodos" title="Permanent link">&para;</a></h3>
+<p>El método indica qué quiere hacer el cliente con el recurso:</p>
+<table>
+<thead>
+<tr>
+<th>Método</th>
+<th>Para qué sirve</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GET</strong></td>
+<td>Obtener un recurso. Es lo que hace el navegador al seguir un enlace o escribir una URL</td>
+</tr>
+<tr>
+<td><strong>HEAD</strong></td>
+<td>Como GET, pero solo devuelve las cabeceras, sin el cuerpo. Útil para comprobar si algo existe o ha cambiado (<code>curl -I</code> usa HEAD)</td>
+</tr>
+<tr>
+<td><strong>POST</strong></td>
+<td>Enviar datos para que el servidor los procese: un formulario, un pedido, un comentario nuevo</td>
+</tr>
+<tr>
+<td><strong>PUT</strong></td>
+<td>Crear o sustituir por completo el recurso de esa URL</td>
+</tr>
+<tr>
+<td><strong>PATCH</strong></td>
+<td>Modificar parcialmente un recurso</td>
+</tr>
+<tr>
+<td><strong>DELETE</strong></td>
+<td>Borrar el recurso</td>
+</tr>
+<tr>
+<td><strong>OPTIONS</strong></td>
+<td>Preguntar qué métodos admite el servidor para esa URL</td>
+</tr>
+</tbody>
+</table>
+<p>En un servidor web que solo sirve ficheros estáticos, en la práctica solo verás <code>GET</code> y <code>HEAD</code>. El resto cobra sentido cuando hay una aplicación detrás (las API REST que programas en otros módulos usan GET, POST, PUT, PATCH y DELETE).</p>
+<h3 id="33-codigos-de-estado">3.3 Códigos de estado<a class="headerlink" href="#33-codigos-de-estado" title="Permanent link">&para;</a></h3>
+<p>Son números de tres cifras. La primera indica la familia:</p>
+<table>
+<thead>
+<tr>
+<th>Familia</th>
+<th>Significado</th>
+<th>Ejemplos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1xx</strong></td>
+<td>Informativo</td>
+<td><code>101 Switching Protocols</code></td>
+</tr>
+<tr>
+<td><strong>2xx</strong></td>
+<td>Éxito</td>
+<td><code>200 OK</code>, <code>201 Created</code>, <code>204 No Content</code></td>
+</tr>
+<tr>
+<td><strong>3xx</strong></td>
+<td>Redirección: el recurso está en otro sitio</td>
+<td><code>301 Moved Permanently</code>, <code>302 Found</code>, <code>304 Not Modified</code></td>
+</tr>
+<tr>
+<td><strong>4xx</strong></td>
+<td>Error <strong>del cliente</strong>: ha pedido algo mal o no tiene permiso</td>
+<td><code>400 Bad Request</code>, <code>401 Unauthorized</code>, <code>403 Forbidden</code>, <code>404 Not Found</code></td>
+</tr>
+<tr>
+<td><strong>5xx</strong></td>
+<td>Error <strong>del servidor</strong>: la petición era correcta, pero el servidor ha fallado</td>
+<td><code>500 Internal Server Error</code>, <code>502 Bad Gateway</code>, <code>503 Service Unavailable</code></td>
+</tr>
+</tbody>
+</table>
+<p>Los que te vas a encontrar en este tema, y lo que significan <strong>en tu servidor</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Código</th>
+<th>Cuándo lo verás</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>200</code></td>
+<td>Todo bien</td>
+</tr>
+<tr>
+<td><code>301</code></td>
+<td>Cuando redirijas HTTP a HTTPS (práctica 2.2)</td>
+</tr>
+<tr>
+<td><code>304</code></td>
+<td>El navegador ya tenía el recurso en caché y el servidor le confirma que no ha cambiado. Por eso a veces "no se ven tus cambios"</td>
+</tr>
+<tr>
+<td><code>401</code></td>
+<td>La zona necesita usuario y contraseña (práctica 2.3)</td>
+</tr>
+<tr>
+<td><code>403</code></td>
+<td>Nginx no tiene permiso para leer el fichero, o una regla lo prohíbe expresamente</td>
+</tr>
+<tr>
+<td><code>404</code></td>
+<td>El fichero no existe, o la ruta <code>root</code> de tu configuración no apunta donde crees</td>
+</tr>
+<tr>
+<td><code>502</code></td>
+<td>Nginx hace de proxy y el servidor de detrás no responde (práctica 2.4 y Tema 3)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="34-cabeceras">3.4 Cabeceras<a class="headerlink" href="#34-cabeceras" title="Permanent link">&para;</a></h3>
+<p>Las cabeceras llevan toda la información de la conversación que no es el contenido en sí. Algunas de las más importantes:</p>
+<table>
+<thead>
+<tr>
+<th>Cabecera</th>
+<th>Va en</th>
+<th>Para qué</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Host</code></td>
+<td>Petición</td>
+<td>Nombre del sitio al que va dirigida. <strong>Obligatoria desde HTTP/1.1</strong></td>
+</tr>
+<tr>
+<td><code>User-Agent</code></td>
+<td>Petición</td>
+<td>Qué programa hace la petición (navegador, <code>curl</code>, un robot…)</td>
+</tr>
+<tr>
+<td><code>Accept</code></td>
+<td>Petición</td>
+<td>Qué tipos de contenido acepta el cliente</td>
+</tr>
+<tr>
+<td><code>Cookie</code></td>
+<td>Petición</td>
+<td>Las cookies que el navegador tiene guardadas para ese sitio</td>
+</tr>
+<tr>
+<td><code>Server</code></td>
+<td>Respuesta</td>
+<td>Qué software responde. Debian configura Nginx para que no diga su versión, para no dar pistas a un atacante</td>
+</tr>
+<tr>
+<td><code>Content-Type</code></td>
+<td>Respuesta</td>
+<td>Tipo MIME del contenido (apartado 3.5)</td>
+</tr>
+<tr>
+<td><code>Content-Length</code></td>
+<td>Respuesta</td>
+<td>Tamaño del cuerpo en bytes</td>
+</tr>
+<tr>
+<td><code>Location</code></td>
+<td>Respuesta</td>
+<td>Adónde redirigir, en las respuestas 3xx</td>
+</tr>
+<tr>
+<td><code>Set-Cookie</code></td>
+<td>Respuesta</td>
+<td>Pide al navegador que guarde una cookie</td>
+</tr>
+<tr>
+<td><code>Last-Modified</code>, <code>ETag</code>, <code>Cache-Control</code></td>
+<td>Respuesta</td>
+<td>Información para la caché del navegador</td>
+</tr>
+</tbody>
+</table>
+<h3 id="35-tipos-mime">3.5 Tipos MIME<a class="headerlink" href="#35-tipos-mime" title="Permanent link">&para;</a></h3>
+<p>El servidor no envía "un fichero": envía bytes. Para que el navegador sepa qué hacer con ellos (pintarlos como HTML, aplicarlos como estilos, mostrarlos como imagen…), la respuesta incluye la cabecera <code>Content-Type</code> con un <strong>tipo MIME</strong>, que tiene la forma <code>tipo/subtipo</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Tipo MIME</th>
+<th>Contenido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>text/html</code></td>
+<td>Página HTML</td>
+</tr>
+<tr>
+<td><code>text/css</code></td>
+<td>Hoja de estilos</td>
+</tr>
+<tr>
+<td><code>text/javascript</code></td>
+<td>Script</td>
+</tr>
+<tr>
+<td><code>image/png</code>, <code>image/jpeg</code>, <code>image/webp</code>, <code>image/svg+xml</code></td>
+<td>Imágenes</td>
+</tr>
+<tr>
+<td><code>application/json</code></td>
+<td>Datos JSON (típico de las API)</td>
+</tr>
+<tr>
+<td><code>application/pdf</code></td>
+<td>Documento PDF</td>
+</tr>
+<tr>
+<td><code>application/octet-stream</code></td>
+<td>"Bytes sin más": el navegador no sabe qué es y lo <strong>descarga</strong></td>
+</tr>
+</tbody>
+</table>
+<p>¿De dónde saca Nginx el tipo? De la <strong>extensión</strong> del fichero, que busca en la tabla <code>/etc/nginx/mime.types</code>. Si la extensión no está en la tabla, usa <code>application/octet-stream</code>.</p>
+<h3 id="36-un-protocolo-sin-estado">3.6 Un protocolo sin estado<a class="headerlink" href="#36-un-protocolo-sin-estado" title="Permanent link">&para;</a></h3>
+<p>HTTP <strong>no recuerda</strong> nada entre una petición y la siguiente: para el servidor, cada petición es la primera. Entonces, ¿cómo sabe una tienda online que sigues siendo tú al pasar de una página a otra? Con las <strong>cookies</strong>: el servidor envía un identificador con <code>Set-Cookie</code>, el navegador lo guarda y lo devuelve en cada petición posterior con la cabecera <code>Cookie</code>. El estado lo guarda la aplicación; HTTP solo transporta el identificador.</p>
+<h3 id="37-versiones-de-http">3.7 Versiones de HTTP<a class="headerlink" href="#37-versiones-de-http" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Versión</th>
+<th>Año</th>
+<th>Qué aportó</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP/0.9</td>
+<td>1991</td>
+<td>Una sola línea: <code>GET /pagina</code>. Solo HTML, sin cabeceras ni códigos de estado</td>
+</tr>
+<tr>
+<td>HTTP/1.0</td>
+<td>1996</td>
+<td>Cabeceras, códigos de estado, tipos MIME. Una conexión TCP nueva para cada recurso</td>
+</tr>
+<tr>
+<td>HTTP/1.1</td>
+<td>1997</td>
+<td><strong>Conexiones persistentes</strong> (varias peticiones por conexión) y <strong>cabecera <code>Host</code> obligatoria</strong>, que permite alojar muchos sitios en una IP</td>
+</tr>
+<tr>
+<td>HTTP/2</td>
+<td>2015</td>
+<td>Protocolo <strong>binario</strong>. Muchas peticiones en paralelo por una sola conexión (multiplexación) y cabeceras comprimidas</td>
+</tr>
+<tr>
+<td>HTTP/3</td>
+<td>2022</td>
+<td>Cambia TCP por <strong>QUIC</strong>, que va sobre UDP. Siempre cifrado</td>
+</tr>
+</tbody>
+</table>
+<p>El problema que resuelve HTTP/3 se llama <strong>bloqueo de cabeza de línea</strong> (<em>head-of-line blocking</em>). HTTP/2 multiplexa muchas peticiones en una conexión TCP, pero TCP entrega los datos estrictamente en orden: si se pierde un solo paquete, todo lo que viene detrás espera a que se retransmita, aunque pertenezca a otra petición. Es como una cola de peaje con un solo carril. QUIC gestiona cada petición como un flujo independiente, de modo que una pérdida solo retrasa su propio flujo. Además, combina la conexión y el cifrado en un solo paso, y sobrevive a un cambio de red (de la wifi a los datos del móvil) sin cortarse.</p>
+<p>Hoy los navegadores y los grandes sitios usan sobre todo HTTP/2 y HTTP/3, y lo negocian solos. HTTP/1.1 sigue siendo el idioma común que todos entienden, y es el que verás con <code>curl</code> en tus prácticas.</p>
+<hr />
+<h2 id="cierre-del-bloque-1">Cierre del bloque 1<a class="headerlink" href="#cierre-del-bloque-1" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 1</p>
+<p>Explica la diferencia entre un error <code>4xx</code> y un error <code>5xx</code>. Pon un ejemplo de cada uno que podría darse en un servidor web.</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 2</p>
+<p>¿Qué cabecera HTTP permite que varios sitios compartan servidor, y desde qué versión de HTTP es obligatoria?</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Ahora toca: actividad en clase (sin entrega)</p>
+<p>Antes de instalar nada, mira HTTP en directo desde tu ordenador. En PowerShell:</p>
+<ol>
+<li><code>curl.exe -v http://github.com -o NUL</code>. Identifica la línea de petición, la cabecera <code>Host</code> y el código de estado. ¿Por qué responde <code>301</code> y adónde te manda la cabecera <code>Location</code>?</li>
+<li><code>curl.exe -I https://github.com</code>. ¿Qué código devuelve ahora? ¿Qué dicen <code>Content-Type</code> y <code>Server</code>?</li>
+<li><code>curl.exe -I https://github.com/noexiste-xyz-123</code>. ¿Qué código devuelve, y de quién es el error, del cliente o del servidor?</li>
+<li>En el navegador, abre <a href="https://www.wikipedia.org">https://www.wikipedia.org</a>, pulsa <strong>F12 → Red</strong> y recarga. ¿Cuántas peticiones ha hecho para una sola página? Busca un fichero <code>text/css</code> y una imagen. Vuelve a recargar: ¿aparece algún <code>304</code>?</li>
+</ol>
+</div>
+<hr />
+<h2 id="4-virtual-hosts-muchas-webs-en-un-solo-servidor">4. Virtual hosts: muchas webs en un solo servidor<a class="headerlink" href="#4-virtual-hosts-muchas-webs-en-un-solo-servidor" title="Permanent link">&para;</a></h2>
+<p>Tu máquina virtual tiene <strong>una</strong> IP, <code>192.168.56.10</code>. Y en la práctica 2.1 vas a alojar en ella <strong>dos</strong> webs distintas. ¿Cómo sabe Nginx cuál tiene que devolver?</p>
+<p>Por la cabecera <strong><code>Host</code></strong>. Mira estas dos peticiones: van a la <strong>misma IP</strong> y al <strong>mismo puerto</strong>, y solo cambia esa cabecera:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>&gt; GET / HTTP/1.1
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>&gt; Host: web1.garcia.test        ──►  responde la web 1
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>&gt; GET / HTTP/1.1
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>&gt; Host: web2.garcia.test        ──►  responde la web 2
+</code></pre></div></p>
+<p>A cada uno de esos sitios se le llama <strong>sitio virtual</strong> o <strong><em>virtual host</em></strong> (en Nginx, <em>server block</em>). Es lo que permite que un único servidor de un proveedor de alojamiento sirva cientos de dominios con una sola IP, y fue posible gracias a que HTTP/1.1 hizo obligatoria la cabecera <code>Host</code>.</p>
+<p>Hay tres formas de distinguir sitios virtuales:</p>
+<table>
+<thead>
+<tr>
+<th>Por…</th>
+<th>Cómo</th>
+<th>Cuándo se usa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Nombre</strong></td>
+<td>Cabecera <code>Host</code></td>
+<td>Casi siempre. Es lo que harás tú</td>
+</tr>
+<tr>
+<td><strong>IP</strong></td>
+<td>Cada sitio escucha en una IP distinta de la máquina</td>
+<td>Requiere tener varias IP; hoy es raro</td>
+</tr>
+<tr>
+<td><strong>Puerto</strong></td>
+<td>Cada sitio escucha en un puerto distinto (<code>:8080</code>, <code>:8081</code>…)</td>
+<td>Servicios internos, pruebas</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">¿Y si la petición no coincide con ningún sitio?</p>
+<p>Si alguien accede por la IP, o con un nombre que no has configurado, el servidor responde con su <strong>sitio por defecto</strong> (<em>default server</em>). En Debian es la página "Welcome to nginx!", que verás al instalarlo.</p>
+</div>
+<h2 id="5-servidores-web-apache-nginx-y-compania">5. Servidores web: Apache, Nginx y compañía<a class="headerlink" href="#5-servidores-web-apache-nginx-y-compania" title="Permanent link">&para;</a></h2>
+<h3 id="quien-sirve-la-web-hoy">Quién sirve la web hoy<a class="headerlink" href="#quien-sirve-la-web-hoy" title="Permanent link">&para;</a></h3>
+<p><img alt="" src="../img/T2-w3techs-tendencia.png" /></p>
+<p><em>Cuota de uso de servidores web entre 2015 y septiembre de 2026. Fuente: <a href="https://w3techs.com/technologies/overview/web_server">W3Techs</a>.</em></p>
+<p>A septiembre de 2026, <strong>Nginx</strong> está presente en el 31,3 % de los sitios web, <strong>Cloudflare</strong> en el 29,9 % y <strong>Apache</strong> en el 22,5 %, seguidos de LiteSpeed. Fíjate en dos tendencias: la caída continuada de Apache, que en 2015 dominaba con casi el 60 %, y la subida de Cloudflare.</p>
+<p>Cloudflare no es exactamente un servidor web, sino una <strong>CDN</strong> y un proxy que se coloca <strong>delante</strong> del servidor real. Cuando una web usa Cloudflare, lo que ves desde fuera es Cloudflare, y detrás puede haber un Nginx, un Apache o cualquier otra cosa.</p>
+<h3 id="apache-frente-a-nginx">Apache frente a Nginx<a class="headerlink" href="#apache-frente-a-nginx" title="Permanent link">&para;</a></h3>
+<p><strong>Apache HTTP Server</strong> nació en 1995 y fue durante dos décadas el servidor web por excelencia. <strong>Nginx</strong> lo creó Igor Sysoev en 2004 con un objetivo muy concreto: el <strong>problema C10K</strong>, es decir, atender diez mil conexiones simultáneas en una sola máquina sin hundirla.</p>
+<p>La diferencia de fondo está en cómo atienden las conexiones:</p>
+<ul>
+<li><strong>Apache</strong>, en su modelo clásico, dedica <strong>un proceso o un hilo a cada conexión</strong>. Es sencillo y robusto, pero cada conexión ocupa memoria aunque esté parada, esperando a un cliente lento.</li>
+<li><strong>Nginx</strong> es <strong>asíncrono y dirigido por eventos</strong>: unos pocos procesos trabajadores, normalmente uno por núcleo de CPU, y cada uno atiende <strong>miles de conexiones</strong> a la vez, saltando a la que tenga algo que hacer en cada momento. Con muchas conexiones gasta mucha menos memoria.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Apache</th>
+<th>Nginx</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Modelo</td>
+<td>Proceso o hilo por conexión (módulos MPM <em>prefork</em>, <em>worker</em>, <em>event</em>)</td>
+<td>Asíncrono, por eventos</td>
+</tr>
+<tr>
+<td>Contenido estático</td>
+<td>Bueno</td>
+<td>Excelente</td>
+</tr>
+<tr>
+<td>Contenido dinámico</td>
+<td>Puede ejecutar PHP dentro del propio servidor (<code>mod_php</code>)</td>
+<td>Siempre lo delega en otro programa (PHP-FPM, un servidor de aplicaciones…)</td>
+</tr>
+<tr>
+<td>Configuración</td>
+<td>Central, y además ficheros <strong><code>.htaccess</code></strong> repartidos por los directorios de la web</td>
+<td>Solo central. No existe <code>.htaccess</code></td>
+</tr>
+<tr>
+<td>Uso típico hoy</td>
+<td>Alojamiento compartido (por los <code>.htaccess</code>), aplicaciones heredadas</td>
+<td>Servidor de estáticos, <strong>proxy inverso</strong> y <strong>balanceador</strong> delante de las aplicaciones</td>
+</tr>
+</tbody>
+</table>
+<p>Los <code>.htaccess</code> de Apache permiten que cada cliente de un alojamiento compartido configure su parte de la web sin tocar la configuración general. Es muy cómodo, pero obliga al servidor a buscar y leer esos ficheros en cada petición. Nginx renuncia a esa comodidad a cambio de rendimiento.</p>
+<p>Otros servidores que conviene conocer: <strong>Caddy</strong> (obtiene y renueva certificados HTTPS él solo), <strong>LiteSpeed</strong> (compatible con la configuración de Apache, muy usado en alojamiento de WordPress) e <strong>IIS</strong> (el de Microsoft, para entornos Windows).</p>
+<p>En este módulo usaremos <strong>Nginx</strong>: es el servidor web más usado, es ligero, su configuración es clara y es la pieza que vas a encontrarte delante de casi cualquier aplicación, haciendo de proxy inverso.</p>
+<h2 id="6-nginx-por-dentro">6. Nginx por dentro<a class="headerlink" href="#6-nginx-por-dentro" title="Permanent link">&para;</a></h2>
+<h3 id="procesos">Procesos<a class="headerlink" href="#procesos" title="Permanent link">&para;</a></h3>
+<p>Al arrancar Nginx en tu Debian verás algo así (salida real de <code>ps -o user,pid,ppid,cmd -C nginx</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>USER         PID    PPID CMD
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>root        1087       1 nginx: master process /usr/sbin/nginx -g daemon on; master_process on;
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>www-data    1760    1087 nginx: worker process
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>www-data    1763    1087 nginx: worker process
+</code></pre></div>
+<ul>
+<li>El <strong>proceso maestro</strong> se ejecuta como <code>root</code>. Lee la configuración, abre los puertos 80 y 443 (en Linux, los puertos por debajo del 1024 solo los puede abrir <code>root</code>) y gestiona a los trabajadores.</li>
+<li>Los <strong>procesos trabajadores</strong> (<em>workers</em>) atienden las peticiones. Se ejecutan como el usuario sin privilegios <strong><code>www-data</code></strong>: si alguien encontrara un fallo en Nginx, solo podría hacer lo que puede hacer <code>www-data</code>, que es muy poco. Hay uno por núcleo de CPU (esta máquina tiene dos).</li>
+</ul>
+<h3 id="donde-esta-cada-cosa-en-debian">Dónde está cada cosa (en Debian)<a class="headerlink" href="#donde-esta-cada-cosa-en-debian" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Ruta</th>
+<th>Qué contiene</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/etc/nginx/nginx.conf</code></td>
+<td>Configuración <strong>global</strong>. Rara vez se toca</td>
+</tr>
+<tr>
+<td><code>/etc/nginx/sites-available/</code></td>
+<td>Un fichero de configuración por cada sitio virtual <strong>disponible</strong></td>
+</tr>
+<tr>
+<td><code>/etc/nginx/sites-enabled/</code></td>
+<td><strong>Enlaces simbólicos</strong> a los sitios que están <strong>activos</strong></td>
+</tr>
+<tr>
+<td><code>/etc/nginx/conf.d/</code></td>
+<td>Otra forma de añadir configuración: aquí se carga todo lo que acabe en <code>.conf</code></td>
+</tr>
+<tr>
+<td><code>/etc/nginx/snippets/</code></td>
+<td>Trozos de configuración reutilizables</td>
+</tr>
+<tr>
+<td><code>/etc/nginx/mime.types</code></td>
+<td>La tabla de extensiones y tipos MIME</td>
+</tr>
+<tr>
+<td><code>/var/www/</code></td>
+<td>Por convención, aquí van los ficheros de las webs</td>
+</tr>
+<tr>
+<td><code>/var/log/nginx/</code></td>
+<td>Los registros: <code>access.log</code> y <code>error.log</code></td>
+</tr>
+</tbody>
+</table>
+<p>La pareja <code>sites-available</code> / <code>sites-enabled</code> es una convención de Debian, heredada de Apache. Nginx solo carga lo que hay en <code>sites-enabled</code>, así que para <strong>activar</strong> un sitio se crea un enlace simbólico en esa carpeta, y para <strong>desactivarlo</strong> se borra el enlace. El fichero original sigue intacto en <code>sites-available</code>, listo para volver a activarlo.</p>
+<h3 id="como-se-escribe-la-configuracion">Cómo se escribe la configuración<a class="headerlink" href="#como-se-escribe-la-configuracion" title="Permanent link">&para;</a></h3>
+<p>La configuración está hecha de <strong>directivas</strong> (<code>nombre valor;</code>, <strong>siempre terminadas en punto y coma</strong>) agrupadas en <strong>bloques</strong> entre llaves. Esta es la parte activa del <code>nginx.conf</code> de Debian 13 (sin comentarios):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">user</span><span class="w"> </span><span class="s">www-data</span><span class="p">;</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">worker_processes</span><span class="w"> </span><span class="s">auto</span><span class="p">;</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">pid</span><span class="w"> </span><span class="s">/run/nginx.pid</span><span class="p">;</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">error_log</span><span class="w"> </span><span class="s">/var/log/nginx/error.log</span><span class="p">;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">include</span><span class="w"> </span><span class="n">/etc/nginx/modules-enabled/*.conf</span>;
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="k">events</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="kn">worker_connections</span><span class="w"> </span><span class="mi">768</span><span class="p">;</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">}</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">http</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="kn">sendfile</span><span class="w"> </span><span class="no">on</span><span class="p">;</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="kn">server_tokens</span><span class="w"> </span><span class="no">off</span><span class="p">;</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="kn">include</span><span class="w"> </span><span class="s">/etc/nginx/mime.types</span><span class="p">;</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="kn">default_type</span><span class="w"> </span><span class="s">application/octet-stream</span><span class="p">;</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="kn">ssl_protocols</span><span class="w"> </span><span class="s">TLSv1.2</span><span class="w"> </span><span class="s">TLSv1.3</span><span class="p">;</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">    </span><span class="kn">access_log</span><span class="w"> </span><span class="s">/var/log/nginx/access.log</span><span class="p">;</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">    </span><span class="kn">gzip</span><span class="w"> </span><span class="no">on</span><span class="p">;</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">    </span><span class="kn">include</span><span class="w"> </span><span class="s">/etc/nginx/conf.d/*.conf</span><span class="p">;</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">    </span><span class="kn">include</span><span class="w"> </span><span class="s">/etc/nginx/sites-enabled/*</span><span class="p">;</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="p">}</span>
+</code></pre></div>
+<p>Los bloques se anidan, y cada uno es un <strong>contexto</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>main            (lo que está fuera de cualquier bloque: usuario, procesos, registros)
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>├── events      (cómo se gestionan las conexiones)
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>└── http        (todo lo relativo a HTTP)
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>    └── server          (un sitio virtual)
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>        └── location    (qué hacer con un grupo de URL dentro de ese sitio)
+</code></pre></div>
+<p>Fíjate en la última línea del bloque <code>http</code>: <strong><code>include /etc/nginx/sites-enabled/*;</code></strong>. Ahí es donde se cargan tus sitios. Cada uno es un bloque <code>server</code> como este:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">80</span><span class="p">;</span><span class="w">                              </span><span class="c1"># (1)!</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">web1.garcia.test</span><span class="p">;</span><span class="w">           </span><span class="c1"># (2)!</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="kn">root</span><span class="w"> </span><span class="s">/var/www/web1.garcia.test/html</span><span class="p">;</span><span class="w">    </span><span class="c1"># (3)!</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="kn">index</span><span class="w"> </span><span class="s">index.html</span><span class="p">;</span><span class="w">                       </span><span class="c1"># (4)!</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="kn">access_log</span><span class="w"> </span><span class="s">/var/log/nginx/web1.access.log</span><span class="p">;</span><span class="w">   </span><span class="c1"># (5)!</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span><span class="w">                            </span><span class="c1"># (6)!</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">        </span><span class="kn">try_files</span><span class="w"> </span><span class="nv">$uri</span><span class="w"> </span><span class="nv">$uri/</span><span class="w"> </span><span class="p">=</span><span class="mi">404</span><span class="p">;</span><span class="w">          </span><span class="c1"># (7)!</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>Puerto en el que escucha este sitio.</li>
+<li>Nombre o nombres del sitio. Nginx lo compara con la cabecera <code>Host</code> de cada petición.</li>
+<li>Carpeta donde están los ficheros de la web. La URL <code>/css/estilo.css</code> se convierte en el fichero <code>/var/www/web1.garcia.test/html/css/estilo.css</code>.</li>
+<li>Qué fichero servir cuando se pide una carpeta (por ejemplo, <code>/</code>).</li>
+<li>Registro propio de este sitio, en lugar del general.</li>
+<li>Bloque que se aplica a las URL que empiezan por <code>/</code>, es decir, a todas.</li>
+<li>Busca un fichero con ese nombre; si no, una carpeta; si tampoco, responde <code>404</code>.</li>
+</ol>
+<h3 id="como-elige-nginx-el-sitio">Cómo elige Nginx el sitio<a class="headerlink" href="#como-elige-nginx-el-sitio" title="Permanent link">&para;</a></h3>
+<p>Cuando llega una petición:</p>
+<ol>
+<li>Se queda con los bloques <code>server</code> cuyo <code>listen</code> coincide con la IP y el puerto por los que ha entrado la conexión.</li>
+<li>Entre ellos, busca el que tiene un <code>server_name</code> igual a la cabecera <code>Host</code>.</li>
+<li>Si ninguno coincide, usa el marcado como <strong><code>default_server</code></strong> en su directiva <code>listen</code>. Y si ninguno lo está, el <strong>primero</strong> que haya cargado.</li>
+</ol>
+<h3 id="el-ciclo-de-trabajo">El ciclo de trabajo<a class="headerlink" href="#el-ciclo-de-trabajo" title="Permanent link">&para;</a></h3>
+<p>Administrar Nginx es siempre el mismo ciclo: <strong>editar, comprobar, aplicar, verificar</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Para…</th>
+<th>Comando</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Comprobar que la configuración no tiene errores</td>
+<td><code>sudo nginx -t</code></td>
+</tr>
+<tr>
+<td>Ver la configuración completa que carga Nginx (todos los <code>include</code> juntos)</td>
+<td><code>sudo nginx -T</code></td>
+</tr>
+<tr>
+<td>Aplicar los cambios sin cortar el servicio</td>
+<td><code>sudo systemctl reload nginx</code></td>
+</tr>
+<tr>
+<td>Reiniciar por completo</td>
+<td><code>sudo systemctl restart nginx</code></td>
+</tr>
+<tr>
+<td>Ver si está funcionando</td>
+<td><code>systemctl status nginx</code></td>
+</tr>
+<tr>
+<td>Ver los mensajes del servicio</td>
+<td><code>journalctl -u nginx</code></td>
+</tr>
+<tr>
+<td>Seguir el registro de accesos en directo</td>
+<td><code>sudo tail -f /var/log/nginx/access.log</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition danger">
+<p class="admonition-title">Antes de aplicar, <code>nginx -t</code>. Siempre.</p>
+<p><code>reload</code> pide a Nginx que relea la configuración <strong>sin dejar de atender</strong> peticiones. Si la configuración nueva tiene un error, la recarga falla y Nginx <strong>sigue funcionando con la anterior</strong>. En cambio, si haces <code>restart</code> con un error, Nginx se para y <strong>no vuelve a arrancar</strong>: tu web queda caída.</p>
+<p>Acostúmbrate a escribirlo siempre así:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo<span class="w"> </span>nginx<span class="w"> </span>-t<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>nginx
+</code></pre></div>
+<p>El <code>&amp;&amp;</code> hace que la recarga solo se ejecute si la comprobación ha ido bien.</p>
+<p>A diferencia de lo que viste con SSH en Debian 13, Nginx no usa activación por <em>socket</em>, así que aquí <code>reload</code> funciona correctamente y es lo recomendable.</p>
+</div>
+<h3 id="los-registros">Los registros<a class="headerlink" href="#los-registros" title="Permanent link">&para;</a></h3>
+<p>Cada petición deja una línea en el registro de accesos. Esta es real:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>192.168.56.1 - - [04/Oct/2026:19:47:48 +0200] "GET /noexiste HTTP/1.1" 404 146 "-" "curl/8.21.0"
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Valor</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IP del cliente</td>
+<td><code>192.168.56.1</code></td>
+<td>Tu Windows, visto desde la red Host-only</td>
+</tr>
+<tr>
+<td>Usuario</td>
+<td><code>-</code></td>
+<td>Solo aparece si hay autenticación (práctica 2.3)</td>
+</tr>
+<tr>
+<td>Fecha y hora</td>
+<td><code>[04/Oct/2026:19:47:48 +0200]</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Petición</td>
+<td><code>"GET /noexiste HTTP/1.1"</code></td>
+<td>Método, ruta y versión</td>
+</tr>
+<tr>
+<td>Código de estado</td>
+<td><code>404</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Tamaño</td>
+<td><code>146</code></td>
+<td>Bytes del cuerpo de la respuesta</td>
+</tr>
+<tr>
+<td>Referer</td>
+<td><code>"-"</code></td>
+<td>Desde qué página se llegó a esta, si se sabe</td>
+</tr>
+<tr>
+<td>User-Agent</td>
+<td><code>"curl/8.21.0"</code></td>
+<td>Qué programa hizo la petición</td>
+</tr>
+</tbody>
+</table>
+<p>El <strong>registro de errores</strong> guarda los problemas del servidor: ficheros que no puede leer, configuraciones incorrectas, servidores de detrás que no responden… Cuando una web "no funciona", la respuesta casi siempre está en uno de estos dos ficheros.</p>
+<h3 id="permisos-lo-que-necesita-www-data">Permisos: lo que necesita <code>www-data</code><a class="headerlink" href="#permisos-lo-que-necesita-www-data" title="Permanent link">&para;</a></h3>
+<p>Los trabajadores de Nginx se ejecutan como <code>www-data</code>, así que <strong><code>www-data</code> tiene que poder leer los ficheros de la web</strong>. En concreto:</p>
+<ul>
+<li><strong>Lectura (<code>r</code>)</strong> sobre cada fichero que se sirve.</li>
+<li><strong>Ejecución (<code>x</code>)</strong> sobre <strong>cada carpeta</strong> del camino, desde <code>/</code> hasta el fichero. En una carpeta, el permiso <code>x</code> significa "poder entrar en ella".</li>
+</ul>
+<p>Si falta cualquiera de los dos, Nginx responde <strong><code>403 Forbidden</code></strong> y deja en el registro de errores una línea con <code>Permission denied</code>. Lo comprobarás en la práctica.</p>
+<p>Muchos tutoriales hacen que <code>www-data</code> sea el <strong>propietario</strong> de los ficheros de la web. No es buena idea: el servidor solo necesita <strong>leer</strong>, y si alguien consiguiera aprovechar un fallo en la aplicación, con permiso de escritura podría modificar tu web. El dueño debe ser tu usuario (o un usuario de despliegue); <code>www-data</code> se queda con permiso de lectura. Es el <strong>principio de mínimo privilegio</strong>.</p>
+<h2 id="7-subir-ficheros-al-servidor-ftp-ftps-y-sftp">7. Subir ficheros al servidor: FTP, FTPS y SFTP<a class="headerlink" href="#7-subir-ficheros-al-servidor-ftp-ftps-y-sftp" title="Permanent link">&para;</a></h2>
+<p>Para poner una web en un servidor, primero hay que hacer llegar los ficheros hasta él. Durante décadas, la forma estándar ha sido <strong>FTP</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Protocolo</th>
+<th>Qué es</th>
+<th>Puertos</th>
+<th>Cifrado</th>
+<th>Qué hace falta en el servidor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>FTP</strong></td>
+<td><em>File Transfer Protocol</em>, de 1971</td>
+<td>21 (órdenes) y 20 o un rango alto (datos)</td>
+<td><strong>Ninguno</strong>: usuario, contraseña y ficheros viajan en claro</td>
+<td>Un servidor FTP (vsftpd, ProFTPD…)</td>
+</tr>
+<tr>
+<td><strong>FTPS</strong></td>
+<td>FTP dentro de TLS</td>
+<td>21 / 990 y rango de datos</td>
+<td>Sí</td>
+<td>Un servidor FTP con certificado</td>
+</tr>
+<tr>
+<td><strong>SFTP</strong></td>
+<td><em>SSH File Transfer Protocol</em>: un subsistema de SSH, <strong>no</strong> es FTP</td>
+<td><strong>22</strong></td>
+<td>Sí, el de SSH</td>
+<td><strong>Nada nuevo</strong>: lo da el servidor SSH que ya tienes</td>
+</tr>
+<tr>
+<td><strong>SCP</strong></td>
+<td>Copia de ficheros por SSH</td>
+<td>22</td>
+<td>Sí</td>
+<td>Nada nuevo</td>
+</tr>
+</tbody>
+</table>
+<p>A pesar del nombre, <strong>SFTP no tiene nada que ver con FTP</strong>: es un protocolo diferente que funciona dentro de una conexión SSH. Usa el mismo puerto, el mismo usuario y la misma clave que ya utilizas para entrar por terminal, y hereda todo su cifrado.</p>
+<p>FTP sin cifrar está completamente desaconsejado: cualquiera que escuche en la red ve tu contraseña. Además, su funcionamiento con dos conexiones (una para las órdenes y otra para los datos, en modo activo o pasivo) da muchos problemas con los cortafuegos. Hoy, si te dan acceso FTP a un alojamiento, lo razonable es usar FTPS o, mejor aún, SFTP.</p>
+<p>Clientes habituales: <strong>FileZilla</strong> y <strong>WinSCP</strong> (gráficos), y los comandos <strong><code>sftp</code></strong> y <strong><code>scp</code></strong>, que ya vienen con el OpenSSH de Windows, Linux y macOS.</p>
+<div class="admonition info">
+<p class="admonition-title">Y en el mundo real…</p>
+<p>Subir ficheros a mano es cada vez menos habitual. Lo normal es que el código viva en un repositorio <strong>Git</strong> (Tema 5) y que el despliegue se haga desde ahí, de forma automática, con un sistema de <strong>integración y despliegue continuo</strong> (Tema 7). En la práctica 2.1 harás un sitio de cada forma: uno clonando un repositorio y otro subiéndolo por SFTP.</p>
+</div>
+<hr />
+<h2 id="cierre-del-bloque-2">Cierre del bloque 2<a class="headerlink" href="#cierre-del-bloque-2" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 3</p>
+<p>Un mismo servidor, con una sola IP, aloja <code>tienda.com</code> y <code>blog.com</code>. ¿Cómo sabe qué web tiene que devolver en cada petición? ¿Qué ocurriría con un navegador que solo hablara HTTP/1.0?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 4</p>
+<p>¿Por qué los procesos trabajadores de Nginx se ejecutan como <code>www-data</code> y no como <code>root</code>? ¿Y por qué no conviene que <code>www-data</code> sea el propietario de los ficheros de la web?</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Ahora toca: Práctica 2.1 - Servidor web Nginx</p>
+<p><strong><a href="../T2-practica-nginx/">Ir a la práctica 2.1</a>.</strong> Instalarás Nginx en tu máquina virtual, montarás dos sitios virtuales con tu apellido (uno clonado de Git y otro subido por SFTP) y diagnosticarás errores con los registros. Usa los apartados 4, 6 y 7.</p>
+</div>
+<hr />
+<h2 id="8-https-http-sobre-tls">8. HTTPS: HTTP sobre TLS<a class="headerlink" href="#8-https-http-sobre-tls" title="Permanent link">&para;</a></h2>
+<p>HTTP viaja en <strong>texto plano</strong>. Cualquiera que esté en el camino (la wifi del aula, el router de una cafetería, un proveedor de Internet) puede leer las peticiones, las respuestas, las contraseñas de los formularios y las cookies, y puede incluso <strong>modificarlas</strong>.</p>
+<p><strong>HTTPS</strong> es exactamente el mismo HTTP, pero dentro de un canal cifrado con <strong>TLS</strong> (<em>Transport Layer Security</em>, heredero de SSL). Escucha por defecto en el <strong>puerto 443</strong> y aporta tres garantías:</p>
+<ul>
+<li><strong>Confidencialidad</strong>: nadie en el camino puede leer el contenido.</li>
+<li><strong>Integridad</strong>: nadie puede modificarlo sin que se detecte.</li>
+<li><strong>Autenticación</strong>: estás hablando con el servidor auténtico de ese dominio, no con un impostor.</li>
+</ul>
+<p>Hoy HTTPS es la norma: los navegadores marcan como <strong>"No es seguro"</strong> cualquier web servida por HTTP. Además, las versiones modernas de HTTP lo exigen. El estándar de HTTP/2 permite usarlo sin cifrar, pero ningún navegador lo implementa así: solo hablan HTTP/2 por HTTPS. Y HTTP/3 va siempre cifrado, porque QUIC lleva TLS 1.3 incorporado.</p>
+<h3 id="lo-que-ya-sabes-de-ssh-te-sirve-aqui">Lo que ya sabes de SSH te sirve aquí<a class="headerlink" href="#lo-que-ya-sabes-de-ssh-te-sirve-aqui" title="Permanent link">&para;</a></h3>
+<p>TLS resuelve el mismo problema que SSH en el Tema 1, y lo resuelve <strong>con las mismas tres herramientas</strong>:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>En SSH</th>
+<th>En TLS (HTTPS)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Acordar la clave de sesión</td>
+<td>Diffie-Hellman</td>
+<td>Diffie-Hellman efímero</td>
+</tr>
+<tr>
+<td>Demostrar quién es el servidor</td>
+<td>Firma con la clave de host</td>
+<td>Firma con la clave privada del <strong>certificado</strong></td>
+</tr>
+<tr>
+<td>Cifrar los datos</td>
+<td>Cifrado simétrico</td>
+<td>Cifrado simétrico</td>
+</tr>
+</tbody>
+</table>
+<h3 id="como-es-el-saludo-tls-13">Cómo es el saludo TLS 1.3<a class="headerlink" href="#como-es-el-saludo-tls-13" title="Permanent link">&para;</a></h3>
+<p>TLS 1.3 (2018) es la versión actual. Su saludo inicial (<em>handshake</em>) necesita <strong>un solo viaje de ida y vuelta</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a> Cliente                                              Servidor
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    │                                                     │
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    │── ClientHello ─────────────────────────────────────►│  versiones y algoritmos que admite,
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>    │     + valor público Diffie-Hellman                  │  y el nombre del sitio (SNI)
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    │                                                     │
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    │◄──────────────────────────────────── ServerHello ───│  algoritmos elegidos
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    │                 + valor público Diffie-Hellman      │  ── desde aquí, todo va cifrado ──
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>    │                 + certificado                       │
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>    │                 + firma del intercambio             │  firmado con la clave privada
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>    │                 + Finished                          │  del certificado
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>    │                                                     │
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>    │── Finished ────────────────────────────────────────►│
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    │                                                     │
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>    │◄═══════════ HTTP cifrado con clave simétrica ══════►│
+</code></pre></div>
+<ol>
+<li>Con los dos valores públicos, cliente y servidor calculan por su cuenta <strong>el mismo secreto</strong>, del que derivan las claves simétricas de la sesión. Igual que en SSH, la clave <strong>nunca viaja</strong> por la red.</li>
+<li>El servidor <strong>firma</strong> el intercambio con la clave privada de su certificado. El cliente comprueba la firma con la clave pública que viene en el certificado: así sabe que el servidor posee esa clave privada.</li>
+<li>A partir de ahí, todo el tráfico HTTP va cifrado con cifrado simétrico, que es el rápido.</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Una explicación que leerás a menudo y ya no es cierta</p>
+<p>Muchos apuntes y diagramas dicen que "el cliente genera una clave simétrica, la cifra con la clave pública del servidor y se la envía". Así funcionaba el intercambio <strong>RSA</strong> de versiones antiguas, y <strong>TLS 1.3 lo eliminó</strong>. El motivo: si algún día alguien robaba la clave privada del servidor, podía descifrar <strong>todo el tráfico grabado en el pasado</strong>. Con Diffie-Hellman efímero, cada sesión usa secretos nuevos que se destruyen al acabar, y robar la clave del servidor no sirve para descifrar sesiones antiguas. A esa propiedad se la llama <strong>secreto hacia adelante</strong> (<em>forward secrecy</em>), y en TLS 1.3 es obligatoria.</p>
+</div>
+<h3 id="certificados-la-diferencia-con-ssh">Certificados: la diferencia con SSH<a class="headerlink" href="#certificados-la-diferencia-con-ssh" title="Permanent link">&para;</a></h3>
+<p>En SSH, la primera vez que te conectas <strong>tú</strong> compruebas la huella del servidor y la guardas en <code>known_hosts</code>. En la web eso es impensable: nadie va a comprobar a mano la huella de cada sitio que visita.</p>
+<p>La solución son los <strong>certificados digitales</strong>. Un certificado es un documento que dice "<em>esta clave pública pertenece al dominio <code>ejemplo.com</code></em>", y que va <strong>firmado por una Autoridad de Certificación</strong> (CA). Tu navegador y tu sistema operativo traen de fábrica una lista de CA en las que confían. Si el certificado de un sitio está firmado por una de ellas (directamente o a través de una cadena de certificados intermedios), el navegador lo acepta y muestra el candado.</p>
+<table>
+<thead>
+<tr>
+<th>Tipo de certificado</th>
+<th>Quién lo firma</th>
+<th>Qué hace el navegador</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>De una CA reconocida</strong></td>
+<td>Una CA de la lista del navegador (por ejemplo, <strong>Let's Encrypt</strong>, que los emite gratis y de forma automática)</td>
+<td>Lo acepta sin avisos</td>
+<td>Cualquier web pública</td>
+</tr>
+<tr>
+<td><strong>Autofirmado</strong></td>
+<td>El propio servidor</td>
+<td>Muestra un aviso de seguridad a pantalla completa</td>
+<td>Laboratorios y redes internas</td>
+</tr>
+</tbody>
+</table>
+<p>Un certificado autofirmado cifra <strong>exactamente igual de bien</strong> que uno de una CA. Lo que no puede es demostrar tu identidad a un desconocido, porque nadie de confianza respalda que esa clave sea tuya. Para obtener uno de Let's Encrypt hace falta un dominio real, accesible desde Internet, así que en la práctica 2.2 usarás uno autofirmado.</p>
+<div class="admonition info">
+<p class="admonition-title">Virtual hosts con HTTPS: SNI</p>
+<p>Con HTTPS hay un problema: el servidor tiene que presentar el certificado del sitio <strong>antes</strong> de recibir la petición HTTP y, por tanto, antes de ver la cabecera <code>Host</code>. Se resuelve con <strong>SNI</strong> (<em>Server Name Indication</em>): el cliente anuncia el nombre del sitio en el primer mensaje del saludo TLS, y así el servidor sabe qué certificado enviar.</p>
+</div>
+<hr />
+<h2 id="cierre-del-bloque-3">Cierre del bloque 3<a class="headerlink" href="#cierre-del-bloque-3" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 5</p>
+<p>Compara cómo comprueba tu cliente la identidad del servidor en SSH y en HTTPS. ¿Por qué en la web no se usa el sistema de SSH?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 6</p>
+<p>Un compañero dice: "En HTTPS, el navegador cifra la clave de sesión con la clave pública del servidor y se la envía". ¿Qué hay de cierto y qué no? ¿Qué problema tenía ese método?</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Ahora toca: Práctica 2.2 - HTTPS en Nginx</p>
+<p><strong><a href="../T2-practica-https/">Ir a la práctica 2.2</a>.</strong> Generarás un certificado autofirmado, pondrás tus dos sitios en HTTPS y redirigirás automáticamente las peticiones HTTP a HTTPS.</p>
+</div>
+<hr />
+<h2 id="bloque-4-proteger-y-escalar">Bloque 4: proteger y escalar<a class="headerlink" href="#bloque-4-proteger-y-escalar" title="Permanent link">&para;</a></h2>
+<p>Este bloque es práctico. Usa lo que ya sabes de los códigos de estado (apartado 3.3) y de las funciones de un servidor web además de servir ficheros (apartado 1).</p>
+<div class="admonition example">
+<p class="admonition-title">Ahora toca: prácticas 2.3, 2.4 y 2.5</p>
+<ul>
+<li><strong><a href="../T2-practica-autenticacion/">Práctica 2.3, autenticación</a>:</strong> pedir usuario y contraseña para una zona de la web (código <code>401</code>) y limitar el acceso por IP.</li>
+<li><strong><a href="../T2-practica-proxy/">Práctica 2.4, proxy inverso</a>:</strong> un Nginx delante que reenvía las peticiones a otro servidor (código <code>502</code> si el de detrás no responde).</li>
+<li><strong><a href="../T2-practica-balanceo/">Práctica 2.5, balanceo de carga</a>:</strong> repartir las peticiones entre varios servidores y comprobar qué pasa cuando uno se cae.</li>
+</ul>
+</div>
+<hr />
+<details class="info">
+<summary>Para saber más: más allá de tu propio servidor</summary>
+<p><strong>CDN (<em>Content Delivery Network</em>).</strong> Una red de servidores repartidos por todo el mundo que guardan copias del contenido de una web. El usuario recibe el contenido del nodo más cercano, lo que reduce la latencia: la luz tarda unos 50 ms solo en recorrer la fibra entre Europa y la costa oeste de Estados Unidos, y una página hace decenas de peticiones. Cloudflare, Akamai o Fastly son CDN. Además de acercar el contenido, absorben ataques de denegación de servicio y terminan las conexiones TLS cerca del usuario.</p>
+<p><strong>Alojamiento estático y JAMstack.</strong> Muchas webs no necesitan generar nada en el momento de la petición: el HTML puede generarse <strong>una vez</strong>, al publicar, con un generador de sitios estáticos (Hugo, Astro, Eleventy, MkDocs…, con el que está hecha esta misma web). El resultado son ficheros estáticos que se sirven desde una CDN, y la parte dinámica se resuelve con JavaScript en el navegador llamando a API. A esa arquitectura se la llama <strong>JAMstack</strong> (<em>JavaScript, APIs y Markup</em>). Servicios como <strong>GitHub Pages</strong>, <strong>Netlify</strong>, <strong>Vercel</strong> o <strong>Cloudflare Pages</strong> alojan este tipo de webs, a menudo gratis, y las despliegan solos cada vez que actualizas el repositorio.</p>
+<p><strong>Edge computing.</strong> Un paso más allá: ejecutar código en los propios nodos de la CDN (Cloudflare Workers, Vercel Edge Functions…), para generar respuestas personalizadas sin llegar al servidor de origen.</p>
+<p>Todo esto funciona muy bien… y es una caja negra si no sabes qué hace un servidor web por dentro. Por eso empezamos por Nginx.</p>
+</details>
+<h2 id="referencias">Referencias<a class="headerlink" href="#referencias" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://developer.mozilla.org/es/docs/Web/HTTP/Guides/Overview">MDN — Una visión general de HTTP</a></li>
+<li><a href="https://developer.mozilla.org/es/docs/Web/HTTP/Reference/Status">MDN — Códigos de estado de respuesta HTTP</a></li>
+<li><a href="https://nginx.org/en/docs/beginners_guide.html">Documentación de Nginx — Beginner's Guide</a></li>
+<li><a href="https://nginx.org/en/docs/http/request_processing.html">Documentación de Nginx — Cómo procesa Nginx una petición</a></li>
+<li><a href="https://www.cloudflare.com/es-es/learning/ssl/what-happens-in-a-tls-handshake/">Cloudflare — ¿Qué ocurre en un protocolo de enlace TLS?</a></li>
+<li><a href="https://w3techs.com/technologies/overview/web_server">W3Techs — Usage statistics of web servers</a></li>
+<li><a href="https://letsencrypt.org/es/how-it-works/">Let's Encrypt — Cómo funciona</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href="../T1-practica-maquina-virtual/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Práctica 1.1 - Instalación y configuración de nuestra máquina virtual">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../T2-practica-nginx/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Práctica 2.1 - Servidor web Nginx">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                Práctica 2.1 - Servidor web Nginx
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Material docente del módulo 0614. Contiene obras derivadas de terceros; ver la página de Créditos.
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.footer", "toc.integrate", "search.highlight", "search.suggest", "content.code.annotate", "content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

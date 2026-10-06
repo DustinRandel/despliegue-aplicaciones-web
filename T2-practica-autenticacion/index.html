@@ -1,0 +1,1617 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes y prácticas del módulo 0614 - 2º DAW">
+      
+      
+        <meta name="author" content="Dustin de Lara">
+      
+      
+        <link rel="canonical" href="https://dustinrandel.github.io/despliegue-aplicaciones-web/T2-practica-autenticacion/">
+      
+      
+        <link rel="prev" href="../T2-practica-https/">
+      
+      
+        <link rel="next" href="../T2-practica-proxy/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Práctica 2.3 - Autenticación y control de acceso - Despliegue de aplicaciones web</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#practica-23-autenticacion-y-control-de-acceso-en-nginx" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-header__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Despliegue de aplicaciones web
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Práctica 2.3 - Autenticación y control de acceso
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="blue"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-nav__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Despliegue de aplicaciones web
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 1
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-introduccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1 - Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-practica-maquina-virtual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 2
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-arquitectura-web/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2 - Arquitectura web
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-nginx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.1 - Servidor web Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-https/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.2 - HTTPS en Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.3 - Autenticación y control de acceso
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.3 - Autenticación y control de acceso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-autenticacion-basica-que-es-y-que-no-es" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Autenticación básica: qué es y qué no es
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-crear-los-usuarios" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Crear los usuarios
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Crear los usuarios">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#permisos-del-fichero" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Permisos del fichero
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-proteger-un-sitio-entero" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Proteger un sitio entero
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Proteger un sitio entero">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#que-queda-en-los-registros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué queda en los registros
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-lo-que-viaja-por-la-red" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Lo que viaja por la red
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-proteger-solo-una-parte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Proteger solo una parte
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-control-de-acceso-por-ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Control de acceso por IP
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Control de acceso por IP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#combinar-ip-y-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combinar IP y contraseña
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-haz-una-instantanea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Haz una instantánea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuestiones-finales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuestiones finales
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entrega" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entrega
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Entrega">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parte-1-documento-de-evidencias-40" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 1 — Documento de evidencias (40 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parte-2-demostracion-en-clase-60" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 2 — Demostración en clase (60 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#criterios-de-evaluacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Criterios de evaluación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#antes-de-entregar-comprueba-que" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antes de entregar, comprueba que…
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referencias
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.4 - Proxy inverso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-balanceo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.5 - Balanceo de carga
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../creditos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Créditos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="practica-23-autenticacion-y-control-de-acceso-en-nginx">Práctica 2.3 - Autenticación y control de acceso en Nginx<a class="headerlink" href="#practica-23-autenticacion-y-control-de-acceso-en-nginx" title="Permanent link">&para;</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">Cuándo se hace</p>
+<p>En el <strong>bloque 4</strong> de la <a href="../T2-arquitectura-web/">teoría del Tema 2</a>, con la <a href="../T2-practica-https/">práctica 2.2</a> terminada: tus dos sitios ya funcionan por HTTPS.</p>
+</div>
+<div class="admonition abstract">
+<p class="admonition-title">Objetivos</p>
+<p>Al terminar esta práctica deberás ser capaz de:</p>
+<ol>
+<li>Crear un fichero de usuarios y contraseñas para Nginx, con los permisos correctos.</li>
+<li>Proteger un sitio entero, o solo una parte, con autenticación básica de HTTP.</li>
+<li>Explicar por qué la autenticación básica solo es aceptable sobre HTTPS.</li>
+<li>Permitir o denegar el acceso según la IP del cliente.</li>
+<li>Combinar las dos condiciones (IP y contraseña) con <code>satisfy</code>.</li>
+</ol>
+</div>
+<hr />
+<h2 id="1-autenticacion-basica-que-es-y-que-no-es">1. Autenticación básica: qué es y qué no es<a class="headerlink" href="#1-autenticacion-basica-que-es-y-que-no-es" title="Permanent link">&para;</a></h2>
+<p>La <strong>autenticación básica</strong> de HTTP es la forma más sencilla de pedir usuario y contraseña. No necesita programar nada: el servidor responde <code>401 Unauthorized</code> con la cabecera <code>WWW-Authenticate</code>, el navegador muestra una ventana para pedir los datos y, a partir de ahí, los envía <strong>en cada petición</strong> en la cabecera <code>Authorization</code>.</p>
+<div class="admonition danger">
+<p class="admonition-title">Base64 no es cifrado</p>
+<p>El navegador manda usuario y contraseña en <strong>base64</strong>, que es solo otra forma de escribir el texto, no un cifrado: cualquiera lo deshace en un segundo. Por eso la autenticación básica <strong>solo</strong> se usa sobre HTTPS, y por eso esta práctica va después de la 2.2. Lo comprobarás en el apartado 4.</p>
+</div>
+<h2 id="2-crear-los-usuarios">2. Crear los usuarios<a class="headerlink" href="#2-crear-los-usuarios" title="Permanent link">&para;</a></h2>
+<p>Las contraseñas se guardan en un fichero, cada una con su <strong>hash</strong>: un resumen del que no se puede recuperar la contraseña. Lo crea la herramienta <code>htpasswd</code>, del paquete <code>apache2-utils</code> (solo trae utilidades: no instala Apache):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>apache2-utils
+</code></pre></div>
+<p>Crea el fichero con un primer usuario, <strong>tu nombre</strong> en minúsculas (<code>-c</code> crea el fichero; <code>-B</code> usa el algoritmo bcrypt):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>htpasswd<span class="w"> </span>-c<span class="w"> </span>-B<span class="w"> </span>/etc/nginx/.htpasswd<span class="w"> </span>ana
+</code></pre></div>
+<p>Te pedirá la contraseña dos veces. Añade un segundo usuario, <strong>tu primer apellido</strong>, esta vez <strong>sin</strong> <code>-c</code> (si lo pones, borra el fichero y empieza de cero):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>htpasswd<span class="w"> </span>-B<span class="w"> </span>/etc/nginx/.htpasswd<span class="w"> </span>garcia
+</code></pre></div>
+<p>Mira el fichero:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>cat<span class="w"> </span>/etc/nginx/.htpasswd
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>ana:$2y$05$dDHxyJNUs7HbizkUys8ceeM2TWFAnJaot3V3RJVUm9qrXmnwRm8aG
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>garcia:$2y$05$vsyk6nY.pJo5w8Wj.tU6r.oRQVQubpSVVCkcs4HI3pCgR78UXwqEq
+</code></pre></div>
+<p>Una línea por usuario: el nombre y el hash. La contraseña no aparece en ningún sitio.</p>
+<h3 id="permisos-del-fichero">Permisos del fichero<a class="headerlink" href="#permisos-del-fichero" title="Permanent link">&para;</a></h3>
+<p>Nginx lee este fichero desde sus trabajadores, que son <code>www-data</code>. Que lo pueda leer <code>www-data</code>, pero nadie más:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>chown<span class="w"> </span>root:www-data<span class="w"> </span>/etc/nginx/.htpasswd
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">640</span><span class="w"> </span>/etc/nginx/.htpasswd
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>ls<span class="w"> </span>-l<span class="w"> </span>/etc/nginx/.htpasswd
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>-rw-r----- 1 root www-data 133 Oct  5 00:06 /etc/nginx/.htpasswd
+</code></pre></div>
+<h2 id="3-proteger-un-sitio-entero">3. Proteger un sitio entero<a class="headerlink" href="#3-proteger-un-sitio-entero" title="Permanent link">&para;</a></h2>
+<p>Edita <code>web2</code>, el bloque de HTTPS, y añade dos líneas dentro del <code>location /</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/nginx/sites-available/web2.garcia.test
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="w">    </span><span class="k">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">        </span><span class="kn">auth_basic</span><span class="w">           </span><span class="s">"Zona</span><span class="w"> </span><span class="s">privada</span><span class="w"> </span><span class="s">de</span><span class="w"> </span><span class="s">web2"</span><span class="p">;</span><span class="w">   </span><span class="c1"># (1)!</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">        </span><span class="kn">auth_basic_user_file</span><span class="w"> </span><span class="s">/etc/nginx/.htpasswd</span><span class="p">;</span><span class="w">      </span><span class="c1"># (2)!</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">        </span><span class="kn">try_files</span><span class="w"> </span><span class="nv">$uri</span><span class="w"> </span><span class="nv">$uri/</span><span class="w"> </span><span class="p">=</span><span class="mi">404</span><span class="p">;</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>Activa la autenticación. El texto es el nombre de la zona, el <em>realm</em>; algunos navegadores lo muestran en la ventana.</li>
+<li>El fichero de usuarios que acabas de crear.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo<span class="w"> </span>nginx<span class="w"> </span>-t<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>nginx
+</code></pre></div>
+<p>Entra en <code>https://web2.garcia.test</code> desde el navegador. Te pedirá usuario y contraseña.</p>
+<div class="admonition tip">
+<p class="admonition-title">El navegador recuerda la contraseña</p>
+<p>Una vez que entras, el navegador guarda las credenciales y no te las vuelve a pedir. Para volver a probar, abre una <strong>ventana de incógnito</strong> nueva.</p>
+</div>
+<p>Pruébalo también con <code>curl</code>, desde PowerShell:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-kI</span> <span class="n">https</span><span class="p">://</span><span class="n">web2</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-kI</span> <span class="n">-u</span> <span class="n">ana</span><span class="p">:</span><span class="n">contraseña_mala</span> <span class="n">https</span><span class="p">://</span><span class="n">web2</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-kI</span> <span class="n">-u</span> <span class="n">ana</span><span class="p">:</span><span class="n">tu_contraseña</span> <span class="n">https</span><span class="p">://</span><span class="n">web2</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>HTTP/1.1 401 Unauthorized
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>WWW-Authenticate: Basic realm="Zona privada de web2"
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>...
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>HTTP/1.1 401 Unauthorized
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>WWW-Authenticate: Basic realm="Zona privada de web2"
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>...
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>HTTP/1.1 200 OK
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>...
+</code></pre></div>
+<p>Sin credenciales, <code>401</code> y la cabecera <code>WWW-Authenticate</code>, que es la que hace que el navegador muestre la ventana. Con una contraseña mala, otra vez <code>401</code>. Con la buena, <code>200</code>.</p>
+<h3 id="que-queda-en-los-registros">Qué queda en los registros<a class="headerlink" href="#que-queda-en-los-registros" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">3</span><span class="w"> </span>/var/log/nginx/web2.access.log
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">2</span><span class="w"> </span>/var/log/nginx/web2.error.log
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>192.168.56.1 - ana [05/Oct/2026:00:07:00 +0200] "HEAD /elements.html HTTP/1.1" 401 0 "-" "curl/8.21.0"
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>192.168.56.1 - ana [05/Oct/2026:00:07:01 +0200] "HEAD /elements.html HTTP/1.1" 200 0 "-" "curl/8.21.0"
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>192.168.56.1 - nadie [05/Oct/2026:00:07:11 +0200] "HEAD /elements.html HTTP/1.1" 401 0 "-" "curl/8.21.0"
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>2026/10/05 00:07:00 [error] 1857#1857: *33 user "ana": password mismatch, client: 192.168.56.1, server: web2.garcia.test, request: "HEAD /elements.html HTTP/1.1", host: "web2.garcia.test"
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>2026/10/05 00:07:11 [error] 1857#1857: *35 user "nadie" was not found in "/etc/nginx/.htpasswd", client: 192.168.56.1, server: web2.garcia.test, request: "HEAD /elements.html HTTP/1.1", host: "web2.garcia.test"
+</code></pre></div>
+<p><em>(Estas líneas son de una prueba sobre <code>elements.html</code>, la página que protegerás en el apartado 5; en tu registro verás la ruta que hayas pedido.)</em></p>
+<p>El registro de accesos guarda ahora el <strong>usuario</strong> en el tercer campo, donde antes había un <code>-</code>: el que se intentó, aunque la contraseña fuera mala. El de errores dice qué ha fallado: una contraseña que no coincide (<code>password mismatch</code>) o un usuario que no existe (<code>was not found</code>).</p>
+<h2 id="4-lo-que-viaja-por-la-red">4. Lo que viaja por la red<a class="headerlink" href="#4-lo-que-viaja-por-la-red" title="Permanent link">&para;</a></h2>
+<p>Pídele a <code>curl</code> que te enseñe lo que envía:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>curl<span class="w"> </span>-vsk<span class="w"> </span>-u<span class="w"> </span>ana:tu_contraseña<span class="w"> </span>https://web2.garcia.test<span class="w"> </span>-o<span class="w"> </span>/dev/null<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span><span class="s1">'&gt; authorization'</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>&gt; Authorization: Basic YW5hOkNsYXZlLUFuYTE=
+</code></pre></div>
+<p>Copia lo que va después de <code>Basic</code> y descodifícalo (en el ejemplo, el usuario es <code>ana</code> y la contraseña <code>Clave-Ana1</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s1">'YW5hOkNsYXZlLUFuYTE='</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d<span class="p">;</span><span class="w"> </span><span class="nb">echo</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>ana:Clave-Ana1
+</code></pre></div>
+<p>Ahí está tu usuario y tu contraseña, legibles. Si esta petición viajara por HTTP, cualquiera que escuchara la red los tendría. Viaja dentro de TLS, y por eso no los ve nadie más que el servidor.</p>
+<h2 id="5-proteger-solo-una-parte">5. Proteger solo una parte<a class="headerlink" href="#5-proteger-solo-una-parte" title="Permanent link">&para;</a></h2>
+<p>Normalmente no se protege una web entera, sino una zona. Quita las dos líneas de <code>auth_basic</code> del <code>location /</code> de <code>web2</code> y añade, debajo de él, un <code>location</code> nuevo solo para la página <code>elements.html</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="w">    </span><span class="k">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">        </span><span class="kn">try_files</span><span class="w"> </span><span class="nv">$uri</span><span class="w"> </span><span class="nv">$uri/</span><span class="w"> </span><span class="p">=</span><span class="mi">404</span><span class="p">;</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="k">location</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">/elements.html</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">        </span><span class="kn">auth_basic</span><span class="w">           </span><span class="s">"Zona</span><span class="w"> </span><span class="s">privada</span><span class="w"> </span><span class="s">de</span><span class="w"> </span><span class="s">web2"</span><span class="p">;</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">        </span><span class="kn">auth_basic_user_file</span><span class="w"> </span><span class="s">/etc/nginx/.htpasswd</span><span class="p">;</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+<p>El <code>=</code> hace que este bloque se aplique <strong>solo</strong> a esa URL exacta. Recarga Nginx y compruébalo:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-k</span> <span class="n">-o</span> <span class="n">NUL</span> <span class="n">-w</span> <span class="s2">"%{http_code}\n"</span> <span class="n">https</span><span class="p">://</span><span class="n">web2</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span><span class="p">/</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-k</span> <span class="n">-o</span> <span class="n">NUL</span> <span class="n">-w</span> <span class="s2">"%{http_code}\n"</span> <span class="n">https</span><span class="p">://</span><span class="n">web2</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span><span class="p">/</span><span class="n">elements</span><span class="p">.</span><span class="n">html</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>200
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>401
+</code></pre></div>
+<p>La portada entra sin contraseña; <code>elements.html</code> la pide. En el navegador, la página <strong>Elements</strong> está en el menú de la plantilla.</p>
+<h2 id="6-control-de-acceso-por-ip">6. Control de acceso por IP<a class="headerlink" href="#6-control-de-acceso-por-ip" title="Permanent link">&para;</a></h2>
+<p>Nginx también puede permitir o denegar según la IP del cliente, con <code>allow</code> y <code>deny</code>. Se evalúan <strong>en orden</strong> y gana la primera que coincide.</p>
+<p>Tu ordenador, visto desde la máquina virtual, tiene la IP <code>192.168.56.1</code> (la has visto en los registros desde la práctica 2.1). Deniégale el acceso a <code>web1</code>, y deja pasar al resto:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="w">    </span><span class="k">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">        </span><span class="kn">deny</span><span class="w">  </span><span class="mi">192</span><span class="s">.168.56.1</span><span class="p">;</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">        </span><span class="kn">allow</span><span class="w"> </span><span class="s">all</span><span class="p">;</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">        </span><span class="kn">try_files</span><span class="w"> </span><span class="nv">$uri</span><span class="w"> </span><span class="nv">$uri/</span><span class="w"> </span><span class="p">=</span><span class="mi">404</span><span class="p">;</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+<p>Recarga y prueba <strong>desde tu ordenador</strong> y <strong>desde la propia máquina virtual</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-k</span> <span class="n">-o</span> <span class="n">NUL</span> <span class="n">-w</span> <span class="s2">"%{http_code}\n"</span> <span class="n">https</span><span class="p">://</span><span class="n">web1</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span><span class="p">/</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>curl<span class="w"> </span>-sk<span class="w"> </span>--resolve<span class="w"> </span>web1.garcia.test:443:127.0.0.1<span class="w"> </span>-o<span class="w"> </span>/dev/null<span class="w"> </span>-w<span class="w"> </span><span class="s2">"%{http_code}\n"</span><span class="w"> </span>https://web1.garcia.test/
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>403     ← desde tu ordenador
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>200     ← desde la propia máquina virtual
+</code></pre></div>
+<p>Desde tu ordenador, <code>403</code>. Desde la máquina, que se conecta a sí misma (<code>127.0.0.1</code>), <code>200</code>. Mira el registro de errores de <code>web1</code>: dice que el acceso está prohibido "por regla" (<em>by rule</em>).</p>
+<div class="admonition info">
+<p class="admonition-title"><code>--resolve</code></p>
+<p>La máquina virtual no tiene tu fichero <code>hosts</code>, así que no sabe que <code>web1.garcia.test</code> es ella misma. <code>--resolve</code> le dice a <code>curl</code> a qué IP conectar para ese nombre, sin tocar ningún fichero.</p>
+</div>
+<h3 id="combinar-ip-y-contrasena">Combinar IP y contraseña<a class="headerlink" href="#combinar-ip-y-contrasena" title="Permanent link">&para;</a></h3>
+<p>Cuando un <code>location</code> tiene a la vez reglas de IP y <code>auth_basic</code>, la directiva <code>satisfy</code> decide cómo se combinan:</p>
+<table>
+<thead>
+<tr>
+<th><code>satisfy</code></th>
+<th>Se permite el acceso si…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>all</code> (por defecto)</td>
+<td>La IP está permitida <strong>y</strong> el usuario es válido</td>
+</tr>
+<tr>
+<td><code>any</code></td>
+<td>La IP está permitida <strong>o</strong> el usuario es válido</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition question">
+<p class="admonition-title">Tarea</p>
+<p>Configura <code>web1</code> para que desde tu ordenador haya que cumplir <strong>las dos</strong> condiciones a la vez: IP permitida <strong>y</strong> usuario válido. Comprueba que entras con tu usuario, y que te rechaza con una contraseña mala. Después cámbialo para que baste con <strong>una</strong> de las dos, y explica qué cambia.</p>
+<p>Al terminar, deja <code>web1</code> como estaba al principio de la práctica, sin restricciones.</p>
+</div>
+<h2 id="7-haz-una-instantanea">7. Haz una instantánea<a class="headerlink" href="#7-haz-una-instantanea" title="Permanent link">&para;</a></h2>
+<p>Apaga la máquina con <code>sudo poweroff</code> y toma la instantánea <code>p2.3-auth</code>.</p>
+<hr />
+<h2 id="cuestiones-finales">Cuestiones finales<a class="headerlink" href="#cuestiones-finales" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 1</p>
+<p>El cliente con IP <code>172.1.10.15</code> entra en <code>/web_muy_guay</code> y se equivoca de contraseña. ¿Puede acceder? ¿Por qué?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">location</span><span class="w"> </span><span class="s">/web_muy_guay</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">    </span><span class="kn">satisfy</span><span class="w"> </span><span class="s">all</span><span class="p">;</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">    </span><span class="kn">deny</span><span class="w">  </span><span class="mi">172</span><span class="s">.1.10.6</span><span class="p">;</span>
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">    </span><span class="kn">allow</span><span class="w"> </span><span class="mi">172</span><span class="s">.1.10.15</span><span class="p">;</span>
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">    </span><span class="kn">allow</span><span class="w"> </span><span class="mi">172</span><span class="s">.1.3.14</span><span class="p">;</span>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">    </span><span class="kn">deny</span><span class="w">  </span><span class="s">all</span><span class="p">;</span>
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">    </span><span class="kn">auth_basic</span><span class="w"> </span><span class="s">"Cuestión</span><span class="w"> </span><span class="mi">1</span><span class="s">"</span><span class="p">;</span>
+<a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">    </span><span class="kn">auth_basic_user_file</span><span class="w"> </span><span class="s">/etc/nginx/.htpasswd</span><span class="p">;</span>
+<a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 2</p>
+<p>El mismo cliente, con la contraseña <strong>correcta</strong>. ¿Puede acceder? ¿Por qué?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">location</span><span class="w"> </span><span class="s">/web_muy_guay</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">    </span><span class="kn">satisfy</span><span class="w"> </span><span class="s">all</span><span class="p">;</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">    </span><span class="kn">deny</span><span class="w">  </span><span class="s">all</span><span class="p">;</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">    </span><span class="kn">deny</span><span class="w">  </span><span class="mi">172</span><span class="s">.1.10.6</span><span class="p">;</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">    </span><span class="kn">allow</span><span class="w"> </span><span class="mi">172</span><span class="s">.1.10.15</span><span class="p">;</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">    </span><span class="kn">allow</span><span class="w"> </span><span class="mi">172</span><span class="s">.1.3.14</span><span class="p">;</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">    </span><span class="kn">auth_basic</span><span class="w"> </span><span class="s">"Cuestión</span><span class="w"> </span><span class="mi">2</span><span class="s">"</span><span class="p">;</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">    </span><span class="kn">auth_basic_user_file</span><span class="w"> </span><span class="s">/etc/nginx/.htpasswd</span><span class="p">;</span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 3</p>
+<p>El mismo cliente, con la contraseña correcta. ¿Puede acceder? ¿Por qué?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">location</span><span class="w"> </span><span class="s">/web_muy_guay</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">    </span><span class="kn">satisfy</span><span class="w"> </span><span class="s">any</span><span class="p">;</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">    </span><span class="kn">deny</span><span class="w">  </span><span class="mi">172</span><span class="s">.1.10.6</span><span class="p">;</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">    </span><span class="kn">deny</span><span class="w">  </span><span class="mi">172</span><span class="s">.1.10.15</span><span class="p">;</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">    </span><span class="kn">allow</span><span class="w"> </span><span class="mi">172</span><span class="s">.1.3.14</span><span class="p">;</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">    </span><span class="kn">auth_basic</span><span class="w"> </span><span class="s">"Cuestión</span><span class="w"> </span><span class="mi">3</span><span class="s">"</span><span class="p">;</span>
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="w">    </span><span class="kn">auth_basic_user_file</span><span class="w"> </span><span class="s">/etc/nginx/.htpasswd</span><span class="p">;</span>
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="p">}</span>
+</code></pre></div>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 4</p>
+<p>Un compañero dice que su web es segura porque "la contraseña va codificada en base64". ¿Qué le contestas? ¿En qué condiciones es aceptable usar autenticación básica?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 5</p>
+<p>Pon el fichero <code>.htpasswd</code> con permisos <code>600</code> y entra en la zona protegida. ¿Qué código devuelve Nginx y qué dice el registro de errores? ¿Por qué? Deja los permisos como estaban.</p>
+</div>
+<h2 id="entrega">Entrega<a class="headerlink" href="#entrega" title="Permanent link">&para;</a></h2>
+<p>Igual que en las prácticas anteriores: <strong>documento de evidencias (40 %)</strong> y <strong>demostración en clase (60 %)</strong>.</p>
+<h3 id="parte-1-documento-de-evidencias-40">Parte 1 — Documento de evidencias (40 %)<a class="headerlink" href="#parte-1-documento-de-evidencias-40" title="Permanent link">&para;</a></h3>
+<p>Un <strong>PDF</strong> llamado <code>P2.3-Apellido-Nombre.pdf</code> con portada, las evidencias (en texto, con comando y <em>prompt</em>) y las respuestas a las cuestiones.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Qué hay que demostrar</th>
+<th>Dónde</th>
+<th>Comando cuya salida se pega</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Los dos usuarios existen, con hash</td>
+<td>Debian</td>
+<td><code>sudo cat /etc/nginx/.htpasswd</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Permisos del fichero de usuarios</td>
+<td>Debian</td>
+<td><code>ls -l /etc/nginx/.htpasswd</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>La configuración de <code>web2</code> con <code>elements.html</code> protegida</td>
+<td>Debian</td>
+<td><code>cat /etc/nginx/sites-available/web2.tuapellido.test</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Sin credenciales, <code>401</code>; con ellas, <code>200</code></td>
+<td>Tu ordenador</td>
+<td>Los tres <code>curl.exe -kI</code> del apartado 3, sobre <code>elements.html</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>El usuario queda registrado</td>
+<td>Debian</td>
+<td><code>sudo tail -n 5 /var/log/nginx/web2.access.log</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Un usuario inexistente y una contraseña mala, en el registro de errores</td>
+<td>Debian</td>
+<td><code>sudo tail -n 5 /var/log/nginx/web2.error.log</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>La contraseña viaja en base64</td>
+<td>Debian</td>
+<td>El <code>curl -v</code> y el <code>base64 -d</code> del apartado 4</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Denegación por IP</td>
+<td>Los dos</td>
+<td>Los dos <code>curl</code> del apartado 6 (<code>403</code> y <code>200</code>)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>La tarea de <code>satisfy</code></td>
+<td>Debian</td>
+<td>La configuración del <code>location</code> con <code>satisfy all</code> y con <code>satisfy any</code>, y una frase sobre cada una</td>
+</tr>
+</tbody>
+</table>
+<h3 id="parte-2-demostracion-en-clase-60">Parte 2 — Demostración en clase (60 %)<a class="headerlink" href="#parte-2-demostracion-en-clase-60" title="Permanent link">&para;</a></h3>
+<p>Mini entrevista individual en la mesa del profesor: muestras la zona protegida en una ventana de incógnito, haces la tarea que se te pida y explicas una decisión o un concepto.</p>
+<h3 id="criterios-de-evaluacion">Criterios de evaluación<a class="headerlink" href="#criterios-de-evaluacion" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Criterio</th>
+<th>Peso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documento</td>
+<td>Las nueve evidencias están completas, en texto y explicadas</td>
+<td>25 %</td>
+</tr>
+<tr>
+<td>Documento</td>
+<td>Las cinco cuestiones están respondidas con corrección y criterio propio</td>
+<td>15 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td><code>elements.html</code> pide usuario y contraseña, y el resto de la web no</td>
+<td>20 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Realizas la tarea que se te pide y explicas lo que haces</td>
+<td>20 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Explicas una decisión o un concepto con tus palabras</td>
+<td>20 %</td>
+</tr>
+</tbody>
+</table>
+<h3 id="antes-de-entregar-comprueba-que">Antes de entregar, comprueba que…<a class="headerlink" href="#antes-de-entregar-comprueba-que" title="Permanent link">&para;</a></h3>
+<ul>
+<li>☐ <code>.htpasswd</code> tiene tus dos usuarios y permisos <code>640</code> con grupo <code>www-data</code>.</li>
+<li>☐ Solo <code>elements.html</code> de <code>web2</code> pide contraseña.</li>
+<li>☐ <code>web1</code> ha vuelto a quedar sin restricciones.</li>
+<li>☐ <code>sudo nginx -t</code> no da errores.</li>
+<li>☐ Existe la instantánea <code>p2.3-auth</code>.</li>
+<li>☐ El archivo se llama <code>P2.3-Apellido-Nombre.pdf</code>.</li>
+</ul>
+<h2 id="referencias">Referencias<a class="headerlink" href="#referencias" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/">Documentación de Nginx — Restringir el acceso con autenticación básica</a></li>
+<li><a href="https://nginx.org/en/docs/http/ngx_http_access_module.html">Módulo <code>ngx_http_access_module</code> (allow, deny)</a></li>
+<li><a href="https://nginx.org/en/docs/http/ngx_http_core_module.html#satisfy">Directiva <code>satisfy</code></a></li>
+<li><a href="https://developer.mozilla.org/es/docs/Web/HTTP/Guides/Authentication">MDN — Autenticación HTTP</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href="../T2-practica-https/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Práctica 2.2 - HTTPS en Nginx">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Práctica 2.2 - HTTPS en Nginx
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../T2-practica-proxy/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Práctica 2.4 - Proxy inverso">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                Práctica 2.4 - Proxy inverso
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Material docente del módulo 0614. Contiene obras derivadas de terceros; ver la página de Créditos.
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.footer", "toc.integrate", "search.highlight", "search.suggest", "content.code.annotate", "content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

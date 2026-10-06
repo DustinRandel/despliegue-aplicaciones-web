@@ -1,0 +1,2293 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes y prácticas del módulo 0614 - 2º DAW">
+      
+      
+        <meta name="author" content="Dustin de Lara">
+      
+      
+        <link rel="canonical" href="https://dustinrandel.github.io/despliegue-aplicaciones-web/T2-practica-nginx/">
+      
+      
+        <link rel="prev" href="../T2-arquitectura-web/">
+      
+      
+        <link rel="next" href="../T2-practica-https/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Práctica 2.1 - Servidor web Nginx - Despliegue de aplicaciones web</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#practica-21-servidor-web-nginx-sitios-virtuales-y-transferencia-por-sftp" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-header__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Despliegue de aplicaciones web
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Práctica 2.1 - Servidor web Nginx
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="blue"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-nav__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Despliegue de aplicaciones web
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 1
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-introduccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1 - Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-practica-maquina-virtual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 2
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-arquitectura-web/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2 - Arquitectura web
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.1 - Servidor web Nginx
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.1 - Servidor web Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tus-nombres-de-dominio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tus nombres de dominio
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-instalar-nginx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Instalar Nginx
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-un-vistazo-a-la-configuracion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Un vistazo a la configuración
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-primer-sitio-web1-desde-un-repositorio-git" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Primer sitio: web1, desde un repositorio Git
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Primer sitio: web1, desde un repositorio Git">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-la-carpeta-y-el-contenido" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 La carpeta y el contenido
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-el-fichero-de-configuracion-del-sitio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 El fichero de configuración del sitio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-activar-el-sitio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Activar el sitio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-probar-el-sitio-sin-dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Probar el sitio sin DNS
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-resolver-los-nombres-el-fichero-hosts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Resolver los nombres: el fichero hosts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-un-fallo-de-seguridad-real-la-carpeta-git" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Un fallo de seguridad real: la carpeta .git
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-segundo-sitio-web2-subido-por-sftp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Segundo sitio: web2, subido por SFTP
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Segundo sitio: web2, subido por SFTP">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-preparar-la-carpeta-en-el-servidor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Preparar la carpeta en el servidor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-descargar-la-web-en-tu-ordenador" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Descargar la web en tu ordenador
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-subir-el-fichero" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Subir el fichero
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#64-descomprimir-en-el-servidor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.4 Descomprimir en el servidor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#65-configurar-y-activar-web2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.5 Configurar y activar web2
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-los-registros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Los registros
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Los registros">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-un-404" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 Un 404
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-un-403-por-permisos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 Un 403 por permisos
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-haz-una-instantanea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Haz una instantánea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuestiones-finales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuestiones finales
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entrega" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entrega
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Entrega">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parte-1-documento-de-evidencias-40" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 1 — Documento de evidencias (40 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parte-2-demostracion-en-clase-60" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 2 — Demostración en clase (60 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#criterios-de-evaluacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Criterios de evaluación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#antes-de-entregar-comprueba-que" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antes de entregar, comprueba que…
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referencias
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-https/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.2 - HTTPS en Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-autenticacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.3 - Autenticación y control de acceso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.4 - Proxy inverso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-balanceo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.5 - Balanceo de carga
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../creditos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Créditos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="practica-21-servidor-web-nginx-sitios-virtuales-y-transferencia-por-sftp">Práctica 2.1 - Servidor web Nginx: sitios virtuales y transferencia por SFTP<a class="headerlink" href="#practica-21-servidor-web-nginx-sitios-virtuales-y-transferencia-por-sftp" title="Permanent link">&para;</a></h1>
+<div class="admonition abstract">
+<p class="admonition-title">Objetivos</p>
+<p>Al terminar esta práctica deberás ser capaz de:</p>
+<ol>
+<li>Instalar el servidor web Nginx y comprobar que funciona.</li>
+<li>Configurar <strong>dos sitios virtuales</strong> en el mismo servidor, cada uno con su nombre de dominio.</li>
+<li>Publicar una web clonándola de un repositorio Git, y otra subiéndola por <strong>SFTP</strong>.</li>
+<li>Asignar propietarios y permisos correctos a los ficheros de una web.</li>
+<li>Detectar y corregir un fallo de seguridad real: la exposición de la carpeta <code>.git</code>.</li>
+<li>Diagnosticar problemas con los registros (<em>logs</em>) de Nginx.</li>
+</ol>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Cuándo se hace</p>
+<p>Al terminar el <strong>bloque 2</strong> de la <a href="../T2-arquitectura-web/">teoría del Tema 2</a>: virtual hosts, Apache y Nginx, Nginx por dentro y FTP/SFTP.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Antes de empezar</p>
+<ul>
+<li>Tienes la <strong>práctica 1.1</strong> terminada: la máquina virtual con IP <code>192.168.56.10</code> y acceso por SSH con clave.</li>
+<li>La máquina tiene <strong>acceso a Internet</strong> (adaptador NAT).</li>
+<li>En tu ordenador tienes <strong>permisos de administrador</strong>, que harán falta para editar el fichero <code>hosts</code> (apartado 4).</li>
+</ul>
+<p>Todos los comandos de la Debian se ejecutan <strong>desde tu sesión SSH</strong>, nunca desde la ventana de VirtualBox.</p>
+</div>
+<h3 id="tus-nombres-de-dominio">Tus nombres de dominio<a class="headerlink" href="#tus-nombres-de-dominio" title="Permanent link">&para;</a></h3>
+<p>En esta práctica crearás dos sitios web, y sus nombres llevan tu apellido, igual que el <em>hostname</em>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>web1.tuapellido.test
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>web2.tuapellido.test
+</code></pre></div>
+<p>en minúsculas, sin acentos y sin la ñ (por ejemplo, <code>web1.garcia.test</code>). En los ejemplos de esta página aparece <code>garcia</code>: <strong>tú escribe el tuyo</strong> en todos los comandos y ficheros.</p>
+<div class="admonition info">
+<p class="admonition-title">¿Por qué <code>.test</code>?</p>
+<p><code>.test</code> es un dominio de primer nivel <strong>reservado</strong> para pruebas (<a href="https://www.rfc-editor.org/rfc/rfc6761">RFC 6761</a>): nunca existirá en Internet, así que no chocarás con ninguna web real. No uses <code>.dev</code>, que sí existe y obliga al navegador a usar HTTPS, ni <code>.local</code>, que tiene un uso especial en las redes locales.</p>
+</div>
+<hr />
+<h2 id="1-instalar-nginx">1. Instalar Nginx<a class="headerlink" href="#1-instalar-nginx" title="Permanent link">&para;</a></h2>
+<p>Actualiza la lista de paquetes e instala Nginx, junto con tres herramientas que necesitarás y que no vienen en la instalación mínima de Debian:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>nginx<span class="w"> </span>git<span class="w"> </span>unzip<span class="w"> </span>curl
+</code></pre></div>
+<p>Nginx arranca solo al instalarse y queda habilitado para arrancar con la máquina. Compruébalo:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>systemctl<span class="w"> </span>status<span class="w"> </span>nginx
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Para salir, pulsa <strong>q</strong></p>
+<p>Cuando la salida no cabe en la pantalla, <code>systemctl</code> la muestra en un visor que se queda esperando (abajo verás <code>lines 1-15/15 (END)</code>). Puedes moverte con las flechas y salir con la tecla <strong>q</strong>. Si prefieres que no se quede esperando, añade <code>--no-pager</code>: <code>systemctl status nginx --no-pager</code>.</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>● nginx.service - A high performance web server and a reverse proxy server
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>     Active: active (running) since Tue 2026-10-06 11:36:16 CEST; 17s ago
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a> Invocation: 2c8e0c8516ad428e93334fab6c2848cb
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>       Docs: man:nginx(8)
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    Process: 1257 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; ...
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    Process: 1263 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, ...
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>   Main PID: 1310 (nginx)
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>      Tasks: 3 (limit: 2317)
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>     Memory: 3M (peak: 6.6M)
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        CPU: 51ms
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>     CGroup: /system.slice/nginx.service
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>             ├─1310 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>             ├─1313 "nginx: worker process"
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>             └─1314 "nginx: worker process"
+</code></pre></div>
+<p>Debe aparecer <code>active (running)</code> y, en la línea <code>Loaded</code>, <code>enabled</code>. Fíjate también en los procesos: un proceso <strong>maestro</strong>, que lee la configuración, y los <strong>trabajadores</strong> (<em>worker</em>), que atienden las peticiones; es lo que viste en el apartado 6 de la teoría.</p>
+<p>Comprueba también que escucha en el puerto 80, y la versión instalada:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>ss<span class="w"> </span>-tlnp<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>nginx
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>sudo<span class="w"> </span>nginx<span class="w"> </span>-v
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>LISTEN 0      511          0.0.0.0:80        0.0.0.0:*    users:(("nginx",pid=1314,fd=5),("nginx",pid=1313,fd=5),("nginx",pid=1310,fd=5))
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>LISTEN 0      511             [::]:80           [::]:*    users:(("nginx",pid=1314,fd=6),("nginx",pid=1313,fd=6),("nginx",pid=1310,fd=6))
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>nginx version: nginx/1.26.3
+</code></pre></div>
+<p>Los tres <code>pid</code> son los mismos procesos que viste en <code>systemctl status</code>: el maestro y los dos trabajadores.</p>
+<div class="admonition info">
+<p class="admonition-title">¿Por qué <code>sudo nginx -v</code>?</p>
+<p>Sin <code>sudo</code>, obtendrás <code>-bash: nginx: command not found</code>, aunque Nginx esté instalado. El programa está en <code>/usr/sbin</code>, la carpeta de los comandos de administración, y en Debian esa carpeta solo está en el <code>PATH</code> de <code>root</code>. Con <code>sudo</code> se encuentra. También funcionaría escribir la ruta completa: <code>/usr/sbin/nginx -v</code>.</p>
+</div>
+<p>Por último, abre el navegador de <strong>tu ordenador</strong> y entra en <code>http://192.168.56.10</code>. Verás la página de bienvenida de Nginx:</p>
+<p><img alt="" src="../img/T2-nginx-default.png" /></p>
+<p>El aviso <strong>No seguro</strong> (<em>Not secure</em>) de la barra de direcciones es normal: la página viaja por HTTP, sin cifrar. Lo resolverás en la práctica 2.2, con HTTPS.</p>
+<div class="admonition question">
+<p class="admonition-title">Comprueba antes de seguir</p>
+<p>Si el navegador no carga la página, revisa en este orden: que la máquina esté encendida, que respondas al <code>ping 192.168.56.10</code> desde PowerShell y que <code>systemctl status nginx</code> diga <code>active</code>. Es el mismo orden que seguirás siempre que algo no cargue: <strong>¿está la máquina?, ¿está el servicio?, ¿escucha en el puerto?</strong></p>
+</div>
+<h2 id="2-un-vistazo-a-la-configuracion">2. Un vistazo a la configuración<a class="headerlink" href="#2-un-vistazo-a-la-configuracion" title="Permanent link">&para;</a></h2>
+<p>Antes de tocar nada, mira cómo está organizada la configuración (lo tienes explicado en el apartado 6 de la teoría):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>ls<span class="w"> </span>/etc/nginx
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>ls<span class="w"> </span>-l<span class="w"> </span>/etc/nginx/sites-available/<span class="w"> </span>/etc/nginx/sites-enabled/
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>conf.d        fastcgi_params  koi-win            modules-available  nginx.conf    scgi_params      sites-enabled  uwsgi_params
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>fastcgi.conf  koi-utf         mime.types         modules-enabled    proxy_params  sites-available  snippets       win-utf
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>/etc/nginx/sites-available/:
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>total 4
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>-rw-r--r-- 1 root root 2412 Jun 27 22:25 default
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>/etc/nginx/sites-enabled/:
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>total 0
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>lrwxrwxrwx 1 root root 34 Oct  6 11:36 default -&gt; /etc/nginx/sites-available/default
+</code></pre></div>
+<p>Ahí están el fichero principal, <code>nginx.conf</code>, y las carpetas que viste en la teoría. En <code>sites-available</code> está el fichero <code>default</code>, que es el sitio que acabas de ver en el navegador. En <code>sites-enabled</code> hay un <strong>enlace simbólico</strong> que apunta a él (la <code>l</code> del principio y la flecha <code>-&gt;</code>): por eso está activo.</p>
+<p>Mira cómo es ese sitio, sin los comentarios:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>grep<span class="w"> </span>-vE<span class="w"> </span><span class="s1">'^\s*#|^\s*$'</span><span class="w"> </span>/etc/nginx/sites-available/default
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">80</span><span class="w"> </span><span class="s">default_server</span><span class="p">;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="s">[::]:80</span><span class="w"> </span><span class="s">default_server</span><span class="p">;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="kn">root</span><span class="w"> </span><span class="s">/var/www/html</span><span class="p">;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="kn">index</span><span class="w"> </span><span class="s">index.html</span><span class="w"> </span><span class="s">index.htm</span><span class="w"> </span><span class="s">index.nginx-debian.html</span><span class="p">;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">_</span><span class="p">;</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">        </span><span class="kn">try_files</span><span class="w"> </span><span class="nv">$uri</span><span class="w"> </span><span class="nv">$uri/</span><span class="w"> </span><span class="p">=</span><span class="mi">404</span><span class="p">;</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="p">}</span>
+</code></pre></div>
+<p>Fíjate en <code>default_server</code>: es el sitio que responde cuando una petición no va dirigida a ningún otro. El fichero que has visto en el navegador es <code>/var/www/html/index.nginx-debian.html</code>.</p>
+<p><strong>No vamos a modificar este fichero.</strong> Cada sitio nuevo tendrá su propio fichero de configuración.</p>
+<h2 id="3-primer-sitio-web1-desde-un-repositorio-git">3. Primer sitio: <code>web1</code>, desde un repositorio Git<a class="headerlink" href="#3-primer-sitio-web1-desde-un-repositorio-git" title="Permanent link">&para;</a></h2>
+<h3 id="31-la-carpeta-y-el-contenido">3.1 La carpeta y el contenido<a class="headerlink" href="#31-la-carpeta-y-el-contenido" title="Permanent link">&para;</a></h3>
+<p>Crea la carpeta del sitio y haz que <strong>tu usuario</strong> sea su propietario:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/var/www/web1.garcia.test
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>sudo<span class="w"> </span>chown<span class="w"> </span>-R<span class="w"> </span><span class="nv">$USER</span>:<span class="nv">$USER</span><span class="w"> </span>/var/www/web1.garcia.test
+</code></pre></div>
+<p>La opción <code>-p</code> (de <em>parents</em>) crea también las carpetas intermedias que falten y no da error si la carpeta ya existe, así que puedes repetir el comando sin miedo.</p>
+<p><code>chown</code> cambia el propietario. Se escribe <code>usuario:grupo</code>, y <code>$USER</code> es una variable que contiene tu nombre de usuario, así que no tienes que escribirlo (en Debian, cada usuario tiene además un grupo propio con su mismo nombre). La opción <code>-R</code> (recursivo) lo aplica también a todo lo que haya dentro de la carpeta.</p>
+<p>Ahora clona dentro, en la subcarpeta <code>html</code>, una web de ejemplo. Como la carpeta es tuya, <strong>no necesitas <code>sudo</code></strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/cloudacademy/static-website-example<span class="w"> </span>/var/www/web1.garcia.test/html
+</code></pre></div>
+<p>Y deja los permisos bien definidos:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>chmod<span class="w"> </span>-R<span class="w"> </span><span class="nv">u</span><span class="o">=</span>rwX,go<span class="o">=</span>rX<span class="w"> </span>/var/www/web1.garcia.test
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>ls<span class="w"> </span>-la<span class="w"> </span>/var/www/web1.garcia.test/html
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>total 64
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>drwxr-xr-x 6 alumno alumno  4096 Oct  6 11:51 .
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>drwxr-xr-x 3 alumno alumno  4096 Oct  6 11:51 ..
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>drwxr-xr-x 6 alumno alumno  4096 Oct  6 11:51 assets
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>drwxr-xr-x 2 alumno alumno  4096 Oct  6 11:51 error
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>drwxr-xr-x 8 alumno alumno  4096 Oct  6 11:51 .git
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>drwxr-xr-x 2 alumno alumno  4096 Oct  6 11:51 images
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>-rw-r--r-- 1 alumno alumno 14522 Oct  6 11:51 index.html
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>-rw-r--r-- 1 alumno alumno 17128 Oct  6 11:51 LICENSE.MD
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>-rw-r--r-- 1 alumno alumno   648 Oct  6 11:51 README.MD
+</code></pre></div>
+<p>Todo es de tu usuario (en el ejemplo, <code>alumno</code>), y ahí está el <code>index.html</code> que servirá Nginx. Fíjate también en la carpeta <code>.git</code>: volverás a ella en el apartado 5.</p>
+<p>Ese <code>chmod</code> significa: el propietario (<code>u</code>) puede leer y escribir; el grupo y el resto (<code>go</code>), solo leer. La <code>X</code> <strong>mayúscula</strong> da permiso de ejecución <strong>solo a las carpetas</strong>, que lo necesitan para poder entrar en ellas. El resultado son carpetas con <code>755</code> (<code>drwxr-xr-x</code>) y ficheros con <code>644</code> (<code>-rw-r--r--</code>).</p>
+<div class="admonition info">
+<p class="admonition-title">Cómo se leen los permisos: <code>drwxr-xr-x</code> y <code>755</code></p>
+<p><code>drwxr-xr-x</code> es la forma en que <code>ls -l</code> muestra los permisos de una <strong>carpeta</strong>. Se lee por trozos:</p>
+<table>
+<thead>
+<tr>
+<th>Trozo</th>
+<th>A quién afecta</th>
+<th>Significa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>d</code></td>
+<td>—</td>
+<td>Es una carpeta (<em>directory</em>). Si fuera un fichero, saldría <code>-</code>; si fuera un enlace, <code>l</code></td>
+</tr>
+<tr>
+<td><code>rwx</code></td>
+<td>El propietario (tú)</td>
+<td>Puede leer, escribir y entrar</td>
+</tr>
+<tr>
+<td><code>r-x</code></td>
+<td>El grupo</td>
+<td>Puede leer y entrar, pero no escribir</td>
+</tr>
+<tr>
+<td><code>r-x</code></td>
+<td>El resto (aquí, <code>www-data</code>)</td>
+<td>Puede leer y entrar, pero no escribir</td>
+</tr>
+</tbody>
+</table>
+<p>Cada posición es siempre la misma letra: <code>r</code> leer, <code>w</code> escribir, <code>x</code> ejecutar (en una carpeta, <strong>entrar</strong> en ella). Un guion significa que <strong>falta</strong> ese permiso: en <code>r-x</code> falta la <code>w</code>.</p>
+<p>En resumen, <code>drwxr-xr-x</code> dice: "es una carpeta; tú puedes hacer de todo y los demás pueden mirar dentro, pero no cambiar nada". Es justo lo que necesita Nginx, que lee la web pero no debe poder modificarla.</p>
+<p>Los mismos permisos se escriben también con <strong>tres cifras</strong>, una por grupo. Cada permiso vale un número y se suman: <strong><code>r</code> = 4, <code>w</code> = 2, <code>x</code> = 1</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Letras</th>
+<th>Suma</th>
+<th>Cifra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rwx</code></td>
+<td>4 + 2 + 1</td>
+<td><strong>7</strong></td>
+</tr>
+<tr>
+<td><code>rw-</code></td>
+<td>4 + 2</td>
+<td><strong>6</strong></td>
+</tr>
+<tr>
+<td><code>r-x</code></td>
+<td>4 + 1</td>
+<td><strong>5</strong></td>
+</tr>
+<tr>
+<td><code>r--</code></td>
+<td>4</td>
+<td><strong>4</strong></td>
+</tr>
+<tr>
+<td><code>---</code></td>
+<td>0</td>
+<td><strong>0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Así, <code>rwxr-xr-x</code> es <strong>755</strong> (tú lo haces todo; los demás leen y entran) y <code>rw-r--r--</code> es <strong>644</strong> (tú lees y escribes; los demás solo leen). En el apartado 7 usarás <code>chmod 700</code>: <code>rwx------</code>, solo tú.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">¿Por qué no <code>www-data</code> como propietario?</p>
+<p>Muchos tutoriales, y la versión anterior de esta práctica, hacen <code>chown www-data:www-data</code> sobre la web. <strong>No lo hagas.</strong> Nginx se ejecuta como <code>www-data</code> y solo necesita <strong>leer</strong> los ficheros. Si <code>www-data</code> fuera el dueño, también podría modificarlos, y un fallo en el servidor permitiría a un atacante cambiar tu web. El dueño eres tú; <code>www-data</code> lee gracias a los permisos del "resto" (<code>r-x</code> en las carpetas y <code>r--</code> en los ficheros). Es el principio de <strong>mínimo privilegio</strong>.</p>
+</div>
+<h3 id="32-el-fichero-de-configuracion-del-sitio">3.2 El fichero de configuración del sitio<a class="headerlink" href="#32-el-fichero-de-configuracion-del-sitio" title="Permanent link">&para;</a></h3>
+<p>Crea el fichero del sitio en <code>sites-available</code>. Es costumbre llamarlo igual que el dominio:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/nginx/sites-available/web1.garcia.test
+</code></pre></div>
+<p>Con este contenido (cambia <code>garcia</code> en las dos líneas en las que aparece, <code>server_name</code> y <code>root</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">80</span><span class="p">;</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="s">[::]:80</span><span class="p">;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">web1.garcia.test</span><span class="p">;</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">    </span><span class="kn">root</span><span class="w"> </span><span class="s">/var/www/web1.garcia.test/html</span><span class="p">;</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">    </span><span class="kn">index</span><span class="w"> </span><span class="s">index.html</span><span class="p">;</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">    </span><span class="kn">access_log</span><span class="w"> </span><span class="s">/var/log/nginx/web1.access.log</span><span class="p">;</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">    </span><span class="kn">error_log</span><span class="w">  </span><span class="s">/var/log/nginx/web1.error.log</span><span class="p">;</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="w">        </span><span class="kn">try_files</span><span class="w"> </span><span class="nv">$uri</span><span class="w"> </span><span class="nv">$uri/</span><span class="w"> </span><span class="p">=</span><span class="mi">404</span><span class="p">;</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="p">}</span>
+</code></pre></div>
+<p>Guarda y sal de <code>nano</code> con <strong>Ctrl+O</strong>, <strong>Enter</strong> y <strong>Ctrl+X</strong>, como en la práctica 1.1.</p>
+<table>
+<thead>
+<tr>
+<th>Directiva</th>
+<th>Qué hace</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>listen 80;</code> / <code>listen [::]:80;</code></td>
+<td>Escucha en el puerto 80, por IPv4 y por IPv6</td>
+</tr>
+<tr>
+<td><code>server_name</code></td>
+<td>El nombre del sitio. Nginx lo compara con la cabecera <code>Host</code> de cada petición</td>
+</tr>
+<tr>
+<td><code>root</code></td>
+<td>La carpeta donde está la web: la que contiene el <code>index.html</code></td>
+</tr>
+<tr>
+<td><code>index</code></td>
+<td>Qué fichero servir cuando se pide una carpeta, como <code>/</code></td>
+</tr>
+<tr>
+<td><code>access_log</code> / <code>error_log</code></td>
+<td>Registros propios de este sitio, separados de los generales</td>
+</tr>
+<tr>
+<td><code>try_files $uri $uri/ =404;</code></td>
+<td>Busca un fichero con ese nombre; si no, una carpeta; si no, responde <code>404</code></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Si trabajas con VS Code</p>
+<p>Con la extensión <strong>Remote - SSH</strong> (la viste en la práctica 1.1) puedes abrir y editar estos ficheros con el editor de VS Code, con colores. Para guardar los que pertenecen a <code>root</code>, VS Code te ofrecerá reintentar con <code>sudo</code>.</p>
+</div>
+<h3 id="33-activar-el-sitio">3.3 Activar el sitio<a class="headerlink" href="#33-activar-el-sitio" title="Permanent link">&para;</a></h3>
+<p>Para activarlo, crea el enlace simbólico en <code>sites-enabled</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>sudo<span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span>/etc/nginx/sites-available/web1.garcia.test<span class="w"> </span>/etc/nginx/sites-enabled/
+</code></pre></div>
+<p>Comprueba que la configuración no tiene errores y, solo si está bien, recárgala:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>sudo<span class="w"> </span>nginx<span class="w"> </span>-t<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>nginx
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>nginx: configuration file /etc/nginx/nginx.conf test is successful
+</code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title"><code>nginx -t</code> antes de aplicar. Siempre.</p>
+<p>Si te equivocas, <code>nginx -t</code> te dice <strong>qué</strong> está mal y <strong>en qué línea</strong>. Por ejemplo, si te dejas el <code>;</code> al final de <code>root</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>nginx: [emerg] invalid number of arguments in "root" directive in /etc/nginx/sites-enabled/web1.garcia.test:8
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>nginx: configuration file /etc/nginx/nginx.conf test failed
+</code></pre></div>
+<p>Con <code>reload</code>, si la configuración es incorrecta, Nginx sigue funcionando con la anterior. Con <code>restart</code>, se para y no vuelve a arrancar. Por eso usamos <code>nginx -t &amp;&amp; reload</code>: el <code>&amp;&amp;</code> solo recarga si la comprobación ha ido bien.</p>
+</div>
+<h3 id="34-probar-el-sitio-sin-dns">3.4 Probar el sitio sin DNS<a class="headerlink" href="#34-probar-el-sitio-sin-dns" title="Permanent link">&para;</a></h3>
+<p>Tu ordenador todavía no sabe que <code>web1.garcia.test</code> es <code>192.168.56.10</code>. Pero recuerda cómo elige Nginx el sitio: por la cabecera <code>Host</code>. Puedes enviarla tú a mano con <code>curl</code>. Desde <strong>PowerShell, en tu ordenador</strong>:</p>
+<div class="admonition warning">
+<p class="admonition-title">Dos terminales: la de la Debian y la de tu ordenador</p>
+<p>Desde aquí vas a alternar entre dos ventanas. Mira siempre el <em>prompt</em> antes de escribir:</p>
+<ul>
+<li><code>alumno@debian-garcia:~$</code> es tu <strong>sesión SSH</strong>: los comandos se ejecutan en la Debian.</li>
+<li><code>PS C:\Users\...&gt;</code> es <strong>PowerShell en tu ordenador</strong>: los comandos se ejecutan en Windows.</li>
+</ul>
+<p>Deja abierta la sesión SSH y abre <strong>otra</strong> ventana de PowerShell para los comandos de tu ordenador. Si escribes <code>curl.exe</code> en la sesión SSH, obtendrás <code>-bash: curl.exe: command not found</code>, porque <code>curl.exe</code> y <code>Select-String</code> solo existen en Windows.</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-s</span> <span class="n">http</span><span class="p">://</span><span class="n">192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">56</span><span class="p">.</span><span class="n">10</span><span class="p">/</span> <span class="p">|</span> <span class="nb">Select-String</span> <span class="s2">"&lt;title&gt;"</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-s</span> <span class="n">-H</span> <span class="s2">"Host: web1.garcia.test"</span> <span class="n">http</span><span class="p">://</span><span class="n">192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">56</span><span class="p">.</span><span class="n">10</span><span class="p">/</span> <span class="p">|</span> <span class="nb">Select-String</span> <span class="s2">"&lt;title&gt;"</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>PS C:\Users\alumno&gt; curl.exe -s http://192.168.56.10/ | Select-String "&lt;title&gt;"
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>PS C:\Users\alumno&gt; curl.exe -s -H "Host: web1.garcia.test" http://192.168.56.10/ | Select-String "&lt;title&gt;"
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>        &lt;title&gt;Welcome&lt;/title&gt;
+</code></pre></div>
+<p><strong>Misma IP, mismo puerto, respuestas distintas.</strong> Sin la cabecera, <code>curl</code> envía <code>Host: 192.168.56.10</code>, que no coincide con ningún <code>server_name</code>, y responde el sitio por defecto. Con la cabecera, responde tu sitio. Esto es exactamente lo que es un <em>virtual host</em>.</p>
+<div class="admonition info">
+<p class="admonition-title"><code>curl.exe</code>, no <code>curl</code></p>
+<p>Escribe la extensión <code>.exe</code>. En Windows PowerShell, <code>curl</code> a secas es un alias de <code>Invoke-WebRequest</code>, un comando distinto que no entiende estas opciones.</p>
+</div>
+<h2 id="4-resolver-los-nombres-el-fichero-hosts">4. Resolver los nombres: el fichero <code>hosts</code><a class="headerlink" href="#4-resolver-los-nombres-el-fichero-hosts" title="Permanent link">&para;</a></h2>
+<p>Para usar el navegador hace falta que tu ordenador traduzca el nombre a la IP. De eso se encarga el DNS, que montarás en el Tema 4. Mientras tanto, lo haremos <strong>a mano</strong> con el fichero <code>hosts</code>, que el sistema consulta <strong>antes</strong> que el DNS.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">Linux / macOS</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Editar este fichero requiere permisos de administrador. Pulsa <strong>Win + X</strong> y elige <strong>Terminal (Administrador)</strong> (o <strong>Windows PowerShell (Administrador)</strong>). En esa ventana:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">notepad</span> <span class="n">C</span><span class="p">:\</span><span class="n">Windows</span><span class="p">\</span><span class="n">System32</span><span class="p">\</span><span class="n">drivers</span><span class="p">\</span><span class="n">etc</span><span class="p">\</span><span class="n">hosts</span>
+</code></pre></div>
+<p>Al final del fichero, en una línea nueva, añade tus dos nombres:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>192.168.56.10    web1.garcia.test    web2.garcia.test
+</code></pre></div>
+<p>Las líneas que empiezan por <code>#</code> son comentarios y no hacen nada: la tuya <strong>no</strong> debe llevarlo. Si tienes Docker Desktop, verás un bloque que acaba en <code># End of section</code>: pon tu línea <strong>después</strong>, porque Docker reescribe lo que hay dentro de su bloque.</p>
+<p><img alt="" src="../img/T2-hosts-windows.png" /></p>
+<p>Fíjate en el título de la terminal: <strong>Administrator</strong>.</p>
+<p>Guarda (<strong>Ctrl+S</strong>) y cierra el Bloc de notas. Si al guardar te dice que no tienes permiso, es que no lo abriste desde una terminal de administrador.</p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/hosts
+</code></pre></div>
+<p>Y añade al final:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>192.168.56.10    web1.garcia.test    web2.garcia.test
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Ya puedes añadir el segundo nombre aunque todavía no exista el sitio: lo crearás en el apartado 6.</p>
+<p>Comprueba que <strong>tu ordenador</strong> resuelve el nombre. Desde PowerShell (cualquier ventana, no hace falta que sea de administrador):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">ping</span> <span class="n">web1</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>Haciendo ping a web1.garcia.test [192.168.56.10] con 32 bytes de datos:
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>Respuesta desde 192.168.56.10: bytes=32 tiempo&lt;1m TTL=64
+</code></pre></div>
+<p>Ahora abre el navegador y escribe la dirección <strong>completa, con <code>http://</code></strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>http://web1.garcia.test
+</code></pre></div>
+<p><img alt="" src="../img/T2-web1.jpg" /></p>
+<div class="admonition tip">
+<p class="admonition-title">Si el navegador no te lleva a tu web</p>
+<ul>
+<li><strong>Escribe siempre <code>http://</code>.</strong> Sin él, el navegador puede pensar que <code>web1.garcia.test</code> es una búsqueda y mandarte a Google.</li>
+<li>Si te redirige a <code>https://</code> y falla, es una función de seguridad del navegador: vuelve a escribir <code>http://</code> o prueba en una <strong>ventana de incógnito</strong>.</li>
+<li>Si ves la página de bienvenida de Nginx en vez de tu web, la petición no coincide con tu <code>server_name</code>: revisa que el nombre del fichero <code>hosts</code> y el de la configuración sean idénticos.</li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Si no tienes permisos de administrador</p>
+<p>Sin ellos no puedes editar el fichero <code>hosts</code>. Puedes hacer todas las comprobaciones con <code>curl.exe -H "Host: ..."</code> como en el apartado 3.4, pero la evidencia del navegador tendrás que hacerla en un equipo donde sí los tengas (tu portátil, por ejemplo).</p>
+</div>
+<h2 id="5-un-fallo-de-seguridad-real-la-carpeta-git">5. Un fallo de seguridad real: la carpeta <code>.git</code><a class="headerlink" href="#5-un-fallo-de-seguridad-real-la-carpeta-git" title="Permanent link">&para;</a></h2>
+<p>Has publicado la web clonando un repositorio, y <code>git clone</code> no solo descarga la web: también crea la carpeta <strong><code>.git</code></strong>, con <strong>toda la historia del repositorio</strong>. Y está dentro de <code>root</code>, así que… prueba desde PowerShell:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">http</span><span class="p">://</span><span class="n">web1</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span><span class="p">/.</span><span class="n">git</span><span class="p">/</span><span class="n">config</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>[core]
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>    repositoryformatversion = 0
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    filemode = true
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>    bare = false
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>    logallrefupdates = true
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>[remote "origin"]
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>    url = https://github.com/cloudacademy/static-website-example
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a>    fetch = +refs/heads/*:refs/remotes/origin/*
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a>[branch "master"]
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a>    remote = origin
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a>    merge = refs/heads/master
+</code></pre></div>
+<p><strong>Tu servidor está regalando el repositorio.</strong> Con herramientas automáticas, cualquiera puede descargar la carpeta <code>.git</code> entera y reconstruir todo el código fuente, incluidas las versiones antiguas. Si alguna vez se subió al repositorio una contraseña o una clave, aunque luego se borrara, sigue en la historia. No es un caso de laboratorio: es uno de los fallos más frecuentes en webs reales, y los robots que rastrean Internet lo buscan a diario.</p>
+<p>Ciérralo. Vuelve a tu <strong>sesión SSH</strong> y edita la configuración del sitio:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/nginx/sites-available/web1.garcia.test
+</code></pre></div>
+<p>Y añade este bloque <strong>dentro</strong> del bloque <code>server</code>, después del <code>location /</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="w">    </span><span class="k">location</span><span class="w"> </span><span class="p">~</span><span class="w"> </span><span class="sr">/\.git</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="w">        </span><span class="kn">deny</span><span class="w"> </span><span class="s">all</span><span class="p">;</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">    </span><span class="p">}</span>
+</code></pre></div>
+<p><code>location ~</code> indica que lo que sigue es una <strong>expresión regular</strong>: se aplica a cualquier URL que contenga <code>/.git</code>. Y <code>deny all</code> prohíbe el acceso a todo el mundo.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>sudo<span class="w"> </span>nginx<span class="w"> </span>-t<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>nginx
+</code></pre></div>
+<p>Vuelve a probar <strong>desde tu ordenador</strong>, con <code>curl.exe</code> en PowerShell y en el navegador. Ahora el servidor responde <strong><code>403 Forbidden</code></strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>PS C:\Users\alumno&gt; curl.exe http://web1.garcia.test/.git/config
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>&lt;html&gt;
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>&lt;head&gt;&lt;title&gt;403 Forbidden&lt;/title&gt;&lt;/head&gt;
+<a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a>&lt;body&gt;
+<a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a>&lt;center&gt;&lt;h1&gt;403 Forbidden&lt;/h1&gt;&lt;/center&gt;
+<a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a>&lt;hr&gt;&lt;center&gt;nginx&lt;/center&gt;
+<a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a>&lt;/body&gt;
+<a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a>&lt;/html&gt;
+</code></pre></div>
+<p><img alt="" src="../img/T2-git-403.png" /></p>
+<div class="admonition info">
+<p class="admonition-title">En un despliegue profesional</p>
+<p>Lo correcto es que la carpeta <code>.git</code> ni siquiera llegue al servidor, o que la web publicada esté fuera del repositorio. Lo verás cuando automatices los despliegues en el Tema 7. La regla <code>deny</code> es una red de seguridad que conviene tener igualmente.</p>
+</div>
+<h2 id="6-segundo-sitio-web2-subido-por-sftp">6. Segundo sitio: <code>web2</code>, subido por SFTP<a class="headerlink" href="#6-segundo-sitio-web2-subido-por-sftp" title="Permanent link">&para;</a></h2>
+<p>En el mundo real no siempre hay un repositorio del que clonar: a veces tienes los ficheros en tu ordenador y hay que subirlos. Lo harás por <strong>SFTP</strong>, que funciona dentro de SSH. No hay que instalar nada en el servidor: tu servidor SSH ya lo incluye.</p>
+<h3 id="61-preparar-la-carpeta-en-el-servidor">6.1 Preparar la carpeta en el servidor<a class="headerlink" href="#61-preparar-la-carpeta-en-el-servidor" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/var/www/web2.garcia.test/html
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>sudo<span class="w"> </span>chown<span class="w"> </span>-R<span class="w"> </span><span class="nv">$USER</span>:<span class="nv">$USER</span><span class="w"> </span>/var/www/web2.garcia.test
+</code></pre></div>
+<h3 id="62-descargar-la-web-en-tu-ordenador">6.2 Descargar la web en tu ordenador<a class="headerlink" href="#62-descargar-la-web-en-tu-ordenador" title="Permanent link">&para;</a></h3>
+<p>Descarga en tu ordenador la plantilla <strong>Phantom</strong> de HTML5 UP desde <a href="https://html5up.net/phantom">https://html5up.net/phantom</a>, con el botón <strong>Download</strong> de arriba a la derecha:</p>
+<p><img alt="" src="../img/T2-phantom-download.png" /></p>
+<p>Obtendrás el fichero <code>html5up-phantom.zip</code> (unos 1,5 MB), que quedará en tu carpeta <strong>Descargas</strong>. No lo descomprimas: subirás el <code>.zip</code> y lo descomprimirás en el servidor.</p>
+<h3 id="63-subir-el-fichero">6.3 Subir el fichero<a class="headerlink" href="#63-subir-el-fichero" title="Permanent link">&para;</a></h3>
+<p>Tienes tres formas de hacerlo, y las tres usan SSH por debajo. <strong>Elige una</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Forma</th>
+<th>Qué es</th>
+<th>¿Hay que instalar algo?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>scp</code></strong></td>
+<td>Un solo comando que copia el fichero y termina. La más rápida</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong><code>sftp</code></strong></td>
+<td>Una sesión interactiva en modo texto: te mueves, listas, subes y bajas varios ficheros</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>FileZilla</strong></td>
+<td>Un programa gráfico: arrastras los ficheros de una ventana a otra</td>
+<td>Sí</td>
+</tr>
+</tbody>
+</table>
+<p><code>scp</code> y <code>sftp</code> vienen con el cliente OpenSSH de Windows, el mismo que te da el comando <code>ssh</code>, y usan tu clave igual que él.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">scp (la más rápida)</label><label for="__tabbed_2_2">sftp</label><label for="__tabbed_2_3">FileZilla</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Desde PowerShell, colócate en tu carpeta de Descargas y copia el fichero al servidor:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="nb">cd </span><span class="nv">$env:USERPROFILE</span><span class="p">\</span><span class="n">Downloads</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="n">scp</span> <span class="n">html5up-phantom</span><span class="p">.</span><span class="n">zip</span> <span class="n">usuario</span><span class="nv">@192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">56</span><span class="p">.</span><span class="n">10</span><span class="p">:/</span><span class="n">var</span><span class="p">/</span><span class="n">www</span><span class="p">/</span><span class="n">web2</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span><span class="p">/</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>html5up-phantom.zip                                   100% 1490KB  39.3MB/s   00:00
+</code></pre></div>
+<p>El destino se escribe <code>usuario@servidor:carpeta</code>: lo que va <strong>detrás de los dos puntos</strong> es la ruta <strong>en el servidor</strong>. Si el fichero ya existía, <code>scp</code> lo sobrescribe sin preguntar.</p>
+<p>Para copiar en sentido contrario, del servidor a tu ordenador, se invierte el orden: <code>scp usuario@192.168.56.10:/ruta/fichero .</code> (el punto final es "la carpeta en la que estoy").</p>
+</div>
+<div class="tabbed-block">
+<p>Desde PowerShell, colócate en tu carpeta de Descargas y abre una sesión SFTP:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nb">cd </span><span class="nv">$env:USERPROFILE</span><span class="p">\</span><span class="n">Downloads</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="n">sftp</span> <span class="n">usuario</span><span class="nv">@192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">56</span><span class="p">.</span><span class="n">10</span>
+</code></pre></div>
+<p>Dentro de la sesión, el <em>prompt</em> cambia a <code>sftp&gt;</code>. Los comandos se parecen a los de la terminal: <code>cd</code> y <code>ls</code> actúan sobre el <strong>servidor</strong>, y <code>lcd</code> y <code>lls</code> sobre <strong>tu ordenador</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>sftp&gt; cd /var/www/web2.garcia.test
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>sftp&gt; put html5up-phantom.zip
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a>sftp&gt; ls -l
+<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>sftp&gt; bye
+</code></pre></div>
+<p><code>put</code> sube un fichero; <code>get</code> haría lo contrario, descargarlo.</p>
+</div>
+<div class="tabbed-block">
+<p>Descarga el <strong>cliente</strong> de FileZilla desde <a href="https://filezilla-project.org/download.php?type=client">filezilla-project.org</a>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Cuidado con el instalador</p>
+<p>El botón verde <strong>Download FileZilla Client</strong> descarga un instalador que puede incluir programas patrocinados (<em>bundled offers</em>). <strong>No lo uses.</strong> Pulsa en <strong>Show additional download options</strong>, al final de la página:</p>
+<p><img alt="" src="../img/T2-filezilla-descarga.png" /></p>
+<p>Y descarga el que acaba en <strong><code>win64-setup.exe</code></strong>, el instalador limpio:</p>
+<p><img alt="" src="../img/T2-filezilla-descarga-opciones.png" /></p>
+<p>El <code>.zip</code> de debajo es la versión <strong>portable</strong>: se descomprime y se ejecuta sin instalar nada. Te sirve si en tu equipo no tienes permisos para instalar programas.</p>
+</div>
+<p>Instálalo con las opciones que vienen marcadas. FileZilla se muestra en el idioma de tu Windows: aquí tienes los nombres en español y, entre paréntesis, en inglés. Al abrirlo por primera vez aparece una ventana de bienvenida; ciérrala con <strong>OK</strong>.</p>
+<p>En la práctica 1.1 desactivaste el acceso por contraseña, así que FileZilla tendrá que usar <strong>tu clave privada</strong>. Abre <strong>Archivo → Gestor de sitios…</strong> (<em>File → Site Manager…</em>), pulsa <strong>Nuevo sitio</strong> (<em>New site</em>) y escribe un nombre para la conexión. Es libre, pero lo más claro es usar el <em>hostname</em> de tu máquina (<code>debian-garcia</code>). Elige primero el <strong>protocolo</strong>: al cambiarlo a SFTP desaparece el campo <strong>Cifrado</strong> (<em>Encryption</em>), porque SFTP va siempre cifrado dentro de SSH. Después rellena el resto:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Protocolo</strong> (<em>Protocol</em>)</td>
+<td><code>SFTP - SSH File Transfer Protocol</code></td>
+</tr>
+<tr>
+<td><strong>Servidor</strong> (<em>Host</em>)</td>
+<td><code>192.168.56.10</code></td>
+</tr>
+<tr>
+<td><strong>Puerto</strong> (<em>Port</em>)</td>
+<td><code>22</code></td>
+</tr>
+<tr>
+<td><strong>Modo de acceso</strong> (<em>Logon Type</em>)</td>
+<td><code>Archivo de claves</code> (<em>Key file</em>)</td>
+</tr>
+<tr>
+<td><strong>Usuario</strong> (<em>User</em>)</td>
+<td>tu usuario de la Debian</td>
+</tr>
+<tr>
+<td><strong>Archivo de claves</strong> (<em>Key file</em>)</td>
+<td><code>C:\Users\tuusuario\.ssh\id_ed25519</code></td>
+</tr>
+</tbody>
+</table>
+<p><img alt="" src="../img/T2-filezilla-sitio.png" /></p>
+<p>Elige el archivo de claves con <strong>Examinar…</strong> (<em>Browse…</em>). Es la clave <strong>privada</strong>, el fichero <strong>sin</strong> <code>.pub</code>. Al principio no la verás: el explorador solo muestra ficheros <code>.ppk</code>. Cambia el filtro, abajo a la derecha, a <strong>Todos los archivos</strong> (<em>All files</em>). Las versiones actuales de FileZilla leen directamente las claves de OpenSSH; si la tuya te pregunta si quieres <strong>convertir</strong> la clave al formato <code>.ppk</code> (el de PuTTY), acepta y guarda la copia junto a la original.</p>
+<p>Pulsa <strong>Conectar</strong> (<em>Connect</em>). Si te pregunta si quieres que recuerde las contraseñas (<em>Remember passwords?</em>), elige <strong>No guardar contraseñas</strong> (<em>Do not save passwords</em>): entras con la clave, así que no hay contraseña que guardar.</p>
+<p><img alt="" src="../img/T2-filezilla-contrasenas.png" /></p>
+<p>La primera vez, FileZilla te mostrará la <strong>huella</strong> del servidor (<em>Fingerprint</em>) y te preguntará si confías en él:</p>
+<p><img alt="" src="../img/T2-filezilla-huella.png" /></p>
+<p>Es la misma comprobación que hiciste en la práctica 1.1 con <code>ssh</code>. <strong>Antes de aceptar</strong>, compárala con la huella real, desde tu sesión SSH:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>ssh-keygen<span class="w"> </span>-lf<span class="w"> </span>/etc/ssh/ssh_host_ed25519_key.pub
+</code></pre></div>
+<p>Si la cadena <code>SHA256:…</code> coincide, marca <strong>Confiar siempre en este servidor</strong> (<em>Always trust this host, add this key to the cache</em>) y pulsa <strong>Aceptar</strong> (<em>OK</em>). Sin esa casilla, FileZilla te lo volverá a preguntar en cada conexión.</p>
+<p>Una vez conectado, verás tu ordenador a la izquierda y el servidor a la derecha. Al conectar, la parte derecha muestra tu carpeta personal en el servidor (<code>/home/tuusuario</code>): hay que cambiar a la carpeta de la web. En el campo <strong>Sitio remoto</strong> (<em>Remote site</em>) de la derecha escribe <code>/var/www/web2.garcia.test</code> y pulsa Enter. En el campo <strong>Sitio local</strong> (<em>Local site</em>) de la izquierda escribe la ruta de tu carpeta de Descargas (<code>C:\Users\tuusuario\Downloads</code>) y pulsa Enter. Por último, <strong>arrastra</strong> <code>html5up-phantom.zip</code> de la lista de ficheros de la izquierda a la de la derecha.
+Cuando termine, el panel de mensajes de arriba dirá <code>File transfer successful</code>, el fichero aparecerá a la derecha junto a la carpeta <code>html</code> y la pestaña <strong>Transferencias satisfactorias</strong> (<em>Successful transfers</em>) de abajo lo contará:</p>
+<p><img alt="" src="../img/T2-filezilla-transferencia.png" /></p>
+<p>Para la evidencia 9 de la entrega, haz clic derecho en el panel de mensajes, elige <strong>Copiar al portapapeles</strong> (<em>Copy to clipboard</em>) y pega el texto en tu documento.</p>
+</div>
+</div>
+</div>
+<div class="admonition info">
+<p class="admonition-title">¿Por qué has podido subirlo sin <code>sudo</code>?</p>
+<p><code>scp</code>, <code>sftp</code> y FileZilla entran con <strong>tu</strong> usuario y solo puede escribir donde <strong>tú</strong> puedes escribir. Has podido subir el fichero porque eres el propietario de <code>/var/www/web2.garcia.test</code>. Si intentas subirlo directamente a <code>/var/www</code>, que es de <code>root</code>, obtendrás <code>Permission denied</code>. Es el comportamiento correcto.</p>
+</div>
+<h3 id="64-descomprimir-en-el-servidor">6.4 Descomprimir en el servidor<a class="headerlink" href="#64-descomprimir-en-el-servidor" title="Permanent link">&para;</a></h3>
+<p>De vuelta en tu sesión SSH:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="nb">cd</span><span class="w"> </span>/var/www/web2.garcia.test
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>unzip<span class="w"> </span>html5up-phantom.zip<span class="w"> </span>-d<span class="w"> </span>html
+<a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a>rm<span class="w"> </span>html5up-phantom.zip
+<a id="__codelineno-41-4" name="__codelineno-41-4" href="#__codelineno-41-4"></a>chmod<span class="w"> </span>-R<span class="w"> </span><span class="nv">u</span><span class="o">=</span>rwX,go<span class="o">=</span>rX<span class="w"> </span>/var/www/web2.garcia.test
+<a id="__codelineno-41-5" name="__codelineno-41-5" href="#__codelineno-41-5"></a>ls<span class="w"> </span>-la<span class="w"> </span>html
+</code></pre></div>
+<p><code>unzip</code> va mostrando cada fichero que extrae (casi cien líneas) y al final verás el contenido de <code>html</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>Archive:  html5up-phantom.zip
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>  inflating: html/LICENSE.txt
+<a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a>   creating: html/assets/
+<a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a>   creating: html/assets/webfonts/
+<a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a>  ...
+<a id="__codelineno-42-6" name="__codelineno-42-6" href="#__codelineno-42-6"></a>  inflating: html/images/pic15.jpg
+<a id="__codelineno-42-7" name="__codelineno-42-7" href="#__codelineno-42-7"></a>  inflating: html/elements.html
+<a id="__codelineno-42-8" name="__codelineno-42-8" href="#__codelineno-42-8"></a>total 80
+<a id="__codelineno-42-9" name="__codelineno-42-9" href="#__codelineno-42-9"></a>drwxr-xr-x 4 alumno alumno  4096 Oct  6 12:47 .
+<a id="__codelineno-42-10" name="__codelineno-42-10" href="#__codelineno-42-10"></a>drwxr-xr-x 3 alumno alumno  4096 Oct  6 12:47 ..
+<a id="__codelineno-42-11" name="__codelineno-42-11" href="#__codelineno-42-11"></a>drwxr-xr-x 6 alumno alumno  4096 Mar  6  2022 assets
+<a id="__codelineno-42-12" name="__codelineno-42-12" href="#__codelineno-42-12"></a>-rw-r--r-- 1 alumno alumno 19131 Mar  6  2022 elements.html
+<a id="__codelineno-42-13" name="__codelineno-42-13" href="#__codelineno-42-13"></a>-rw-r--r-- 1 alumno alumno  5408 Mar  6  2022 generic.html
+<a id="__codelineno-42-14" name="__codelineno-42-14" href="#__codelineno-42-14"></a>drwxr-xr-x 2 alumno alumno  4096 Mar  6  2022 images
+<a id="__codelineno-42-15" name="__codelineno-42-15" href="#__codelineno-42-15"></a>-rw-r--r-- 1 alumno alumno  8654 Mar  6  2022 index.html
+<a id="__codelineno-42-16" name="__codelineno-42-16" href="#__codelineno-42-16"></a>-rw-r--r-- 1 alumno alumno 17128 Mar  6  2022 LICENSE.txt
+<a id="__codelineno-42-17" name="__codelineno-42-17" href="#__codelineno-42-17"></a>-rw-r--r-- 1 alumno alumno   861 Mar  6  2022 README.txt
+</code></pre></div>
+<p>El <code>index.html</code> está directamente dentro de <code>html</code>, que es lo que necesita la directiva <code>root</code>. Las fechas de 2022 no son un error: <code>unzip</code> conserva las fechas originales de los ficheros dentro del <code>.zip</code>.</p>
+<h3 id="65-configurar-y-activar-web2">6.5 Configurar y activar <code>web2</code><a class="headerlink" href="#65-configurar-y-activar-web2" title="Permanent link">&para;</a></h3>
+<p>Esta vez <strong>lo haces tú</strong>. Parte de la configuración de <code>web1</code> como plantilla:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>/etc/nginx/sites-available/web1.garcia.test<span class="w"> </span>/etc/nginx/sites-available/web2.garcia.test
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/nginx/sites-available/web2.garcia.test
+</code></pre></div>
+<p>Cambia lo que haga falta para que sea el sitio <code>web2</code> (el nombre, la carpeta y los dos registros), actívalo con su enlace simbólico, comprueba la configuración y recarga. El bloque <code>location ~ /\.git</code> puede quedarse: no estorba, y protege el sitio si algún día lo despliegas con Git.</p>
+<div class="admonition warning">
+<p class="admonition-title">Son <strong>cuatro</strong> líneas: no te olvides de los registros</p>
+<p><code>server_name</code>, <code>root</code>, <code>access_log</code> y <code>error_log</code>. Si dejas los registros con <code>web1</code>, <code>nginx -t</code> <strong>no</strong> se quejará, porque la configuración es válida, pero las peticiones de <code>web2</code> acabarán mezcladas en los registros de <code>web1</code>. Es un error silencioso: compruébalo con <code>cat</code> antes de seguir.</p>
+</div>
+<p>Si tu fichero <code>hosts</code> ya tiene <code>web2.garcia.test</code>, entra en <code>http://web2.garcia.test</code>:</p>
+<p><img alt="" src="../img/T2-web2.png" /></p>
+<p>Comprueba que <strong>cada nombre muestra su web</strong>, y que <code>http://192.168.56.10</code> sigue mostrando la página de bienvenida de Nginx.</p>
+<h2 id="7-los-registros">7. Los registros<a class="headerlink" href="#7-los-registros" title="Permanent link">&para;</a></h2>
+<p>Los registros son la herramienta de diagnóstico más importante que tienes. Cuando alguien te diga "la web no funciona", lo primero que miráis juntos es esto.</p>
+<p>Los ficheros de <code>/var/log/nginx</code> solo los pueden leer <code>root</code> y el grupo <code>adm</code>, así que necesitas <code>sudo</code>. Deja el registro de accesos de <code>web1</code> abierto en directo:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-f<span class="w"> </span>/var/log/nginx/web1.access.log
+</code></pre></div>
+<p>Recarga <code>http://web1.garcia.test</code> en el navegador con <strong>Ctrl+F5</strong> y observa cómo aparece de golpe una línea por cada petición: el HTML, las hojas de estilo, los <em>scripts</em>, las imágenes… Pulsa <strong>Ctrl+C</strong> para salir.</p>
+<div class="admonition tip">
+<p class="admonition-title">Si no aparece nada</p>
+<ul>
+<li><strong>Usa Ctrl+F5</strong>, no F5 a secas. El navegador guarda en caché lo que ya ha descargado y puede no volver a pedirlo, o pedirlo y recibir un <code>304 Not Modified</code>. También sirve una <strong>ventana de incógnito</strong>.</li>
+<li><strong>Pulsar los botones de la web no genera peticiones.</strong> La web de <code>web1</code> es una sola página: INTRO, WORK, ABOUT y CONTACT solo cambian la parte de la URL que va detrás de <code>#</code> y muestran contenido que ya estaba cargado. El navegador <strong>nunca</strong> envía al servidor lo que va detrás de <code>#</code>.</li>
+</ul>
+</div>
+<h3 id="71-un-404">7.1 Un 404<a class="headerlink" href="#71-un-404" title="Permanent link">&para;</a></h3>
+<p>Pide una página que no existe, por ejemplo <code>http://web1.garcia.test/noexiste.html</code>:</p>
+<p><img alt="" src="../img/T2-404.png" /></p>
+<p>Busca la petición en el registro de accesos:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">5</span><span class="w"> </span>/var/log/nginx/web1.access.log
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>192.168.56.1 - - [06/Oct/2026:12:57:02 +0200] "GET /images/overlay.png HTTP/1.1" 200 4385 "http://web1.garcia.test/assets/css/main.css" "Mozilla/5.0 (...)"
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>192.168.56.1 - - [06/Oct/2026:12:57:02 +0200] "GET /assets/fonts/fontawesome-webfont.woff2?v=4.6.3 HTTP/1.1" 200 71896 "http://web1.garcia.test/assets/css/font-awesome.min.css" "Mozilla/5.0 (...)"
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>192.168.56.1 - - [06/Oct/2026:12:57:02 +0200] "GET /images/bg.jpg HTTP/1.1" 200 37864 "http://web1.garcia.test/assets/css/main.css" "Mozilla/5.0 (...)"
+<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>192.168.56.1 - - [06/Oct/2026:12:57:02 +0200] "GET /favicon.ico HTTP/1.1" 404 181 "http://web1.garcia.test/" "Mozilla/5.0 (...)"
+<a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a>192.168.56.1 - - [06/Oct/2026:12:58:41 +0200] "GET /noexiste.html HTTP/1.1" 404 181 "-" "Mozilla/5.0 (...)"
+</code></pre></div>
+<p>(El último campo, que aquí aparece abreviado como <code>Mozilla/5.0 (...)</code>, es largo: identifica el navegador y el sistema operativo).</p>
+<p>Cada línea es una petición. Toma la última y léela por partes:</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Valor</th>
+<th>Qué es</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IP del cliente</td>
+<td><code>192.168.56.1</code></td>
+<td>Tu ordenador, visto desde la red Host-only</td>
+</tr>
+<tr>
+<td>Fecha y hora</td>
+<td><code>[06/Oct/2026:12:58:41 +0200]</code></td>
+<td>Cuándo llegó la petición</td>
+</tr>
+<tr>
+<td>Petición</td>
+<td><code>"GET /noexiste.html HTTP/1.1"</code></td>
+<td>Método, ruta y versión de HTTP</td>
+</tr>
+<tr>
+<td>Código de estado</td>
+<td><code>404</code></td>
+<td>La respuesta: no encontrado</td>
+</tr>
+<tr>
+<td>Tamaño</td>
+<td><code>181</code></td>
+<td>Bytes enviados en el cuerpo de la respuesta (la página de error)</td>
+</tr>
+<tr>
+<td><em>Referer</em></td>
+<td><code>"-"</code></td>
+<td>Desde qué página se llegó. <code>-</code> significa que la escribiste a mano</td>
+</tr>
+<tr>
+<td><em>User-Agent</em></td>
+<td><code>"Mozilla/5.0 (...)"</code></td>
+<td>El navegador del cliente</td>
+</tr>
+</tbody>
+</table>
+<p>Fíjate en dos detalles de las otras líneas:</p>
+<ul>
+<li>El <em>referer</em> de <code>overlay.png</code> y <code>bg.jpg</code> es <code>main.css</code>: esas imágenes no las pide el HTML, sino la <strong>hoja de estilos</strong>. El registro te dice quién ha provocado cada petición.</li>
+<li>Hay un <code>404</code> que <strong>tú no has pedido</strong>: <code>/favicon.ico</code>. Es el icono de la pestaña, y el navegador lo pide por su cuenta a cualquier web. Esta no lo tiene, así que falla. Es inofensivo, y lo verás en los registros de casi todas las webs.</li>
+</ul>
+<p>Ahora mira el registro de errores:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">5</span><span class="w"> </span>/var/log/nginx/web1.error.log
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>2026/10/06 12:16:08 [error] 1545#1545: *14 access forbidden by rule, client: 192.168.56.1, server: web1.garcia.test, request: "GET /.git/config HTTP/1.1", host: "web1.garcia.test"
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a>2026/10/06 12:16:55 [error] 1545#1545: *16 access forbidden by rule, client: 192.168.56.1, server: web1.garcia.test, request: "GET /.git/config HTTP/1.1", host: "web1.garcia.test"
+</code></pre></div>
+<p><strong>El <code>404</code> no aparece.</strong> Un <code>404</code> no es un error del servidor: el cliente ha pedido algo que no existe, y el servidor ha respondido correctamente. Por eso solo deja rastro en el registro de accesos.</p>
+<p>Lo que sí aparece son tus pruebas del apartado 5: los <code>403</code> de la carpeta <code>.git</code>, con el motivo, <code>access forbidden by rule</code> (prohibido por una regla: tu <code>deny all</code>). El registro de errores no solo dice <strong>que</strong> algo ha fallado, sino <strong>por qué</strong>.</p>
+<h3 id="72-un-403-por-permisos">7.2 Un 403 por permisos<a class="headerlink" href="#72-un-403-por-permisos" title="Permanent link">&para;</a></h3>
+<p>Ahora provoca tú un fallo. Quita a todos, menos a ti, el permiso para entrar en la carpeta de la web:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span>/var/www/web1.garcia.test/html
+</code></pre></div>
+<p>Ahora pide la <strong>página principal</strong>, <code>http://web1.garcia.test/</code> (con <strong>Ctrl+F5</strong>). Aparecerá un <strong>403 Forbidden</strong>:</p>
+<p><img alt="" src="../img/T2-403-permisos.png" /></p>
+<p>Es la misma página que viste con la carpeta <code>.git</code>, pero la causa es otra. Para saber cuál, mira el registro de errores:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">3</span><span class="w"> </span>/var/log/nginx/web1.error.log
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>2026/10/06 13:04:34 [error] 1716#1716: *43 "/var/www/web1.garcia.test/html/index.html" is forbidden (13: Permission denied), client: 192.168.56.1, server: web1.garcia.test, request: "GET / HTTP/1.1", host: "web1.garcia.test"
+</code></pre></div>
+<p>El registro te dice exactamente qué ha pasado: el usuario <code>www-data</code> no tiene permiso para llegar al fichero (<code>Permission denied</code>). Tú sigues pudiendo leerlo, porque eres el propietario, y por eso este error despista tanto.</p>
+<p>Compáralo con el <code>403</code> de la carpeta <code>.git</code>: el navegador mostraba la misma página, pero el registro decía <code>access forbidden by rule</code> (una regla <code>deny</code>). Aquí dice <code>Permission denied</code> (permisos del sistema de ficheros). <strong>Mismo código, causas distintas: el registro es lo que te dice cuál es.</strong></p>
+<div class="admonition tip">
+<p class="admonition-title">¿Te sale un 404 en vez de un 403?</p>
+<p>Es que has recargado otra dirección, por ejemplo <code>/noexiste.html</code> del apartado anterior. Nginx intenta comprobar si ese fichero existe, no puede entrar en la carpeta, y <code>try_files</code> pasa a su última opción: <code>=404</code>. El navegador dice 404, pero el registro de errores cuenta la verdad:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>2026/10/06 13:02:21 [crit] 1714#1714: *41 stat() "/var/www/web1.garcia.test/html/noexiste.html" failed (13: Permission denied), client: 192.168.56.1, server: web1.garcia.test, request: "GET /noexiste.html HTTP/1.1", host: "web1.garcia.test"
+</code></pre></div>
+<p>Es una buena lección: <strong>el código que ve el navegador no siempre cuenta toda la historia; el registro, sí.</strong></p>
+</div>
+<p>Restaura los permisos y comprueba que la web vuelve a funcionar:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>chmod<span class="w"> </span><span class="m">755</span><span class="w"> </span>/var/www/web1.garcia.test/html
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Diagnosticar en tres pasos</p>
+<p>Cuando una web no carga, pregúntate en este orden:</p>
+<ol>
+<li><strong>¿Está el servicio funcionando?</strong> <code>systemctl status nginx</code></li>
+<li><strong>¿Escucha donde debe?</strong> <code>sudo ss -tlnp | grep nginx</code></li>
+<li><strong>¿Qué dicen los registros?</strong> <code>sudo tail /var/log/nginx/*error.log</code>, y <code>journalctl -u nginx</code> si el servicio no arranca.</li>
+</ol>
+<p>Si el navegador muestra un <strong>403</strong>, piensa en permisos o en una regla <code>deny</code>. Si muestra un <strong>404</strong>, revisa la directiva <code>root</code>. Si muestra la <strong>página de bienvenida</strong> en lugar de tu web, revisa el <code>server_name</code> y el fichero <code>hosts</code>.</p>
+</div>
+<h2 id="8-haz-una-instantanea">8. Haz una instantánea<a class="headerlink" href="#8-haz-una-instantanea" title="Permanent link">&para;</a></h2>
+<p>Apaga la máquina desde tu sesión SSH:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>sudo<span class="w"> </span>poweroff
+</code></pre></div>
+<p>En VirtualBox, en la pestaña <strong>Snapshots</strong>, pulsa <strong>Take</strong> y llama a la instantánea <code>p2.1-nginx</code>. Quedará colgando de la instantánea de la práctica 1.1:</p>
+<p><img alt="" src="../img/T2-snapshot-p21.png" /></p>
+<p>La siguiente práctica parte de aquí.</p>
+<hr />
+<h2 id="cuestiones-finales">Cuestiones finales<a class="headerlink" href="#cuestiones-finales" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 1</p>
+<p>¿Qué ocurre si creas el fichero de un sitio en <code>sites-available</code> pero no haces el enlace simbólico en <code>sites-enabled</code>? ¿Qué ventaja tiene este sistema de dos carpetas frente a tener un único directorio de configuración?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 2</p>
+<p>En esta práctica, el propietario de las carpetas de las webs eres tú y no <code>www-data</code>. Explica por qué. ¿Qué permisos concretos necesita <code>www-data</code> sobre las carpetas y sobre los ficheros? ¿Qué ves en el navegador y en qué registro, si le faltan?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 3</p>
+<p>Entra en <code>http://192.168.56.10</code>. ¿Qué sitio responde, y por qué? Ahora desactiva el sitio <code>default</code> (borra <strong>solo el enlace</strong> de <code>sites-enabled</code>), recarga Nginx y vuelve a entrar por IP. ¿Qué responde ahora y por qué? Vuelve a activar <code>default</code> al terminar.</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 4</p>
+<p>En el apartado 3.4 viste tu web con <code>curl.exe -H "Host: ..."</code> sin haber tocado el fichero <code>hosts</code>. ¿Qué demuestra eso sobre cómo elige Nginx el sitio? Y entonces, ¿para qué sirve el fichero <code>hosts</code>?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 5</p>
+<p>Para subir <code>web2</code> no has instalado ningún servidor FTP. ¿Por qué no ha hecho falta? Si hubieras usado FTP sin cifrar desde la wifi del aula, ¿qué podría ver un compañero que estuviera capturando el tráfico?</p>
+</div>
+<h2 id="entrega">Entrega<a class="headerlink" href="#entrega" title="Permanent link">&para;</a></h2>
+<p>Como en la práctica 1.1, lo que entregas son <strong>las pruebas</strong> de que tu servidor funciona y está bien
+configurado. La entrega tiene dos partes, y las dos son obligatorias.</p>
+<h3 id="parte-1-documento-de-evidencias-40">Parte 1 — Documento de evidencias (40 %)<a class="headerlink" href="#parte-1-documento-de-evidencias-40" title="Permanent link">&para;</a></h3>
+<p>Un único <strong>PDF</strong> llamado <code>P2.1-Apellido-Nombre.pdf</code> que contenga, en este orden:</p>
+<ol>
+<li><strong>Portada</strong> con tu nombre, el grupo, el <em>hostname</em> de tu máquina y tus dos dominios.</li>
+<li><strong>Las evidencias</strong> de la tabla de abajo.</li>
+<li><strong>Las respuestas a las cinco cuestiones finales</strong>, con tus palabras.</li>
+</ol>
+<div class="admonition danger">
+<p class="admonition-title">Texto, no capturas</p>
+<p>La salida de los comandos se entrega <strong>copiada como texto</strong>, junto con el comando y el <em>prompt</em>
+(<code>usuario@debian-tuapellido:~$ ...</code>), dentro de un bloque o con tipografía de ancho fijo.</p>
+<p>Solo hay una excepción, porque ahí sí hace falta ver la pantalla: las dos webs en el navegador.</p>
+</div>
+<p>Evidencias que debe contener el documento:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Qué hay que demostrar</th>
+<th>Dónde</th>
+<th>Comando cuya salida se pega</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Nginx está instalado y funcionando, en tu máquina</td>
+<td>Debian</td>
+<td><code>hostname</code>, <code>sudo nginx -v</code> y <code>systemctl status nginx --no-pager</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Hay tres sitios activos</td>
+<td>Debian</td>
+<td><code>ls -l /etc/nginx/sites-enabled/</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>La configuración de <code>web1</code>, con la regla de <code>.git</code></td>
+<td>Debian</td>
+<td><code>cat /etc/nginx/sites-available/web1.tuapellido.test</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>La configuración es correcta</td>
+<td>Debian</td>
+<td><code>sudo nginx -t</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Propietarios y permisos de las webs</td>
+<td>Debian</td>
+<td><code>ls -la /var/www/</code> y <code>ls -la /var/www/web2.tuapellido.test/html</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Tu ordenador resuelve los dos nombres</td>
+<td>Tu ordenador</td>
+<td><code>ping -n 1 web1.tuapellido.test</code> y <code>ping -n 1 web2.tuapellido.test</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Cada nombre devuelve su web</td>
+<td>Tu ordenador</td>
+<td>Los dos comandos que hay debajo de esta tabla</td>
+</tr>
+<tr>
+<td>8</td>
+<td>La carpeta <code>.git</code> está protegida</td>
+<td>Tu ordenador</td>
+<td><code>curl.exe -sI http://web1.tuapellido.test/.git/config</code> (debe responder <code>403</code>)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Has subido <code>web2</code> por SSH</td>
+<td>Tu ordenador</td>
+<td>El comando <code>scp</code> con su salida, la sesión de <code>sftp</code> completa o, con FileZilla, el texto del panel de mensajes de la transferencia</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Los registros muestran tus pruebas</td>
+<td>Debian</td>
+<td><code>sudo tail -n 8 /var/log/nginx/web1.access.log</code> (con peticiones <code>200</code>, <code>404</code> y <code>403</code>) y <code>sudo tail -n 3 /var/log/nginx/web1.error.log</code> (con el <code>Permission denied</code>)</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Las dos webs, en el navegador</td>
+<td>Tu ordenador</td>
+<td><strong>Captura</strong> de cada una con la barra de direcciones visible</td>
+</tr>
+</tbody>
+</table>
+<p>Comandos de la evidencia 7, en PowerShell:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-s</span> <span class="n">http</span><span class="p">://</span><span class="n">web1</span><span class="p">.</span><span class="n">tuapellido</span><span class="p">.</span><span class="n">test</span> <span class="p">|</span> <span class="nb">Select-String</span> <span class="s2">"&lt;title&gt;"</span>
+<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-s</span> <span class="n">http</span><span class="p">://</span><span class="n">web2</span><span class="p">.</span><span class="n">tuapellido</span><span class="p">.</span><span class="n">test</span> <span class="p">|</span> <span class="nb">Select-String</span> <span class="s2">"&lt;title&gt;"</span>
+</code></pre></div>
+<p>Cada evidencia debe ir acompañada de <strong>una frase tuya</strong> explicando qué demuestra.
+Una tanda de comandos pegados sin explicar no puntúa.</p>
+<h3 id="parte-2-demostracion-en-clase-60">Parte 2 — Demostración en clase (60 %)<a class="headerlink" href="#parte-2-demostracion-en-clase-60" title="Permanent link">&para;</a></h3>
+<p>Es una mini entrevista individual. Cuando se te llame, vienes a la mesa del profesor con
+<strong>tu ordenador</strong> y la máquina virtual preparada para arrancar. En unos dos o tres minutos:</p>
+<ol>
+<li>Te conectas por SSH a tu máquina y abres tus dos webs en el navegador, por su nombre.</li>
+<li>Haces la tarea que se te pida en ese momento. Por ejemplo: desactivar un sitio y volver a activarlo, encontrar en el registro una petición concreta, o diagnosticar un error que se te provoque.</li>
+<li>Explicas en voz alta <strong>una</strong> de tus decisiones (por qué los ficheros son tuyos y no de <code>www-data</code>, para qué sirve el enlace simbólico, por qué hay que proteger <code>.git</code>…).</li>
+</ol>
+<div class="admonition info">
+<p class="admonition-title">Cómo se califica</p>
+<p>La demostración pesa más que el documento porque es lo que de verdad acredita el
+resultado de aprendizaje. <strong>Una demostración que no funciona no se compensa con un
+documento impecable</strong>: en ese caso la práctica queda pendiente hasta que el servidor
+funcione, y se vuelve a demostrar.</p>
+</div>
+<h3 id="criterios-de-evaluacion">Criterios de evaluación<a class="headerlink" href="#criterios-de-evaluacion" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Criterio</th>
+<th>Peso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documento</td>
+<td>Las once evidencias están completas, en texto (salvo las capturas) y cada una con su frase explicativa</td>
+<td>25 %</td>
+</tr>
+<tr>
+<td>Documento</td>
+<td>Las cinco cuestiones finales están respondidas con corrección y criterio propio</td>
+<td>15 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Los dos sitios responden por su nombre desde tu equipo, con <code>.git</code> protegido</td>
+<td>20 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Realizas la tarea que se te pide y explicas lo que estás haciendo</td>
+<td>20 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Explicas una de tus decisiones con tus palabras y respondes a las preguntas sobre ella</td>
+<td>20 %</td>
+</tr>
+</tbody>
+</table>
+<p>Si en la demostración o en el documento aparecen una máquina o unos dominios que no son los tuyos (el <em>hostname</em>, el apellido de los dominios), la parte correspondiente cuenta como no superada.</p>
+<h3 id="antes-de-entregar-comprueba-que">Antes de entregar, comprueba que…<a class="headerlink" href="#antes-de-entregar-comprueba-que" title="Permanent link">&para;</a></h3>
+<ul>
+<li>☐ <code>http://web1.tuapellido.test</code> y <code>http://web2.tuapellido.test</code> muestran <strong>cada uno su web</strong>.</li>
+<li>☐ <code>http://192.168.56.10</code> sigue mostrando la página de bienvenida de Nginx.</li>
+<li>☐ Las carpetas de las webs son de tu usuario, con carpetas <code>755</code> y ficheros <code>644</code>.</li>
+<li>☐ <code>http://web1.tuapellido.test/.git/config</code> responde <code>403</code>.</li>
+<li>☐ Cada sitio tiene sus propios registros en <code>/var/log/nginx/</code>.</li>
+<li>☐ <code>sudo nginx -t</code> no da errores.</li>
+<li>☐ Existe la instantánea <code>p2.1-nginx</code>.</li>
+<li>☐ Las once evidencias están en el PDF, en texto y comentadas.</li>
+<li>☐ Las cinco cuestiones están respondidas.</li>
+<li>☐ El archivo se llama <code>P2.1-Apellido-Nombre.pdf</code>.</li>
+</ul>
+<h2 id="referencias">Referencias<a class="headerlink" href="#referencias" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://nginx.org/en/docs/beginners_guide.html">Documentación de Nginx — Beginner's Guide</a></li>
+<li><a href="https://nginx.org/en/docs/http/server_names.html">Documentación de Nginx — Nombres de servidor (<code>server_name</code>)</a></li>
+<li><a href="https://nginx.org/en/docs/http/request_processing.html">Documentación de Nginx — Cómo procesa Nginx una petición</a></li>
+<li><a href="https://wiki.debian.org/Nginx">Debian Wiki — Nginx</a></li>
+<li><a href="https://www.rfc-editor.org/rfc/rfc6761">RFC 6761 — Nombres de dominio de uso especial (<code>.test</code>)</a></li>
+<li><a href="https://filezilla-project.org/">FileZilla</a> · <a href="https://winscp.net/">WinSCP</a>, una alternativa a FileZilla para Windows</li>
+<li>Webs de ejemplo: <a href="https://github.com/cloudacademy/static-website-example">cloudacademy/static-website-example</a> y <a href="https://html5up.net/phantom">Phantom, de HTML5 UP</a> (licencia CC BY 3.0)</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href="../T2-arquitectura-web/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Tema 2 - Arquitectura web">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Tema 2 - Arquitectura web
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../T2-practica-https/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Práctica 2.2 - HTTPS en Nginx">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                Práctica 2.2 - HTTPS en Nginx
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Material docente del módulo 0614. Contiene obras derivadas de terceros; ver la página de Créditos.
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.footer", "toc.integrate", "search.highlight", "search.suggest", "content.code.annotate", "content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

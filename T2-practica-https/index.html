@@ -1,0 +1,1726 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes y prácticas del módulo 0614 - 2º DAW">
+      
+      
+        <meta name="author" content="Dustin de Lara">
+      
+      
+        <link rel="canonical" href="https://dustinrandel.github.io/despliegue-aplicaciones-web/T2-practica-https/">
+      
+      
+        <link rel="prev" href="../T2-practica-nginx/">
+      
+      
+        <link rel="next" href="../T2-practica-autenticacion/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Práctica 2.2 - HTTPS en Nginx - Despliegue de aplicaciones web</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#practica-22-https-en-nginx" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-header__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Despliegue de aplicaciones web
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Práctica 2.2 - HTTPS en Nginx
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="blue"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-nav__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Despliegue de aplicaciones web
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 1
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-introduccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1 - Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-practica-maquina-virtual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 2
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-arquitectura-web/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2 - Arquitectura web
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-nginx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.1 - Servidor web Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.2 - HTTPS en Nginx
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.2 - HTTPS en Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-donde-van-los-certificados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Dónde van los certificados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-generar-un-certificado-autofirmado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Generar un certificado autofirmado
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Generar un certificado autofirmado">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#que-hay-dentro-de-un-certificado" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Qué hay dentro de un certificado
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-configurar-https-en-el-sitio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Configurar HTTPS en el sitio
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-probar-desde-tu-ordenador" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Probar desde tu ordenador
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Probar desde tu ordenador">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#la-redireccion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La redirección
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#https-con-curl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTPS con curl
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#https-en-el-navegador" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTPS en el navegador
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-el-saludo-tls-visto-desde-dentro" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. El saludo TLS, visto desde dentro
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. El saludo TLS, visto desde dentro">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sni-un-certificado-para-cada-nombre" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SNI: un certificado para cada nombre
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-los-registros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Los registros
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-haz-una-instantanea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Haz una instantánea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuestiones-finales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuestiones finales
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entrega" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entrega
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Entrega">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parte-1-documento-de-evidencias-40" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 1 — Documento de evidencias (40 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parte-2-demostracion-en-clase-60" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 2 — Demostración en clase (60 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#criterios-de-evaluacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Criterios de evaluación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#antes-de-entregar-comprueba-que" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antes de entregar, comprueba que…
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referencias
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-autenticacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.3 - Autenticación y control de acceso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.4 - Proxy inverso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-balanceo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.5 - Balanceo de carga
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../creditos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Créditos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="practica-22-https-en-nginx">Práctica 2.2 - HTTPS en Nginx<a class="headerlink" href="#practica-22-https-en-nginx" title="Permanent link">&para;</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">Cuándo se hace</p>
+<p>Al terminar el <strong>bloque 3</strong> de la <a href="../T2-arquitectura-web/">teoría del Tema 2</a> (apartado 8, HTTPS), con la <a href="../T2-practica-nginx/">práctica 2.1</a> terminada.</p>
+</div>
+<div class="admonition abstract">
+<p class="admonition-title">Objetivos</p>
+<p>Al terminar esta práctica deberás ser capaz de:</p>
+<ol>
+<li>Generar un certificado autofirmado y su clave privada con <code>openssl</code>, y leer lo que contiene.</li>
+<li>Configurar un sitio de Nginx para que sirva por HTTPS.</li>
+<li>Redirigir automáticamente las peticiones HTTP a HTTPS.</li>
+<li>Comprobar el saludo TLS desde la terminal: versión, intercambio de claves y certificado.</li>
+<li>Explicar por qué el navegador avisa con un certificado autofirmado y qué significa aceptar la excepción.</li>
+</ol>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Antes de empezar</p>
+<ul>
+<li>Tu máquina principal (<code>192.168.56.10</code>) tiene la práctica 2.1 funcionando: <code>web1</code> y <code>web2</code> responden por su nombre.</li>
+<li>Tienes la instantánea <code>p2.1-nginx</code>. Si algo se rompe sin remedio, vuelves a ella.</li>
+</ul>
+<p>En los ejemplos aparece <code>garcia</code>: escribe <strong>tu</strong> apellido en todos los comandos y ficheros.</p>
+</div>
+<hr />
+<h2 id="1-donde-van-los-certificados">1. Dónde van los certificados<a class="headerlink" href="#1-donde-van-los-certificados" title="Permanent link">&para;</a></h2>
+<p>Cada sitio HTTPS necesita dos ficheros:</p>
+<table>
+<thead>
+<tr>
+<th>Fichero</th>
+<th>Qué es</th>
+<th>¿Secreto?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>web1.garcia.test.crt</code></td>
+<td>El <strong>certificado</strong>: la clave pública del sitio, su nombre y quién lo firma</td>
+<td>No. Se envía a todo el que se conecta</td>
+</tr>
+<tr>
+<td><code>web1.garcia.test.key</code></td>
+<td>La <strong>clave privada</strong> del certificado</td>
+<td><strong>Sí.</strong> Si alguien la obtiene, puede hacerse pasar por tu sitio</td>
+</tr>
+</tbody>
+</table>
+<p>Crea una carpeta para ellos que solo pueda leer <code>root</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/etc/nginx/ssl
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span>/etc/nginx/ssl
+</code></pre></div>
+<p>Nginx puede leerla aunque sus trabajadores sean <code>www-data</code>: los certificados los lee el <strong>proceso maestro</strong>, que se ejecuta como <code>root</code> (lo viste en el apartado 6 de la teoría).</p>
+<h2 id="2-generar-un-certificado-autofirmado">2. Generar un certificado autofirmado<a class="headerlink" href="#2-generar-un-certificado-autofirmado" title="Permanent link">&para;</a></h2>
+<p>Genera el certificado y la clave de <code>web1</code> con un solo comando (es una sola orden partida en varias líneas: cópiala entera):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>openssl<span class="w"> </span>req<span class="w"> </span>-x509<span class="w"> </span>-newkey<span class="w"> </span>rsa:2048<span class="w"> </span>-nodes<span class="w"> </span>-days<span class="w"> </span><span class="m">365</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>-keyout<span class="w"> </span>/etc/nginx/ssl/web1.garcia.test.key<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span>-out<span class="w"> </span>/etc/nginx/ssl/web1.garcia.test.crt<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span>-subj<span class="w"> </span><span class="s2">"/C=ES/O=2DAW/OU=Despliegue - Garcia/CN=web1.garcia.test"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span>-addext<span class="w"> </span><span class="s2">"subjectAltName=DNS:web1.garcia.test"</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Opción</th>
+<th>Qué hace</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>req -x509</code></td>
+<td>Crea un certificado <strong>autofirmado</strong>, en lugar de una solicitud para que lo firme una CA</td>
+</tr>
+<tr>
+<td><code>-newkey rsa:2048</code></td>
+<td>Genera a la vez una clave privada nueva, RSA de 2048 bits</td>
+</tr>
+<tr>
+<td><code>-nodes</code></td>
+<td>No cifra la clave privada con contraseña. Si la tuviera, Nginx no podría arrancar solo: te la pediría en cada reinicio</td>
+</tr>
+<tr>
+<td><code>-days 365</code></td>
+<td>El certificado caduca en un año</td>
+</tr>
+<tr>
+<td><code>-keyout</code> / <code>-out</code></td>
+<td>Dónde guardar la clave privada y el certificado</td>
+</tr>
+<tr>
+<td><code>-subj</code></td>
+<td>Los datos del titular: país, organización, unidad y <strong>nombre común</strong> (<code>CN</code>)</td>
+</tr>
+<tr>
+<td><code>-addext "subjectAltName=…"</code></td>
+<td>Los nombres para los que vale el certificado. <strong>Los navegadores actuales solo miran este campo</strong>: sin él, el certificado no vale para tu dominio aunque el <code>CN</code> coincida</td>
+</tr>
+</tbody>
+</table>
+<p>Repite el comando para <code>web2</code>, cambiando <code>web1</code> por <code>web2</code> en las <strong>cuatro</strong> líneas en las que aparece.</p>
+<p>Comprueba que tienes los cuatro ficheros:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>ls<span class="w"> </span>-l<span class="w"> </span>/etc/nginx/ssl
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>total 16
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>-rw-r--r-- 1 root root 1330 Oct  5 00:05 web1.garcia.test.crt
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>-rw------- 1 root root 1704 Oct  5 00:05 web1.garcia.test.key
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>-rw-r--r-- 1 root root 1330 Oct  5 00:05 web2.garcia.test.crt
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>-rw------- 1 root root 1704 Oct  5 00:05 web2.garcia.test.key
+</code></pre></div>
+<h3 id="que-hay-dentro-de-un-certificado">Qué hay dentro de un certificado<a class="headerlink" href="#que-hay-dentro-de-un-certificado" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>openssl<span class="w"> </span>x509<span class="w"> </span>-in<span class="w"> </span>/etc/nginx/ssl/web1.garcia.test.crt<span class="w"> </span>-noout<span class="w"> </span>-subject<span class="w"> </span>-issuer<span class="w"> </span>-dates<span class="w"> </span>-ext<span class="w"> </span>subjectAltName
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>subject=C=ES, O=2DAW, OU=Despliegue - Garcia, CN=web1.garcia.test
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>issuer=C=ES, O=2DAW, OU=Despliegue - Garcia, CN=web1.garcia.test
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>notBefore=Oct  4 22:05:58 2026 GMT
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>notAfter=Oct  4 22:05:58 2027 GMT
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>X509v3 Subject Alternative Name:
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    DNS:web1.garcia.test
+</code></pre></div>
+<p>Fíjate en que <strong><code>subject</code> e <code>issuer</code> son iguales</strong>: el titular del certificado y quien lo firma son la misma persona, tú. Eso es exactamente lo que significa "autofirmado", y es la razón por la que el navegador no se va a fiar.</p>
+<h2 id="3-configurar-https-en-el-sitio">3. Configurar HTTPS en el sitio<a class="headerlink" href="#3-configurar-https-en-el-sitio" title="Permanent link">&para;</a></h2>
+<p>Edita la configuración de <code>web1</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/nginx/sites-available/web1.garcia.test
+</code></pre></div>
+<p>Vas a dejarla con <strong>dos</strong> bloques <code>server</code>: uno que solo redirige lo que llega por HTTP, y otro que sirve la web por HTTPS. Quedará así (cambia <code>garcia</code> por tu apellido):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">80</span><span class="p">;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="s">[::]:80</span><span class="p">;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">web1.garcia.test</span><span class="p">;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="kn">access_log</span><span class="w"> </span><span class="s">/var/log/nginx/web1.access.log</span><span class="p">;</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="kn">return</span><span class="w"> </span><span class="mi">301</span><span class="w"> </span><span class="s">https://</span><span class="nv">$host$request_uri</span><span class="p">;</span><span class="w">  </span><span class="c1"># (1)!</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="p">}</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">443</span><span class="w"> </span><span class="s">ssl</span><span class="p">;</span><span class="w">                          </span><span class="c1"># (2)!</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="s">[::]:443</span><span class="w"> </span><span class="s">ssl</span><span class="p">;</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">    </span><span class="kn">http2</span><span class="w"> </span><span class="no">on</span><span class="p">;</span><span class="w">                                </span><span class="c1"># (3)!</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">web1.garcia.test</span><span class="p">;</span>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">    </span><span class="kn">ssl_certificate</span><span class="w">     </span><span class="s">/etc/nginx/ssl/web1.garcia.test.crt</span><span class="p">;</span><span class="w">   </span><span class="c1"># (4)!</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">    </span><span class="kn">ssl_certificate_key</span><span class="w"> </span><span class="s">/etc/nginx/ssl/web1.garcia.test.key</span><span class="p">;</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="w">    </span><span class="kn">root</span><span class="w"> </span><span class="s">/var/www/web1.garcia.test/html</span><span class="p">;</span>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="w">    </span><span class="kn">index</span><span class="w"> </span><span class="s">index.html</span><span class="p">;</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="w">    </span><span class="kn">access_log</span><span class="w"> </span><span class="s">/var/log/nginx/web1.access.log</span><span class="p">;</span>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a><span class="w">    </span><span class="kn">error_log</span><span class="w">  </span><span class="s">/var/log/nginx/web1.error.log</span><span class="p">;</span>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a><span class="w">        </span><span class="kn">try_files</span><span class="w"> </span><span class="nv">$uri</span><span class="w"> </span><span class="nv">$uri/</span><span class="w"> </span><span class="p">=</span><span class="mi">404</span><span class="p">;</span>
+<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-30" name="__codelineno-7-30" href="#__codelineno-7-30"></a>
+<a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="p">~</span><span class="w"> </span><span class="sr">/\.git</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="w">        </span><span class="kn">deny</span><span class="w"> </span><span class="s">all</span><span class="p">;</span>
+<a id="__codelineno-7-33" name="__codelineno-7-33" href="#__codelineno-7-33"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-7-34" name="__codelineno-7-34" href="#__codelineno-7-34"></a><span class="p">}</span>
+</code></pre></div>
+<ol>
+<li>Responde <code>301 Moved Permanently</code> y manda al cliente a la misma dirección, pero con <code>https://</code>. <code>$host</code> es el nombre que pidió y <code>$request_uri</code> la ruta: <code>http://web1.garcia.test/css/a.css</code> pasa a <code>https://web1.garcia.test/css/a.css</code>.</li>
+<li>Escucha en el puerto 443 y activa TLS en él.</li>
+<li>Permite HTTP/2. Como viste en la teoría, los navegadores solo lo usan sobre HTTPS.</li>
+<li>El certificado y la clave privada de <strong>este</strong> sitio.</li>
+</ol>
+<p>El segundo bloque es tu configuración de la práctica 2.1, con tres cambios: el puerto, la línea <code>http2</code> y las dos líneas del certificado.</p>
+<p>Haz lo mismo con <code>web2</code>, con sus propios ficheros de certificado. Después, comprueba y recarga:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>sudo<span class="w"> </span>nginx<span class="w"> </span>-t<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>nginx
+</code></pre></div>
+<p>Y comprueba que Nginx escucha ahora también en el 443:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo<span class="w"> </span>ss<span class="w"> </span>-tlnp<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>nginx
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>LISTEN 0  511  0.0.0.0:80   0.0.0.0:*  users:(("nginx",pid=1611,fd=5),("nginx",pid=1610,fd=5),("nginx",pid=1522,fd=5))
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>LISTEN 0  511  0.0.0.0:443  0.0.0.0:*  users:(("nginx",pid=1611,fd=21),("nginx",pid=1610,fd=21),("nginx",pid=1522,fd=21))
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>LISTEN 0  511     [::]:80      [::]:*  users:(...)
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>LISTEN 0  511     [::]:443     [::]:*  users:(...)
+</code></pre></div>
+<h2 id="4-probar-desde-tu-ordenador">4. Probar desde tu ordenador<a class="headerlink" href="#4-probar-desde-tu-ordenador" title="Permanent link">&para;</a></h2>
+<h3 id="la-redireccion">La redirección<a class="headerlink" href="#la-redireccion" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-I</span> <span class="n">http</span><span class="p">://</span><span class="n">web1</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>HTTP/1.1 301 Moved Permanently
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>Server: nginx
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>Date: Sun, 04 Oct 2026 22:06:05 GMT
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>Content-Type: text/html
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>Content-Length: 162
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>Connection: keep-alive
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>Location: https://web1.garcia.test/
+</code></pre></div>
+<p>El servidor responde <code>301</code> y la cabecera <code>Location</code> dice adónde ir.</p>
+<h3 id="https-con-curl">HTTPS con <code>curl</code><a class="headerlink" href="#https-con-curl" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-I</span> <span class="n">https</span><span class="p">://</span><span class="n">web1</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>curl: (60) schannel: SEC_E_UNTRUSTED_ROOT (0x80090325) - The certificate chain was issued by an authority that is not trusted.
+</code></pre></div>
+<p><code>curl</code> se niega: no conoce a quien ha firmado el certificado. Es el comportamiento correcto. Para probar a pesar de ello, la opción <code>-k</code> le dice que no compruebe el certificado (<strong>solo</strong> para pruebas con certificados propios):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-kI</span> <span class="n">https</span><span class="p">://</span><span class="n">web1</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>HTTP/1.1 200 OK
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>Server: nginx
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>Content-Type: text/html
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>Content-Length: 14522
+</code></pre></div>
+<h3 id="https-en-el-navegador">HTTPS en el navegador<a class="headerlink" href="#https-en-el-navegador" title="Permanent link">&para;</a></h3>
+<p>Entra en <code>http://web1.garcia.test</code>. El navegador te llevará solo a <code>https://</code> y te mostrará un aviso a pantalla completa: <strong>"La conexión no es privada"</strong>.</p>
+<p>El aviso dice exactamente lo que ya sabes: el certificado no lo firma ninguna autoridad en la que el navegador confíe. Como lo has generado tú y sabes que es tuyo, puedes continuar: <strong>Configuración avanzada → Acceder a web1.garcia.test (sitio no seguro)</strong>.</p>
+<p>Ya dentro, pulsa en el icono de la izquierda de la barra de direcciones y abre los datos del certificado. Comprueba que son los tuyos: el nombre del sitio, tu apellido en la unidad organizativa y las fechas de validez.</p>
+<div class="admonition warning">
+<p class="admonition-title">En el mundo real, nunca</p>
+<p>Aceptar la excepción tiene sentido aquí porque <strong>tú</strong> has creado el certificado. En una web ajena, ese aviso puede significar que alguien se ha puesto en medio de tu conexión. Es el mismo caso que la huella de SSH de la práctica 1.1: si no sabes por qué cambia, no continúes.</p>
+</div>
+<h2 id="5-el-saludo-tls-visto-desde-dentro">5. El saludo TLS, visto desde dentro<a class="headerlink" href="#5-el-saludo-tls-visto-desde-dentro" title="Permanent link">&para;</a></h2>
+<p><code>openssl s_client</code> hace de cliente TLS y te enseña lo que se negocia. Desde la sesión SSH de tu máquina:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>openssl<span class="w"> </span>s_client<span class="w"> </span>-connect<span class="w"> </span>localhost:443<span class="w"> </span>-servername<span class="w"> </span>web1.garcia.test<span class="w"> </span>&lt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s1">'^subject|^issuer|Protocol|Cipher is|Negotiated TLS1.3 group'</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>subject=C=ES, O=2DAW, OU=Despliegue - Garcia, CN=web1.garcia.test
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>issuer=C=ES, O=2DAW, OU=Despliegue - Garcia, CN=web1.garcia.test
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>Protocol: TLSv1.3
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>Negotiated TLS1.3 group: X25519MLKEM768
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Línea</th>
+<th>Qué te dice</th>
+<th>Dónde está en la teoría</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Protocol: TLSv1.3</code></td>
+<td>La versión negociada</td>
+<td>El saludo TLS 1.3</td>
+</tr>
+<tr>
+<td><code>Negotiated TLS1.3 group</code></td>
+<td>El algoritmo de <strong>Diffie-Hellman efímero</strong> con el que se ha acordado la clave</td>
+<td>Lo que ya sabes de SSH</td>
+</tr>
+<tr>
+<td><code>Cipher is</code></td>
+<td>El cifrado <strong>simétrico</strong> que protege los datos</td>
+<td>Cifrado simétrico para todo lo demás</td>
+</tr>
+<tr>
+<td><code>subject</code> / <code>issuer</code></td>
+<td>El certificado que ha presentado el servidor</td>
+<td>Certificados</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title"><code>X25519MLKEM768</code>: un intercambio de claves para el futuro</p>
+<p>El grupo negociado combina dos algoritmos: <strong>X25519</strong>, el Diffie-Hellman efímero sobre curvas elípticas que viste en la teoría, y <strong>ML-KEM</strong>, un algoritmo nuevo diseñado para resistir a los futuros ordenadores cuánticos. Si algún día se rompiera uno de los dos, el otro seguiría protegiendo la clave. Las versiones recientes de OpenSSL y de los navegadores ya lo usan por defecto.</p>
+</div>
+<h3 id="sni-un-certificado-para-cada-nombre">SNI: un certificado para cada nombre<a class="headerlink" href="#sni-un-certificado-para-cada-nombre" title="Permanent link">&para;</a></h3>
+<p>Las dos webs están en la misma IP y el mismo puerto 443. ¿Cómo sabe Nginx qué certificado enviar, si todavía no ha visto la cabecera <code>Host</code>? Porque el cliente lo anuncia en el primer mensaje del saludo (SNI). La opción <code>-servername</code> es justo eso:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>openssl<span class="w"> </span>s_client<span class="w"> </span>-connect<span class="w"> </span>localhost:443<span class="w"> </span>-servername<span class="w"> </span>web2.garcia.test<span class="w"> </span>&lt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">'^subject'</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>openssl<span class="w"> </span>s_client<span class="w"> </span>-connect<span class="w"> </span>localhost:443<span class="w"> </span>-noservername<span class="w"> </span>&lt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">'^subject'</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>subject=C=ES, O=2DAW, OU=Despliegue - Garcia, CN=web2.garcia.test
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>subject=C=ES, O=2DAW, OU=Despliegue - Garcia, CN=web1.garcia.test
+</code></pre></div>
+<p>Con <code>web2</code> llega el certificado de <code>web2</code>. Sin nombre (<code>-noservername</code>), Nginx no sabe qué sitio quieres y presenta el del sitio por defecto del puerto 443.</p>
+<h2 id="6-los-registros">6. Los registros<a class="headerlink" href="#6-los-registros" title="Permanent link">&para;</a></h2>
+<p>Entra en <code>http://web1.garcia.test</code> desde el navegador (con <code>http://</code>) y mira el registro:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">3</span><span class="w"> </span>/var/log/nginx/web1.access.log
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>192.168.56.1 - - [05/Oct/2026:00:06:18 +0200] "GET / HTTP/1.1" 301 162 "-" "Mozilla/5.0 (...)"
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>192.168.56.1 - - [05/Oct/2026:00:06:18 +0200] "GET / HTTP/2.0" 200 3875 "-" "Mozilla/5.0 (...)"
+</code></pre></div>
+<p>Primero la petición que llegó por HTTP y recibió el <code>301</code>; después la que llegó por HTTPS y recibió el <code>200</code>. Fíjate en la versión: la primera es <code>HTTP/1.1</code> y la segunda <code>HTTP/2.0</code>. En cuanto hay cifrado, el navegador pasa a HTTP/2.</p>
+<h2 id="7-haz-una-instantanea">7. Haz una instantánea<a class="headerlink" href="#7-haz-una-instantanea" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>sudo<span class="w"> </span>poweroff
+</code></pre></div>
+<p>En VirtualBox, toma la instantánea <code>p2.2-https</code>.</p>
+<hr />
+<h2 id="cuestiones-finales">Cuestiones finales<a class="headerlink" href="#cuestiones-finales" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 1</p>
+<p>¿Por qué el navegador avisa con tu certificado si cifra exactamente igual de bien que uno de Let's Encrypt? ¿Qué tendrías que hacer para que tu navegador dejara de avisar, y por qué no sirve para los visitantes de una web pública?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 2</p>
+<p>Tu clave privada está en <code>/etc/nginx/ssl</code> con permisos <code>700</code>. ¿Qué podría hacer alguien que la copiara? ¿Y si copiara solo el <code>.crt</code>?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 3</p>
+<p>En el resultado de <code>openssl s_client</code>, ¿qué línea corresponde al Diffie-Hellman efímero de la teoría, y cuál al cifrado simétrico? ¿Por qué hacen falta los dos?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 4</p>
+<p>Explica qué es SNI con el resultado de la prueba del apartado 5. ¿Qué pasaría con tus dos webs si los clientes no enviaran el nombre?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 5</p>
+<p>¿Por qué la redirección usa el código <code>301</code> y no <code>200</code>? ¿Qué hace el navegador con la cabecera <code>Location</code>?</p>
+</div>
+<h2 id="entrega">Entrega<a class="headerlink" href="#entrega" title="Permanent link">&para;</a></h2>
+<p>Igual que en las prácticas anteriores: <strong>documento de evidencias (40 %)</strong> y <strong>demostración en clase (60 %)</strong>.</p>
+<h3 id="parte-1-documento-de-evidencias-40">Parte 1 — Documento de evidencias (40 %)<a class="headerlink" href="#parte-1-documento-de-evidencias-40" title="Permanent link">&para;</a></h3>
+<p>Un <strong>PDF</strong> llamado <code>P2.2-Apellido-Nombre.pdf</code> con portada, las evidencias de la tabla (en texto, con el comando y el <em>prompt</em>) y las respuestas a las cuestiones.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Qué hay que demostrar</th>
+<th>Dónde</th>
+<th>Comando cuya salida se pega</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Los certificados y claves existen, y la carpeta está protegida</td>
+<td>Debian</td>
+<td><code>sudo ls -la /etc/nginx/ssl</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>El certificado de <code>web1</code> es tuyo y autofirmado</td>
+<td>Debian</td>
+<td><code>sudo openssl x509 -in /etc/nginx/ssl/web1.tuapellido.test.crt -noout -subject -issuer -dates -ext subjectAltName</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>La configuración de <code>web1</code> con los dos bloques</td>
+<td>Debian</td>
+<td><code>cat /etc/nginx/sites-available/web1.tuapellido.test</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>La configuración es correcta</td>
+<td>Debian</td>
+<td><code>sudo nginx -t</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Nginx escucha en 80 y 443</td>
+<td>Debian</td>
+<td><code>sudo ss -tlnp</code> (las líneas de <code>nginx</code>)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>HTTP redirige a HTTPS en los dos sitios</td>
+<td>Tu ordenador</td>
+<td><code>curl.exe -I http://web1.tuapellido.test</code> y lo mismo con <code>web2</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>HTTPS responde en los dos sitios</td>
+<td>Tu ordenador</td>
+<td><code>curl.exe -kI https://web1.tuapellido.test</code> y lo mismo con <code>web2</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>TLS 1.3 y SNI</td>
+<td>Debian</td>
+<td>Los dos <code>openssl s_client</code> del apartado 5, con <code>web1</code> y con <code>web2</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>El registro muestra la redirección</td>
+<td>Debian</td>
+<td><code>sudo tail -n 3 /var/log/nginx/web1.access.log</code> (un <code>301</code> seguido de un <code>200</code>)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>El certificado en el navegador</td>
+<td>Tu ordenador</td>
+<td><strong>Captura</strong> del visor de certificados con tus datos</td>
+</tr>
+</tbody>
+</table>
+<p>Cada evidencia, con <strong>una frase tuya</strong> explicando qué demuestra.</p>
+<h3 id="parte-2-demostracion-en-clase-60">Parte 2 — Demostración en clase (60 %)<a class="headerlink" href="#parte-2-demostracion-en-clase-60" title="Permanent link">&para;</a></h3>
+<p>Mini entrevista individual en la mesa del profesor, con tu ordenador:</p>
+<ol>
+<li>Abres <code>http://web1.tuapellido.test</code> en el navegador y muestras que acaba en HTTPS con tu certificado.</li>
+<li>Haces la tarea que se te pida en ese momento.</li>
+<li>Explicas en voz alta una de tus decisiones o uno de los conceptos de la práctica.</li>
+</ol>
+<div class="admonition info">
+<p class="admonition-title">Cómo se califica</p>
+<p><strong>Una demostración que no funciona no se compensa con un documento impecable</strong>: la práctica queda pendiente hasta que funcione.</p>
+</div>
+<h3 id="criterios-de-evaluacion">Criterios de evaluación<a class="headerlink" href="#criterios-de-evaluacion" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Criterio</th>
+<th>Peso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documento</td>
+<td>Las diez evidencias están completas, en texto (salvo la captura) y explicadas</td>
+<td>25 %</td>
+</tr>
+<tr>
+<td>Documento</td>
+<td>Las cinco cuestiones están respondidas con corrección y criterio propio</td>
+<td>15 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Los dos sitios sirven por HTTPS con su certificado y HTTP redirige</td>
+<td>20 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Realizas la tarea que se te pide y explicas lo que haces</td>
+<td>20 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Explicas una decisión o un concepto con tus palabras</td>
+<td>20 %</td>
+</tr>
+</tbody>
+</table>
+<h3 id="antes-de-entregar-comprueba-que">Antes de entregar, comprueba que…<a class="headerlink" href="#antes-de-entregar-comprueba-que" title="Permanent link">&para;</a></h3>
+<ul>
+<li>☐ <code>http://web1.tuapellido.test</code> y <code>http://web2.tuapellido.test</code> terminan en <code>https://</code>.</li>
+<li>☐ Cada sitio presenta <strong>su</strong> certificado, con tu apellido en la unidad organizativa.</li>
+<li>☐ <code>/etc/nginx/ssl</code> tiene permisos <code>700</code> y las claves no salen de ahí.</li>
+<li>☐ <code>sudo nginx -t</code> no da errores.</li>
+<li>☐ Existe la instantánea <code>p2.2-https</code>.</li>
+<li>☐ El archivo se llama <code>P2.2-Apellido-Nombre.pdf</code>.</li>
+</ul>
+<h2 id="referencias">Referencias<a class="headerlink" href="#referencias" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://nginx.org/en/docs/http/configuring_https_servers.html">Documentación de Nginx — Configurar servidores HTTPS</a></li>
+<li><a href="https://docs.openssl.org/master/man1/openssl-req/">OpenSSL — <code>req</code></a> y <a href="https://docs.openssl.org/master/man1/openssl-s_client/"><code>s_client</code></a></li>
+<li><a href="https://developer.mozilla.org/es/docs/Web/HTTP/Reference/Headers/Strict-Transport-Security">MDN — Strict-Transport-Security (HSTS)</a>, para cuando tengas un certificado de verdad</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href="../T2-practica-nginx/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Práctica 2.1 - Servidor web Nginx">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Práctica 2.1 - Servidor web Nginx
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../T2-practica-autenticacion/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Práctica 2.3 - Autenticación y control de acceso">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                Práctica 2.3 - Autenticación y control de acceso
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Material docente del módulo 0614. Contiene obras derivadas de terceros; ver la página de Créditos.
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.footer", "toc.integrate", "search.highlight", "search.suggest", "content.code.annotate", "content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>

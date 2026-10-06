@@ -1,0 +1,1931 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes y prácticas del módulo 0614 - 2º DAW">
+      
+      
+        <meta name="author" content="Dustin de Lara">
+      
+      
+        <link rel="canonical" href="https://dustinrandel.github.io/despliegue-aplicaciones-web/T1-practica-maquina-virtual/">
+      
+      
+        <link rel="prev" href="../T1-introduccion/">
+      
+      
+        <link rel="next" href="../T2-arquitectura-web/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Práctica 1.1 - Instalación y configuración de nuestra máquina virtual - Despliegue de aplicaciones web</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#practica-11-instalacion-y-configuracion-de-nuestra-maquina-virtual" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-header__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Despliegue de aplicaciones web
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="blue"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-nav__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Despliegue de aplicaciones web
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 1
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-introduccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1 - Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-descargar-debian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Descargar Debian
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-crear-la-maquina-virtual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Crear la máquina virtual
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Crear la máquina virtual">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuracion-de-red-nat-host-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuración de red: NAT + Host-only
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-instalar-debian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Instalar Debian
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-configurar-la-red-host-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Configurar la red Host-only
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-primera-conexion-por-ssh-con-contrasena" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Primera conexión por SSH (con contraseña)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-administrar-con-sudo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Administrar con sudo
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Administrar con sudo">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dar-permisos-de-sudo-a-otro-usuario" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dar permisos de sudo a otro usuario
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-autenticacion-con-par-de-claves" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Autenticación con par de claves
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-endurecer-el-servidor-ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Endurecer el servidor SSH
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-haz-una-instantanea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Haz una instantánea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuestiones-finales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuestiones finales
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entrega" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entrega
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Entrega">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parte-1-documento-de-evidencias-40" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 1 — Documento de evidencias (40 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parte-2-demostracion-en-clase-60" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 2 — Demostración en clase (60 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#criterios-de-evaluacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Criterios de evaluación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#antes-de-entregar-comprueba-que" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antes de entregar, comprueba que…
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referencias
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 2
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-arquitectura-web/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2 - Arquitectura web
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-nginx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.1 - Servidor web Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-https/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.2 - HTTPS en Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-autenticacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.3 - Autenticación y control de acceso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.4 - Proxy inverso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-balanceo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.5 - Balanceo de carga
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../creditos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Créditos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="practica-11-instalacion-y-configuracion-de-nuestra-maquina-virtual">Práctica 1.1 - Instalación y configuración de nuestra máquina virtual<a class="headerlink" href="#practica-11-instalacion-y-configuracion-de-nuestra-maquina-virtual" title="Permanent link">&para;</a></h1>
+<div class="admonition abstract">
+<p class="admonition-title">Objetivos</p>
+<p>Al terminar esta práctica deberás ser capaz de:</p>
+<ol>
+<li>Instalar un sistema operativo servidor (Debian) en una máquina virtual, sin entorno gráfico.</li>
+<li>Configurar su red para que sea accesible desde tu equipo.</li>
+<li>Administrar el sistema con <code>sudo</code> desde un usuario normal, sin trabajar como <em>root</em>.</li>
+<li>Conectarte al servidor por SSH, primero con contraseña y después con un par de claves.</li>
+<li>Endurecer la configuración del servidor SSH para que solo se pueda acceder con clave.</li>
+</ol>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Material necesario</p>
+<ul>
+<li>Un ordenador con al menos 8 GB de RAM y 30 GB de disco libres.</li>
+<li><a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox</a> (versión 7.2 o superior). También sirve VMware Workstation, UTM o KVM: los pasos son equivalentes.</li>
+<li>La imagen <em>netinst</em> de Debian (paso 1).</li>
+</ul>
+</div>
+<hr />
+<h2 id="1-descargar-debian">1. Descargar Debian<a class="headerlink" href="#1-descargar-debian" title="Permanent link">&para;</a></h2>
+<p>Como servidor utilizaremos la distribución <strong>Debian</strong>. Descargaremos la imagen <em>netinst</em>, que la propia <a href="https://www.debian.org/CD/netinst/index.es.html">página de Debian</a> describe así:</p>
+<div class="admonition quote">
+<p class="admonition-title">Quote</p>
+<p>Un CD de "instalación por red" o "netinst" es un único CD que posibilita que instale el sistema completo. Este único CD contiene sólo la mínima cantidad de software para instalar el sistema base y obtener el resto de paquetes a través de Internet.</p>
+</div>
+<p>Es decir: una imagen pequeña (unos 700 MB) que descarga lo demás durante la instalación. Perfecta para un servidor, donde queremos instalar lo mínimo imprescindible.</p>
+<p>Descárgala desde aquí, eligiendo el archivo <code>debian-XX.X.X-amd64-netinst.iso</code>:</p>
+<p><strong><a href="https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/">https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/</a></strong></p>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Trabajaremos con <strong>Debian 13 (Trixie)</strong>, la versión estable actual. Desde Debian 12 las imágenes oficiales ya incluyen el <em>firmware</em> no libre, así que no necesitas buscar ninguna imagen especial para que funcione el hardware.</p>
+<p>Instalar máquinas virtuales es algo que se supone aprendido de cursos anteriores, así que aquí se dan las pautas generales y se hace hincapié solo en lo que importa para este módulo.</p>
+</div>
+<h2 id="2-crear-la-maquina-virtual">2. Crear la máquina virtual<a class="headerlink" href="#2-crear-la-maquina-virtual" title="Permanent link">&para;</a></h2>
+<p>En VirtualBox pulsa <strong>New</strong>. Desde la versión 7.2 todo se configura en una sola ventana con cuatro secciones desplegables.</p>
+<p><strong>Virtual machine name and operating system.</strong> Ponle un nombre identificable y selecciona como <strong>ISO Image</strong> el fichero <em>netinst</em> que acabas de descargar. Así queda montado como unidad de CD de la máquina, y VirtualBox detecta solo el tipo de sistema (<strong>Linux / Debian / Debian 13 Trixie (64-bit)</strong>):</p>
+<p><img alt="" src="../img/debian1.png" /></p>
+<div class="admonition warning">
+<p class="admonition-title">Desactiva la instalación desatendida</p>
+<p>Con la ISO ya seleccionada, VirtualBox te ofrece la casilla <strong>Proceed with Unattended Installation</strong>. <strong>Déjala desmarcada</strong>: si la marcas, VirtualBox instala Debian por su cuenta y no verás el instalador. Queremos instalar a mano para ver y entender cada decisión. La sección <strong>Set up unattended guest OS installation</strong> no se toca.</p>
+</div>
+<p><strong>Specify virtual hardware</strong> y <strong>Specify virtual hard disk:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Recurso</th>
+<th>Mínimo</th>
+<th>Recomendado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RAM (<em>Base Memory</em>)</td>
+<td>1 GB</td>
+<td><strong>2048 MB</strong></td>
+</tr>
+<tr>
+<td>Procesadores (<em>Number of CPUs</em>)</td>
+<td>1</td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td>Disco (<em>Create a New Virtual Hard Disk</em>)</td>
+<td>10 GB</td>
+<td><strong>20 GB</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Use EFI:</strong> desmarcado.</li>
+<li>Disco de tipo <strong>VDI</strong>, sin marcar <em>Pre-allocate Full Size</em>: así el fichero crece según se usa y no ocupa los 20 GB de golpe.</li>
+</ul>
+<p>Sin entorno gráfico la máquina funciona perfectamente con poco, pero a lo largo del módulo instalarás servidores web, Docker y bases de datos: no te quedes corto.</p>
+<p>Pulsa <strong>Finish</strong>, pero <strong>no arranques todavía la máquina</strong>.</p>
+<h3 id="configuracion-de-red-nat-host-only">Configuración de red: NAT + Host-only<a class="headerlink" href="#configuracion-de-red-nat-host-only" title="Permanent link">&para;</a></h3>
+<p>Este paso es <strong>el más importante de toda la práctica</strong>. Selecciona la máquina, entra en <strong>Settings → Network</strong> y configura <strong>dos adaptadores</strong>:</p>
+<p><strong>Adapter 1 → NAT.</strong> Es el que viene por defecto; déjalo así. Le da a la máquina <strong>salida a Internet</strong>, que el instalador <em>netinst</em> necesita para descargar los paquetes.</p>
+<p><img alt="" src="../img/debian14.png" /></p>
+<p><strong>Adapter 2 → Host-only Adapter.</strong> Marca <strong>Enable Network Adapter</strong>, en <strong>Attached to</strong> elige <strong>Host-only Adapter</strong> y en <strong>Name</strong> <code>VirtualBox Host-Only Ethernet Adapter</code>. Crea una red privada entre tu ordenador y la máquina virtual, y es por donde <strong>entrarás al servidor</strong> (SSH, web…).</p>
+<p><img alt="" src="../img/debian15.png" /></p>
+<p>Si en <strong>Name</strong> no aparece ninguna red, créala antes en la ventana principal de VirtualBox: <strong>File → Tools → Network Manager → Host-only Networks → Create</strong>.</p>
+<div class="admonition danger">
+<p class="admonition-title">Por qué no basta con NAT</p>
+<p>El modo NAT mete la máquina en una red privada propia. Desde ella podrás salir a Internet, pero <strong>tú no podrás entrar</strong>, que es exactamente lo contrario de lo que necesita un servidor. Por eso añadimos el adaptador Host-only. Si más adelante no puedes conectarte por SSH, lo primero que debes comprobar es esto.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">¿Y el adaptador puente?</p>
+<p>El adaptador puente (<em>bridged</em>) mete la máquina directamente en la red del aula o de tu casa, como un ordenador más. Funciona con un solo adaptador, pero depende de la red física: suele fallar con wifi o con redes que filtran equipos, la IP cambia cada vez que cambias de red y deja tu servidor a medio configurar expuesto a toda la red del centro. Con NAT + Host-only la máquina funciona igual en cualquier sitio y tiene siempre la misma IP.</p>
+</div>
+<p><strong>Comprueba la red Host-only de tu ordenador.</strong> En Windows, abre PowerShell y ejecuta <code>ipconfig</code>. Busca el adaptador <em>VirtualBox Host-Only Network</em> (a veces aparece como <em>Ethernet 2</em> o similar): su IP debe ser <strong><code>192.168.56.1</code></strong>. Es lo normal. Si fuera otra (por ejemplo <code>192.168.57.1</code>), en el paso 4 tendrás que usar la IP terminada en <code>.10</code> de <strong>tu</strong> red (<code>192.168.57.10</code>).</p>
+<h2 id="3-instalar-debian">3. Instalar Debian<a class="headerlink" href="#3-instalar-debian" title="Permanent link">&para;</a></h2>
+<p>Selecciona la máquina y pulsa <strong>Start</strong>. Arrancará desde la ISO y verás el menú del instalador. Elige <strong>Graphical install</strong>:</p>
+<p><img alt="" src="../img/debian3.png" /></p>
+<div class="admonition tip">
+<p class="admonition-title">Usa el teclado</p>
+<p>Al principio el ratón puede no responder bien dentro de la máquina. En el instalador el teclado es más fiable: <strong>flechas</strong> para moverte, <strong>escribir las primeras letras</strong> para saltar en una lista, <strong>barra espaciadora</strong> para marcar casillas, <strong>Tab</strong> para cambiar de campo y <strong>Enter</strong> para continuar.</p>
+<p>Si el ratón queda atrapado dentro de la ventana, pulsa <strong>Ctrl derecho</strong> (la tecla <em>Host</em> de VirtualBox) para liberarlo.</p>
+</div>
+<p>Los pasos que importan:</p>
+<p><strong>Idioma, ubicación y teclado.</strong> Instalaremos el sistema <strong>en inglés</strong>: los mensajes de error y los <em>logs</em> saldrán igual que en la documentación y en los foros donde buscarás soluciones.</p>
+<ul>
+<li><strong>Select a language:</strong> <strong>English</strong>.</li>
+<li>
+<p><strong>Select your location:</strong> España no aparece en la lista corta, porque solo incluye países de habla inglesa. Elige <strong>other → Europe → Spain</strong>. Así se configura la zona horaria de España.</p>
+<p><img alt="" src="../img/debian16.png" /></p>
+</li>
+<li>
+<p><strong>Configure locales:</strong> <strong>United States - en_US.UTF-8</strong>.</p>
+</li>
+<li><strong>Configure the keyboard:</strong> <strong>Spanish</strong>. ⚠️ Si dejas <em>American English</em>, los símbolos (<code>/</code>, <code>-</code>, <code>|</code>, <code>@</code>…) no estarán donde esperas.</li>
+</ul>
+<p><strong>Interfaz de red principal.</strong> Como la máquina tiene dos adaptadores, el instalador pregunta cuál usar. Elige <strong><code>enp0s3</code></strong>, que es el Adapter 1 (NAT) y el que tiene Internet. <code>enp0s8</code> es el Host-only y lo configuraremos después de instalar.</p>
+<p><img alt="" src="../img/debian17.png" /></p>
+<p><strong>Nombre de la máquina (<em>hostname</em>).</strong> Aquí no eliges libremente: el nombre de tu máquina debe ser</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>debian-tuapellido
+</code></pre></div>
+<p>en minúsculas, sin acentos, sin espacios y sin la ñ (por ejemplo, <code>debian-garcia</code>). Si tienes dos apellidos, usa solo el primero. En la captura aparece <code>daw-debian</code>: tú escribe el tuyo.</p>
+<div class="admonition warning">
+<p class="admonition-title">Esto no es un capricho</p>
+<p>El <em>hostname</em> aparece en el <em>prompt</em> de cada comando que ejecutes (<code>usuario@debian-tuapellido</code>), así que <strong>firma automáticamente toda tu entrega</strong>. Una práctica entregada con el nombre de otra persona en el prompt es una práctica copiada, y se corrige sola.</p>
+<p>Si te equivocas al instalar, se arregla después con estos dos comandos y reiniciando. El segundo cambia también el nombre en <code>/etc/hosts</code>; si te lo saltas, <code>sudo</code> se quejará en cada uso con <code>unable to resolve host</code> (el propio segundo comando todavía mostrará ese aviso una última vez; es normal):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>hostnamectl<span class="w"> </span>set-hostname<span class="w"> </span>debian-tuapellido
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">'s/^127\.0\.1\.1.*/127.0.1.1    debian-tuapellido/'</span><span class="w"> </span>/etc/hosts
+</code></pre></div>
+</div>
+<p><img alt="" src="../img/debian4.png" /></p>
+<p><strong>Domain name:</strong> déjalo en blanco.</p>
+<p><strong>Contraseña de <em>root</em>: déjala vacía</strong> (los dos campos).</p>
+<p><img alt="" src="../img/debian5.png" /></p>
+<p>Como indica el propio instalador, si no pones contraseña a <em>root</em> la cuenta queda bloqueada y el usuario que crees a continuación se añade automáticamente al grupo <code>sudo</code>. Es lo que se hace hoy en la mayoría de servidores (Ubuntu Server, las máquinas de AWS o Azure…): se trabaja con un usuario normal y se usa <code>sudo</code> solo para las tareas de administración. Lo verás en el paso 6.</p>
+<p><strong>Usuario.</strong> Después te pedirá:</p>
+<ul>
+<li><strong>Full name for the new user:</strong> tu nombre completo.</li>
+<li><strong>Username for your account:</strong> en minúsculas y sin espacios ni tildes (por ejemplo, <code>ana</code>).</li>
+<li><strong>Password:</strong> escríbela dos veces y <strong>apúntala</strong>, porque es la que te pedirá <code>sudo</code>. Marca <strong>Show Password in Clear</strong> para comprobar que la escribes bien: es fácil equivocarse con la distribución del teclado.</li>
+</ul>
+<p><strong>Reloj.</strong> <strong>Madrid</strong> (o <em>Canary Islands</em> si corresponde).</p>
+<p><strong>Particionado.</strong> Para simplificar, dile que utilice todo el disco:</p>
+<p><img alt="" src="../img/debian6.png" /></p>
+<ol>
+<li><strong>Partitioning method:</strong> <strong>Guided - use entire disk</strong>.</li>
+<li><strong>Select disk to partition:</strong> el único que hay, <code>sda</code>. Aparece como 21.5 GB y no como 20 GB porque VirtualBox mide en GiB y el instalador en GB.</li>
+<li><strong>Partitioning scheme:</strong> <strong>All files in one partition (recommended for new users)</strong>.</li>
+<li>En el resumen verás una partición <code>ext4</code> montada en <code>/</code> y otra de <code>swap</code>. Elige <strong>Finish partitioning and write changes to disk</strong>.</li>
+<li><strong>Write the changes to disks?:</strong> marca <strong>Yes</strong>. ⚠️ Por defecto está en <em>No</em>; si continúas así, vuelve atrás y parece que no avanza.</li>
+</ol>
+<p>Solo se borra el disco virtual de la máquina, no el de tu ordenador.</p>
+<p><strong>Gestor de paquetes.</strong></p>
+<ul>
+<li><strong>Scan extra installation media?:</strong> <strong>No</strong>.</li>
+<li><strong>Debian archive mirror country:</strong> <strong>Spain</strong>.</li>
+<li><strong>Debian archive mirror:</strong> <strong>deb.debian.org</strong>. Es una red de servidores que te redirige automáticamente al más cercano.</li>
+<li><strong>HTTP proxy information:</strong> en blanco.</li>
+<li><strong>Participate in the package usage survey?:</strong> <strong>No</strong>.</li>
+</ul>
+<p><strong>Selección de software (<em>tasksel</em>).</strong> Aquí está la otra decisión crítica. Deja marcado <strong>únicamente</strong>:</p>
+<ul>
+<li><strong>SSH server</strong></li>
+<li><strong>standard system utilities</strong></li>
+</ul>
+<p>Y <strong>desmarca todo lo demás</strong>, en especial <strong>Debian desktop environment</strong> y cualquier escritorio (GNOME, Xfce, LXDE…). Revisa la lista entera: si queda marcado un escritorio concreto, se instala aunque hayas desmarcado <em>Debian desktop environment</em>.</p>
+<p><img alt="" src="../img/debian7.png" /></p>
+<div class="admonition warning">
+<p class="admonition-title">Sin entorno gráfico</p>
+<p>Un servidor no lleva escritorio: consume memoria, aumenta la superficie de ataque y no lo va a mirar nadie. Las webs que despliegues las probarás desde el navegador de tu ordenador, gracias al adaptador Host-only.</p>
+<p>Tampoco marques <strong>web server</strong>: instalaremos el servidor web a mano en una práctica posterior.</p>
+</div>
+<p><strong>Gestor de arranque GRUB.</strong> Dile que sí lo instale (<strong>Yes</strong>), y selecciona el único disco que tienes, <code>/dev/sda</code>. <strong>Pincha en el nombre del disco</strong>, no en <em>Enter device manually</em>, o no se instalará:</p>
+<p><img alt="" src="../img/debian12.png" /></p>
+<p>Al terminar aparecerá <strong>Installation complete</strong>: pulsa <strong>Continue</strong> y la máquina se reiniciará. Tras el reinicio aparecerá una terminal pidiendo <em>login</em>, y ahí ya puedes entrar con tu usuario y contraseña (al escribir la contraseña no se ve nada; es normal).</p>
+<div class="admonition tip">
+<p class="admonition-title">Si vuelve a aparecer el instalador</p>
+<p>Normalmente el instalador expulsa la ISO al terminar. Si al reiniciar vuelves a ver el menú de instalación, quita la ISO desde <strong>Devices → Optical Drives → Remove disk from virtual drive</strong> y reinicia.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Máquina de respaldo</p>
+<p>Si tu instalación falla y no hay tiempo para repetirla, el profesor te facilitará una máquina ya instalada (<code>DAW-debian.ova</code>). Impórtala con <strong>File → Import Appliance</strong> y, en <strong>MAC Address Policy</strong>, elige <strong>Generate new MAC addresses for all network adapters</strong>.</p>
+<ul>
+<li>Usuario: <code>alumno</code> · Contraseña: <code>daw1234</code></li>
+<li>Nada más entrar, <strong>cambia la contraseña</strong> con <code>passwd</code> y <strong>el <em>hostname</em></strong> con los dos comandos del recuadro "Esto no es un capricho" (el de <code>hostnamectl</code> y el de <code>/etc/hosts</code>).</li>
+<li>
+<p><strong>Regenera las claves del servidor SSH.</strong> Todas las copias de la máquina de respaldo tienen las mismas, así que todas tendrían la misma huella (lo entenderás en el paso 5):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>rm<span class="w"> </span>/etc/ssh/ssh_host_*
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>dpkg-reconfigure<span class="w"> </span>openssh-server
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>ssh
+</code></pre></div>
+</li>
+<li>
+<p>La red Host-only ya viene configurada: puedes saltarte el paso 4.</p>
+</li>
+</ul>
+</div>
+<h2 id="4-configurar-la-red-host-only">4. Configurar la red Host-only<a class="headerlink" href="#4-configurar-la-red-host-only" title="Permanent link">&para;</a></h2>
+<p>Desde la ventana de la máquina virtual, comprueba el estado de las interfaces de red:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>ip<span class="w"> </span>-br<span class="w"> </span>a
+</code></pre></div>
+<p><img alt="" src="../img/debian11.png" /></p>
+<table>
+<thead>
+<tr>
+<th>Interfaz</th>
+<th>Qué es</th>
+<th>Estado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lo</code></td>
+<td><em>Loopback</em>: la máquina hablando consigo misma</td>
+<td><code>127.0.0.1</code></td>
+</tr>
+<tr>
+<td><code>enp0s3</code></td>
+<td>Adapter 1 (NAT): salida a Internet</td>
+<td><code>UP</code> con <code>10.0.2.15</code></td>
+</tr>
+<tr>
+<td><code>enp0s8</code></td>
+<td>Adapter 2 (Host-only): acceso desde tu ordenador</td>
+<td><strong><code>DOWN</code>, sin IP</strong></td>
+</tr>
+</tbody>
+</table>
+<p>El instalador solo configuró la interfaz principal. Vamos a dar a <code>enp0s8</code> una <strong>IP fija</strong>: <code>192.168.56.10</code>.</p>
+<div class="admonition info">
+<p class="admonition-title">¿Y si todos usamos la misma IP?</p>
+<p>No hay problema. La red Host-only es privada y <strong>local a cada ordenador</strong>: solo existe entre tu Windows y tus máquinas virtuales, y no sale a la red del aula. Treinta máquinas con <code>192.168.56.10</code> en treinta ordenadores distintos no chocan, igual que todos los routers domésticos usan <code>192.168.1.1</code>.</p>
+<p>Si más adelante tienes <strong>varias</strong> máquinas virtuales en tu ordenador, cada una necesitará una IP distinta dentro de esa red (<code>.10</code>, <code>.11</code>, <code>.12</code>…).</p>
+</div>
+<p>Edita el fichero de configuración de red:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/network/interfaces
+</code></pre></div>
+<p>Te pedirá tu contraseña: es la primera vez que usas <code>sudo</code>. Al <strong>final</strong> del fichero, añade:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a># Red Host-only: acceso desde el anfitrión
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>allow-hotplug enp0s8
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>iface enp0s8 inet static
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    address 192.168.56.10/24
+</code></pre></div>
+<p>No lleva <code>gateway</code>: la salida a Internet ya la da <code>enp0s3</code> (NAT).</p>
+<p>Guarda y sal de <code>nano</code> con <strong>Ctrl+O</strong>, <strong>Enter</strong> y <strong>Ctrl+X</strong>. Después levanta la interfaz y comprueba que tiene su IP:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo<span class="w"> </span>ifup<span class="w"> </span>enp0s8
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>ip<span class="w"> </span>-br<span class="w"> </span>a
+</code></pre></div>
+<p><code>enp0s8</code> debe aparecer como <code>UP</code> con <code>192.168.56.10/24</code>:</p>
+<p><img alt="" src="../img/debian18.png" /></p>
+<div class="admonition question">
+<p class="admonition-title">Comprueba antes de seguir</p>
+<p>Desde tu ordenador, abre PowerShell y haz <code>ping 192.168.56.10</code>. Si no responde, revisa el Adapter 2 de VirtualBox y el fichero <code>/etc/network/interfaces</code> antes de continuar.</p>
+</div>
+<h2 id="5-primera-conexion-por-ssh-con-contrasena">5. Primera conexión por SSH (con contraseña)<a class="headerlink" href="#5-primera-conexion-por-ssh-con-contrasena" title="Permanent link">&para;</a></h2>
+<p>Con la red configurada ya no necesitas la ventana de VirtualBox: a partir de aquí trabajarás <strong>siempre desde tu terminal</strong>, igual que con un servidor real, al que nunca tienes delante. Además, en la terminal puedes copiar y pegar comandos, cosa que en la ventana de la máquina virtual no se puede.</p>
+<p>Para arrancar la máquina, haz clic derecho sobre ella en VirtualBox y elige una de estas opciones en <strong>Start</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Opción</th>
+<th>Qué hace</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Start with GUI</strong></td>
+<td>Arranque normal, con ventana</td>
+</tr>
+<tr>
+<td><strong>Start without GUI</strong></td>
+<td>Sin ventana: la máquina funciona en segundo plano</td>
+</tr>
+<tr>
+<td><strong>Start with detachable GUI</strong></td>
+<td>Con ventana, pero <strong>al cerrarla la máquina sigue encendida</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Se recomienda <strong>Start with detachable GUI</strong>: ves el arranque y el <em>login</em> por si algo falla, y cuando ya te conectes por SSH cierras la ventana (eligiendo <strong>Continue running in the background</strong>).</p>
+<p>Con la máquina encendida, conéctate:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Windows</label><label for="__tabbed_1_2">Linux / macOS</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Windows 10 y 11 ya traen el cliente OpenSSH integrado. Abre <strong>PowerShell</strong> o el <strong>Terminal de Windows</strong> y escribe:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">ssh</span> <span class="n">nombreusuario</span><span class="nv">@192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">56</span><span class="p">.</span><span class="n">10</span>
+</code></pre></div>
+<p>No necesitas instalar PuTTY ni nada parecido.</p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ssh<span class="w"> </span>nombreusuario@192.168.56.10
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>La primera vez te avisará de que no conoce el servidor y te mostrará su <strong>huella</strong> (<em>fingerprint</em>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>The authenticity of host '192.168.56.10 (192.168.56.10)' can't be established.
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>ED25519 key fingerprint is SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Are you sure you want to continue connecting (yes/no/[fingerprint])?
+</code></pre></div>
+<p><strong>No escribas <code>yes</code> todavía.</strong> La huella es el resumen de la clave pública del servidor, algo así como su DNI. Si alguien se hubiera interpuesto entre tú y el servidor (un ataque de <em>hombre en el medio</em>), la huella que ves sería la <strong>suya</strong>, y al escribir <code>yes</code> le estarías entregando tu contraseña. Antes de confiar, compruébala.</p>
+<p>En la <strong>ventana de la máquina virtual</strong> (por eso conviene arrancarla con ventana), ejecuta:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>ssh-keygen<span class="w"> </span>-lf<span class="w"> </span>/etc/ssh/ssh_host_ed25519_key.pub
+</code></pre></div>
+<p>Te mostrará la huella real de tu servidor:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>256 SHA256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx root@debian-tuapellido (ED25519)
+</code></pre></div>
+<p>Compara la cadena <code>SHA256:…</code> con la que te muestra PowerShell. Arriba, la huella vista desde dentro del servidor; abajo, la que recibe tu ordenador. Son idénticas:</p>
+<p><img alt="" src="../img/debian19.png" /></p>
+<p>Si coinciden, escribe <code>yes</code>. A partir de entonces la huella queda guardada en tu fichero <code>known_hosts</code> (en Windows, <code>C:\Users\tuusuario\.ssh\known_hosts</code>) y no te lo volverá a preguntar.</p>
+<div class="admonition tip">
+<p class="admonition-title">Que lo compare SSH por ti</p>
+<p>Fíjate en la pregunta: <code>(yes/no/[fingerprint])</code>. En lugar de <code>yes</code> puedes <strong>pegar la huella</strong> que has obtenido en el servidor (<code>SHA256:…</code>), y SSH la comparará por ti: si no coincide, rechazará la conexión. Es más fiable que comparar a ojo 43 caracteres.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">En un servidor real</p>
+<p>En un VPS no tienes "ventana" a la que asomarte. El proveedor te muestra la huella en su panel web o en la consola de emergencia, y ahí es donde la compruebas. Casi nadie lo hace, y precisamente por eso este ataque funciona.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!</p>
+<p>Si algún día, al conectarte, SSH se niega con este aviso enorme, es que la huella del servidor <strong>ya no es la que tenías guardada</strong>. Puede ser un ataque, o puede tener una explicación inocente: has reinstalado la máquina, o has importado otra con la misma IP. <strong>Solo si sabes el motivo</strong>, borra la huella antigua y vuelve a conectarte (y a comprobar la nueva):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">ssh-keygen</span> <span class="n">-R</span> <span class="n">192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">56</span><span class="p">.</span><span class="n">10</span>
+</code></pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">También desde Visual Studio Code</p>
+<p>Con la extensión <strong>Remote - SSH</strong> de Microsoft puedes conectarte al servidor desde VS Code (<strong>F1 → Remote-SSH: Connect to Host… → <code>usuario@192.168.56.10</code></strong>, plataforma <strong>Linux</strong>). Tendrás su terminal integrada y podrás editar los ficheros de configuración del servidor con el editor de VS Code. Te resultará muy cómodo en las prácticas siguientes.</p>
+</div>
+<p>A partir de ahora, <strong>todos los comandos de la Debian los ejecutas desde esta sesión SSH</strong>.</p>
+<h2 id="6-administrar-con-sudo">6. Administrar con sudo<a class="headerlink" href="#6-administrar-con-sudo" title="Permanent link">&para;</a></h2>
+<p>Con <code>sudo</code>, cualquier comando precedido de esa palabra se ejecuta como <em>root</em>, y todo lo demás se ejecuta con tus permisos normales. Así te proteges de liarla con un comando que no tocaba. A lo largo del módulo harás incontables tareas de administración, y trabajar como <em>root</em> todo el rato es incómodo y peligroso.</p>
+<p>Como dejaste vacía la contraseña de <em>root</em>, tu usuario ya tiene permisos. Compruébalo:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>groups
+</code></pre></div>
+<p>En la lista debe aparecer <code>sudo</code>. Valida que funciona:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>sudo<span class="w"> </span>-v
+</code></pre></div>
+<p>Si <strong>no</strong> tienes permisos, responderá:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Sorry, user [usuario] may not run sudo on [maquina].
+</code></pre></div>
+<p>Y si los tienes, no devolverá nada. Si quieres algo más explícito:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>timeout<span class="w"> </span><span class="m">2</span><span class="w"> </span>sudo<span class="w"> </span>id<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span>Access<span class="w"> </span>granted<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span>Access<span class="w"> </span>denied
+</code></pre></div>
+<h3 id="dar-permisos-de-sudo-a-otro-usuario">Dar permisos de sudo a otro usuario<a class="headerlink" href="#dar-permisos-de-sudo-a-otro-usuario" title="Permanent link">&para;</a></h3>
+<p>En un servidor que no has instalado tú, lo normal es tener que dar permisos a un usuario a mano. Practícalo creando un segundo usuario llamado <code>deploy</code>, el típico usuario de despliegue:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>sudo<span class="w"> </span>adduser<span class="w"> </span>deploy
+</code></pre></div>
+<p>Te pedirá una contraseña para <code>deploy</code> (dos veces) y después unos datos opcionales (<em>Full Name</em>, <em>Room Number</em>…): pulsa <strong>Enter</strong> en todos para dejarlos vacíos y confirma con <strong>Y</strong>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Método corto: añadir al grupo sudo</label><label for="__tabbed_2_2">Método clásico: visudo</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>sudo<span class="w"> </span>usermod<span class="w"> </span>-aG<span class="w"> </span>sudo<span class="w"> </span>deploy
+</code></pre></div>
+<p>Debian ya trae en <code>/etc/sudoers</code> una línea que concede permisos a todo el grupo <code>sudo</code>, así que con añadir el usuario al grupo es suficiente.</p>
+</div>
+<div class="tabbed-block">
+<p>Ejecuta <code>visudo</code>, la herramienta que edita el fichero de permisos de forma segura (comprueba la sintaxis antes de guardar, para que no te quedes fuera):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>sudo<span class="w"> </span>visudo
+</code></pre></div>
+<p>Deja la sección así:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a># User privilege specification
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>root    ALL=(ALL:ALL) ALL
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>deploy  ALL=(ALL:ALL) ALL
+</code></pre></div>
+<p>Guarda con <code>Ctrl+X</code> y confirma.</p>
+</div>
+</div>
+</div>
+<p>Comprueba que funciona cambiando a ese usuario. El prompt pasará a ser <code>deploy@debian-tuapellido</code>, y tanto <code>su</code> como <code>sudo</code> te pedirán la contraseña <strong>de <code>deploy</code></strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>su<span class="w"> </span>-<span class="w"> </span>deploy
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>sudo<span class="w"> </span>-v
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="nb">exit</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">No pegues de golpe comandos que piden contraseña</p>
+<p>Si pegas estas tres líneas a la vez, las que van detrás de <code>su</code> no se ejecutan cuando esperas: pueden tomarse como la contraseña (y falla con <code>su: Authentication failure</code>) o quedarse en espera y ejecutarse más tarde, en otra sesión. Por ejemplo, el <code>exit</code> pegado puede acabar cerrándote la conexión SSH. Cuando un comando pide contraseña, ejecútalo <strong>solo</strong> y espera a que te la pida.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Los grupos se leen al iniciar sesión</p>
+<p>Si añades a un grupo a un usuario que ya tiene una sesión abierta, el cambio no se nota hasta que <strong>cierra la sesión y vuelve a entrar</strong>.</p>
+</div>
+<h2 id="7-autenticacion-con-par-de-claves">7. Autenticación con par de claves<a class="headerlink" href="#7-autenticacion-con-par-de-claves" title="Permanent link">&para;</a></h2>
+<p>Ahora haremos lo que se hace en un servidor real: entrar sin contraseña, con un par de claves.</p>
+<p><strong>En tu ordenador</strong> (no en la máquina virtual), genera el par de claves:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ed25519<span class="w"> </span>-C<span class="w"> </span><span class="s2">"tu_correo_o_un_comentario"</span>
+</code></pre></div>
+<div class="admonition info">
+<p class="admonition-title">Por qué ed25519 y no RSA</p>
+<p><code>ed25519</code> es el algoritmo recomendado hoy: claves mucho más cortas, más rápidas y al menos igual de seguras que un RSA de 4096 bits. Verás mucha documentación antigua que usa <code>ssh-keygen -b 4096</code>; funciona, pero ya no es la primera opción.</p>
+</div>
+<div class="admonition danger">
+<p class="admonition-title">Si ya tienes una clave, no la sobrescribas</p>
+<p>Si en tu ordenador ya existe <code>id_ed25519</code> (por ejemplo, porque la usas para GitHub), <code>ssh-keygen</code> te preguntará <code>Overwrite (y/n)?</code>. Responde <strong><code>n</code></strong>: si la sobrescribes, perderás el acceso a todo lo que usaba la antigua. No necesitas otra; sáltate la generación y usa la que ya tienes.</p>
+<p>Para saber si ya tienes una, en PowerShell: <code>ls $env:USERPROFILE\.ssh</code></p>
+</div>
+<p>Acepta la ubicación por defecto. Te pedirá una <em>passphrase</em> para proteger la clave privada: dado que queremos agilizar la conexión, <strong>déjala vacía</strong> pulsando Enter.</p>
+<p>Se habrán creado dos archivos en tu carpeta <code>.ssh</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Archivo</th>
+<th>Qué es</th>
+<th>¿Se comparte?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>id_ed25519</code></td>
+<td>Clave <strong>privada</strong></td>
+<td><strong>Nunca.</strong> No sale de tu equipo</td>
+</tr>
+<tr>
+<td><code>id_ed25519.pub</code></td>
+<td>Clave <strong>pública</strong></td>
+<td>Sí, es la que copiamos al servidor</td>
+</tr>
+</tbody>
+</table>
+<p>Ahora hay que copiar la clave <strong>pública</strong> al servidor:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Linux / macOS</label><label for="__tabbed_3_2">Windows</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>ssh-copy-id<span class="w"> </span>usuario@192.168.56.10
+</code></pre></div>
+<p>Es una conexión SSH normal que, además, copia la clave en el sitio adecuado.</p>
+</div>
+<div class="tabbed-block">
+<p>En Windows <strong>no existe <code>ssh-copy-id</code></strong>. Hazlo con este comando en PowerShell (todo en una línea):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="nb">type </span><span class="nv">$env:USERPROFILE</span><span class="p">\.</span><span class="n">ssh</span><span class="p">\</span><span class="n">id_ed25519</span><span class="p">.</span><span class="n">pub</span> <span class="p">|</span> <span class="n">ssh</span> <span class="n">usuario</span><span class="nv">@192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">56</span><span class="p">.</span><span class="n">10</span> <span class="s2">"mkdir -p ~/.ssh &amp;&amp; cat &gt;&gt; ~/.ssh/authorized_keys"</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Para evitar problemas de permisos, ejecuta <strong>en la Debian</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span>~/.ssh
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>~/.ssh/authorized_keys
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Los permisos no son opcionales</p>
+<p>SSH <strong>ignora</strong> el fichero <code>authorized_keys</code> si tiene permisos demasiado abiertos, y lo hace en silencio: te seguirá pidiendo la contraseña sin decirte por qué. Es el fallo número uno de esta práctica.</p>
+</div>
+<p>Cierra la sesión y vuelve a conectarte. Debe entrar <strong>sin pedirte contraseña</strong>. Fíjate en la diferencia: al copiar la clave pide la contraseña por última vez; en la última conexión, ya no:</p>
+<p><img alt="" src="../img/debian20.png" /></p>
+<h2 id="8-endurecer-el-servidor-ssh">8. Endurecer el servidor SSH<a class="headerlink" href="#8-endurecer-el-servidor-ssh" title="Permanent link">&para;</a></h2>
+<p>Si ya entras con clave, la contraseña sobra: es una puerta abierta que solo sirve para que la intenten forzar. Vamos a cerrarla.</p>
+<div class="admonition danger">
+<p class="admonition-title">Antes de tocar nada</p>
+<p><strong>Comprueba que la conexión con clave funciona.</strong> Si desactivas la contraseña sin tener la clave bien puesta, te quedas fuera de tu propio servidor (en la VM podrías entrar por la ventana; en un VPS real, no).</p>
+</div>
+<p>Edita el fichero de configuración del servidor:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/ssh/sshd_config
+</code></pre></div>
+<p>Busca estas tres directivas (con <strong>Ctrl+F</strong> puedes buscar en <code>nano</code>). Por defecto están comentadas con <code>#</code>, lo que significa que se aplica su valor por defecto. Quita el <code>#</code> y déjalas así:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nb">PermitRootLogin</span><span class="w"> </span>no
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="nb">PasswordAuthentication</span><span class="w"> </span>no
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="nb">PubkeyAuthentication</span><span class="w"> </span>yes
+</code></pre></div>
+<p>Las líneas activas se ven en blanco y las comentadas en azul:</p>
+<p><img alt="" src="../img/debian21.png" /></p>
+<p>Antes de aplicar nada, comprueba que el fichero no tiene errores. Si hay alguno, el servicio no arrancaría:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>sudo<span class="w"> </span>sshd<span class="w"> </span>-t
+</code></pre></div>
+<p>Si no devuelve nada, está bien. Aplica los cambios:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>ssh
+</code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">Trampa de Debian 13</p>
+<p>En Debian 13 el servidor SSH se activa <strong>por socket</strong> (<code>ssh.socket</code>). Eso significa que el clásico <code>systemctl reload ssh</code> <strong>falla</strong> con el error <code>fatal: Cannot bind any address</code> y puede tumbarte el servicio.</p>
+<p>Usa siempre <strong><code>restart</code></strong>, no <code>reload</code>. Tranquilo: reiniciar el servicio <strong>no corta</strong> las sesiones SSH que ya estén abiertas.</p>
+</div>
+<p>Comprueba la configuración que el servidor está aplicando <strong>de verdad</strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>sudo<span class="w"> </span>sshd<span class="w"> </span>-T<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-Ei<span class="w"> </span><span class="s1">'permitrootlogin|passwordauthentication|pubkeyauthentication'</span>
+</code></pre></div>
+<p>Debe mostrar <code>permitrootlogin no</code>, <code>passwordauthentication no</code> y <code>pubkeyauthentication yes</code>. Si alguna no coincide con lo que has escrito, puede que otro fichero de <code>/etc/ssh/sshd_config.d/</code> la esté sobrescribiendo.</p>
+<p>Comprueba desde <strong>otra terminal</strong> (sin cerrar la que tienes abierta, por si acaso) que sigues entrando con la clave y que, si intentas forzar la contraseña, te rechaza:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>ssh<span class="w"> </span>-o<span class="w"> </span><span class="nv">PreferredAuthentications</span><span class="o">=</span>password<span class="w"> </span>usuario@192.168.56.10
+</code></pre></div>
+<p>Debe responder <code>Permission denied (publickey)</code>: el servidor solo acepta claves.</p>
+<p><img alt="" src="../img/debian22.png" /></p>
+<h2 id="9-haz-una-instantanea">9. Haz una instantánea<a class="headerlink" href="#9-haz-una-instantanea" title="Permanent link">&para;</a></h2>
+<p>Apaga la máquina desde tu sesión SSH:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>sudo<span class="w"> </span>poweroff
+</code></pre></div>
+<p>En VirtualBox, selecciona la máquina, abre la pestaña <strong>Snapshots</strong>, pulsa <strong>Take</strong> y llama a la instantánea <code>base-limpia</code>:</p>
+<p><img alt="" src="../img/debian23.png" /></p>
+<p>Para volver a ese punto en el futuro: selecciona la instantánea y pulsa <strong>Restore</strong>.</p>
+<p>A lo largo del módulo vas a instalar, configurar y romper muchas cosas. Poder volver a un punto conocido en treinta segundos, en vez de reinstalar Debian entera, te va a salvar más de una tarde.</p>
+<hr />
+<h2 id="cuestiones-finales">Cuestiones finales<a class="headerlink" href="#cuestiones-finales" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 1</p>
+<p>Tu máquina tiene dos adaptadores de red: <strong>NAT</strong> y <strong>Host-only</strong>. ¿Para qué sirve cada uno? ¿Qué pasaría si solo tuviera el NAT? ¿Y si solo tuviera el Host-only?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 2</p>
+<p>¿Por qué <code>visudo</code> es preferible a editar <code>/etc/sudoers</code> directamente con <code>nano</code>?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 3</p>
+<p>Has copiado tu clave pública al servidor. ¿Qué ocurriría si, por error, hubieras copiado la privada? ¿Y qué debes hacer si eso pasa?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 4</p>
+<p>A <code>enp0s8</code> le hemos puesto una IP fija en lugar de dejar que la asigne un servidor DHCP. ¿Qué ventajas tiene eso en un servidor? ¿Por qué todos los compañeros podéis usar la misma IP sin que haya conflictos?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 5</p>
+<p>Explica, con lo visto en la teoría, qué interviene en cada momento cuando te conectas por SSH con un par de claves: Diffie-Hellman, firmas asimétricas o cifrado simétrico.</p>
+</div>
+<h2 id="entrega">Entrega<a class="headerlink" href="#entrega" title="Permanent link">&para;</a></h2>
+<p>El resultado de esta práctica es una máquina virtual, y una máquina no se puede entregar.
+Lo que entregas son <strong>las pruebas de que esa máquina existe y está bien configurada</strong>.</p>
+<p>La entrega tiene dos partes, y las dos son obligatorias.</p>
+<h3 id="parte-1-documento-de-evidencias-40">Parte 1 — Documento de evidencias (40 %)<a class="headerlink" href="#parte-1-documento-de-evidencias-40" title="Permanent link">&para;</a></h3>
+<p>Un único <strong>PDF</strong> llamado <code>P1.1-Apellido-Nombre.pdf</code> que contenga, en este orden:</p>
+<ol>
+<li><strong>Portada</strong> con tu nombre, el grupo y el <em>hostname</em> de tu máquina.</li>
+<li><strong>Las evidencias</strong> de la tabla de abajo.</li>
+<li><strong>Las respuestas a las cinco cuestiones finales</strong>, con tus palabras.</li>
+</ol>
+<div class="admonition danger">
+<p class="admonition-title">Texto, no capturas</p>
+<p>La salida de los comandos se entrega <strong>copiada como texto</strong>, dentro de un bloque o con
+tipografía de ancho fijo. <strong>No</strong> valen fotos ni capturas de la terminal.</p>
+<p>Solo hay dos excepciones, porque ahí sí hace falta ver la pantalla: la configuración de los
+adaptadores de red en VirtualBox y la instantánea creada.</p>
+</div>
+<p>Evidencias que debe contener el documento:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Qué hay que demostrar</th>
+<th>Comando cuya salida se pega</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>La máquina es tuya y el <em>hostname</em> es el correcto</td>
+<td><code>hostnamectl</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Tu usuario y sus grupos</td>
+<td><code>id</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>El sistema arranca sin entorno gráfico</td>
+<td><code>systemctl status display-manager</code> (debe responder <code>Unit display-manager.service could not be found.</code>: no hay gestor de pantalla)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Las dos interfaces de red tienen IP (<code>enp0s3</code> por NAT y <code>enp0s8</code> con <code>192.168.56.10</code>)</td>
+<td><code>ip a</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>El servidor SSH está activo</td>
+<td><code>systemctl status ssh</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Tu usuario y el usuario <code>deploy</code> tienen permisos de administración</td>
+<td><code>sudo id</code> y <code>groups deploy</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Entras con par de claves</td>
+<td><code>ssh -v usuario@192.168.56.10</code> — señala la línea <code>Authenticated using "publickey"</code></td>
+</tr>
+<tr>
+<td>8</td>
+<td>El acceso por contraseña está cerrado</td>
+<td><code>ssh -o PreferredAuthentications=password usuario@192.168.56.10</code> — debe responder <code>Permission denied (publickey)</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>Configuración de red de la máquina</td>
+<td><strong>Captura</strong> de VirtualBox con el Adapter 1 (NAT) y otra con el Adapter 2 (Host-only)</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Instantánea creada</td>
+<td><strong>Captura</strong> de la instantánea <code>base-limpia</code></td>
+</tr>
+</tbody>
+</table>
+<p>Cada evidencia debe ir acompañada de <strong>una frase tuya</strong> explicando qué demuestra.
+Una tanda de comandos pegados sin explicar no puntúa.</p>
+<h3 id="parte-2-demostracion-en-clase-60">Parte 2 — Demostración en clase (60 %)<a class="headerlink" href="#parte-2-demostracion-en-clase-60" title="Permanent link">&para;</a></h3>
+<p>Es una mini entrevista individual. Cuando se te llame, vienes a la mesa del profesor con
+<strong>tu ordenador</strong> y la máquina virtual preparada para arrancar. En unos dos minutos:</p>
+<ol>
+<li>Te conectas por SSH desde tu equipo a tu máquina virtual.</li>
+<li>Ejecutas el comando que se te pida en ese momento.</li>
+<li>Explicas en voz alta <strong>una</strong> de las decisiones que tomaste (por qué dos adaptadores de red, por qué sin escritorio, por qué desactivamos la contraseña…).</li>
+</ol>
+<p>Esta parte no se puede preparar de memoria ni copiar: o la máquina funciona, o no funciona.</p>
+<div class="admonition info">
+<p class="admonition-title">Cómo se califica</p>
+<p>La demostración pesa más que el documento porque es lo que de verdad acredita el
+resultado de aprendizaje. <strong>Una demostración que no funciona no se compensa con un
+documento impecable</strong>: en ese caso la práctica queda pendiente hasta que la máquina
+funcione, y se vuelve a demostrar.</p>
+</div>
+<h3 id="criterios-de-evaluacion">Criterios de evaluación<a class="headerlink" href="#criterios-de-evaluacion" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Criterio</th>
+<th>Peso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documento</td>
+<td>Las diez evidencias están completas, en texto y cada una con su frase explicativa</td>
+<td>25 %</td>
+</tr>
+<tr>
+<td>Documento</td>
+<td>Las cinco cuestiones finales están respondidas con corrección y criterio propio</td>
+<td>15 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Te conectas por SSH con clave desde tu equipo, y el acceso por contraseña está cerrado</td>
+<td>20 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Ejecutas el comando que se te pide y la salida es la esperada</td>
+<td>20 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Explicas una de tus decisiones con tus palabras y respondes a las preguntas sobre ella</td>
+<td>20 %</td>
+</tr>
+</tbody>
+</table>
+<p>Si en la demostración aparece una máquina que no es la tuya (el <em>hostname</em>, la huella del servidor o la clave de otra persona), la demostración entera cuenta como no superada.</p>
+<h3 id="antes-de-entregar-comprueba-que">Antes de entregar, comprueba que…<a class="headerlink" href="#antes-de-entregar-comprueba-que" title="Permanent link">&para;</a></h3>
+<ul>
+<li>☐ El <em>hostname</em> es <code>debian-tuapellido</code> y aparece en todas las salidas.</li>
+<li>☐ La máquina arranca <strong>sin entorno gráfico</strong> y muestra el <em>login</em> en terminal.</li>
+<li>☐ <code>enp0s8</code> tiene la IP <code>192.168.56.10</code> y responde al <code>ping</code> desde tu ordenador.</li>
+<li>☐ Tu usuario y el usuario <code>deploy</code> ejecutan <code>sudo</code> correctamente.</li>
+<li>☐ Te conectas por SSH <strong>sin que te pida contraseña</strong>.</li>
+<li>☐ El acceso por contraseña y el de <em>root</em> están desactivados.</li>
+<li>☐ Existe la instantánea <code>base-limpia</code>.</li>
+<li>☐ Las diez evidencias están en el PDF, en texto y comentadas.</li>
+<li>☐ Las cinco cuestiones están respondidas.</li>
+<li>☐ El archivo se llama <code>P1.1-Apellido-Nombre.pdf</code>.</li>
+</ul>
+<h2 id="referencias">Referencias<a class="headerlink" href="#referencias" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://www.debian.org/CD/netinst/index.es.html">Debian — Instalación por red (netinst)</a></li>
+<li><a href="https://www.debian.org/releases/stable/installmanual">Guía de instalación de Debian</a></li>
+<li><a href="https://www.openssh.com/manual.html">Manual de OpenSSH</a></li>
+<li><a href="https://www.hostinger.es/tutoriales/que-es-un-vps">¿Qué es un VPS? Todo lo que necesitas saber sobre servidores virtuales</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href="../T1-introduccion/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Tema 1 - Introducción">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Tema 1 - Introducción
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../T2-arquitectura-web/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Tema 2 - Arquitectura web">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                Tema 2 - Arquitectura web
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Material docente del módulo 0614. Contiene obras derivadas de terceros; ver la página de Créditos.
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.footer", "toc.integrate", "search.highlight", "search.suggest", "content.code.annotate", "content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
