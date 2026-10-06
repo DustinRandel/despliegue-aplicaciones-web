@@ -642,7 +642,7 @@ Evidencias que debe contener el documento:
 |---|---|---|
 | 1 | La máquina es tuya y el *hostname* es el correcto | `hostnamectl` |
 | 2 | Tu usuario y sus grupos | `id` |
-| 3 | El sistema arranca sin entorno gráfico | `systemctl get-default` (debe responder `multi-user.target`) |
+| 3 | El sistema arranca sin entorno gráfico | `systemctl status display-manager` (debe responder `Unit display-manager.service could not be found.`: no hay gestor de pantalla) |
 | 4 | Las dos interfaces de red tienen IP (`enp0s3` por NAT y `enp0s8` con `192.168.56.10`) | `ip a` |
 | 5 | El servidor SSH está activo | `systemctl status ssh` |
 | 6 | Tu usuario y el usuario `deploy` tienen permisos de administración | `sudo id` y `groups deploy` |
