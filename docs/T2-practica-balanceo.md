@@ -24,6 +24,20 @@ Reescrita a partir de old.P1.4.md (balanceo) y old.P1.5.md (proxy y balanceo con
       levantado: lo marca caído unos segundos (max_fails=1, fail_timeout=10s por defecto).
 
 VALIDADA el 05/10/2026: principal .10 + back1 .11 + back2 .12 (clones enlazados de 512 MB), nginx 1.26.3.
+
+Validado en VM el 15/11/2026, a continuación de la P2.4: back2 clon enlazado de back1 desde su instantánea
+back1-listo, las tres máquinas a la vez (2 GB + 512 + 512) sin problemas. Reparto, pesos, caída con Nginx parado,
+máquina apagada (2,02 s con proxy_connect_timeout 2s; 3,07 s sin él) y 504/502 coinciden con la página. Cambios:
+  - ERROR DE LA PÁGINA: el curl.exe -w "%{http_code} %{time_total}s\n" del apartado 5 tenía el \n convertido en un
+    salto de línea real (comando partido). Corregido.
+  - El ejemplo de weight=3 quitaba la línea "zone backends 64k;": se ha dejado en el ejemplo. Con ella, la
+    secuencia real es exactamente la que se muestra (11 11 12 11 11 11 12 11).
+  - Nginx parado en back1: con zone, solo la PRIMERA petición sale con "192.168.56.11:80, 192.168.56.12:80" (la
+    marca de caído es compartida por los trabajadores); la página mostraba dos. Salida real y texto corregido.
+    Tras arrancarlo, back1 vuelve al reparto al cabo de unos 10 s (fail_timeout): dicho en el texto.
+  - Apartado "Sin nadie detrás": añadido el comando (el mismo bucle de cuatro peticiones) y la salida real con
+    tiempos; el registro es de un GET, no de un HEAD.
+  - Evidencia 6: decía "seis peticiones" con weight=3, pero el apartado usa ocho.
 -->
 
 # Práctica 2.5 - Balanceo de carga con Nginx
@@ -176,6 +190,7 @@ Si `back1` fuera un servidor el triple de potente que `back2`, convendría manda
 
 ```nginx
 upstream backends {
+    zone backends 64k;
     server 192.168.56.11 weight=3;
     server 192.168.56.12;
 }
@@ -204,32 +219,38 @@ En `back1`, para Nginx (`sudo systemctl stop nginx`) y repite las seis peticione
 
 ```
 X-Upstream: 192.168.56.11:80, 192.168.56.12:80
-X-Upstream: 192.168.56.11:80, 192.168.56.12:80
+X-Upstream: 192.168.56.12:80
 X-Upstream: 192.168.56.12:80
 X-Upstream: 192.168.56.12:80
 X-Upstream: 192.168.56.12:80
 X-Upstream: 192.168.56.12:80
 ```
 
-Todas las respondió `back2`, y **ninguna dio error**. Fíjate en las dos primeras: dicen `192.168.56.11:80, 192.168.56.12:80` porque el balanceador lo intentó primero con `back1`, que rechazó la conexión, y la reintentó en `back2`. Después marca `back1` como caído durante unos segundos y ya ni lo intenta. El usuario no se entera de nada. En el registro de errores del balanceador sí queda constancia:
+Todas las respondió `back2`, y **ninguna dio error**. Fíjate en la primera: dice `192.168.56.11:80, 192.168.56.12:80` porque el balanceador lo intentó primero con `back1`, que rechazó la conexión, y la reintentó en `back2`. Después marca `back1` como caído durante 10 segundos y ya ni lo intenta. El usuario no se entera de nada. En el registro de errores del balanceador sí queda constancia:
 
 ```sh
-sudo tail -n 2 /var/log/nginx/balanceo.error.log
+sudo tail -n 1 /var/log/nginx/balanceo.error.log
 ```
 
 ```
-2026/10/05 00:14:59 [error] 1160#1160: *67 connect() failed (111: Connection refused) while connecting to upstream, client: 192.168.56.1, server: balanceo.garcia.test, request: "HEAD / HTTP/1.1", upstream: "http://192.168.56.11:80/", host: "balanceo.garcia.test"
+2026/11/15 19:47:34 [error] 1425#1425: *189 connect() failed (111: Connection refused) while connecting to upstream, client: 192.168.56.1, server: balanceo.garcia.test, request: "HEAD / HTTP/1.1", upstream: "http://192.168.56.11:80/", host: "balanceo.garcia.test"
 ```
 
-Vuelve a arrancar Nginx en `back1` y comprueba que vuelve a entrar en el reparto.
+Vuelve a arrancar Nginx en `back1` y comprueba que vuelve a entrar en el reparto. Si lo pruebas enseguida, las primeras peticiones seguirán yendo a `back2`: el balanceador no vuelve a intentarlo con `back1` hasta que pasan esos 10 segundos.
 
 ### Máquina apagada
 
 Ahora apaga la máquina `back2` entera (`sudo poweroff`) y mide cuánto tarda cada petición:
 
 ```powershell
-1..4 | ForEach-Object { curl.exe -sk -o NUL -w "%{http_code} %{time_total}s
-" https://balanceo.garcia.test }
+1..4 | ForEach-Object { curl.exe -sk -o NUL -w "%{http_code} %{time_total}s\n" https://balanceo.garcia.test }
+```
+
+```
+200 0.019438s
+200 2.020795s
+200 0.013177s
+200 0.013359s
 ```
 
 Todas responden `200`, pero la que le toque a `back2` la primera vez tarda unos 2 segundos: con la máquina apagada nadie rechaza la conexión, y el balanceador espera a que pase el `proxy_connect_timeout` antes de probar con `back1`. Las siguientes ya son inmediatas, porque `back2` ha quedado marcado como caído.
@@ -239,18 +260,20 @@ Todas responden `200`, pero la que le toque a `back2` la primera vez tarda unos 
 
 ### Sin nadie detrás
 
-Con `back2` todavía apagada, para Nginx en `back1` y haz varias peticiones seguidas:
+Con `back2` todavía apagada, espera unos segundos a que el balanceador vuelva a darle una oportunidad, para Nginx en `back1` y repite las cuatro peticiones con tiempo:
 
 ```
-504
-502
-502
+504 2.022434s
+502 0.011853s
+502 0.011313s
+502 0.012092s
 ```
 
-La primera da **`504 Gateway Time-out`**: el balanceador lo intentó con los dos, y el último, `back2`, no contestó a tiempo. Las siguientes dan **`502 Bad Gateway`** al instante, porque ya los tiene a los dos marcados como caídos y ni siquiera lo intenta. El registro de errores lo dice así:
+La primera da **`504 Gateway Time-out`** a los 2 segundos: el balanceador lo intentó con los dos, y el último, `back2`, no contestó a tiempo. Las siguientes dan **`502 Bad Gateway`** al instante, porque ya los tiene a los dos marcados como caídos y ni siquiera lo intenta. El registro de errores lo dice así:
 
 ```
-[error] 1364#1364: *138 no live upstreams while connecting to upstream, client: 192.168.56.1, server: balanceo.garcia.test, request: "HEAD / HTTP/1.1", upstream: "http://backends/", host: "balanceo.garcia.test"
+2026/11/15 19:49:01 [error] 1550#1550: *232 upstream timed out (110: Connection timed out) while connecting to upstream, client: 192.168.56.1, server: balanceo.garcia.test, request: "GET / HTTP/1.1", upstream: "http://192.168.56.12:80/", host: "balanceo.garcia.test"
+2026/11/15 19:49:01 [error] 1551#1551: *235 no live upstreams while connecting to upstream, client: 192.168.56.1, server: balanceo.garcia.test, request: "GET / HTTP/1.1", upstream: "http://backends/", host: "balanceo.garcia.test"
 ```
 
 Arranca de nuevo Nginx en `back1` y enciende `back2`.
@@ -288,12 +311,12 @@ Un **PDF** llamado `P2.5-Apellido-Nombre.pdf` con portada, las evidencias (en te
 
 | # | Qué hay que demostrar | Dónde | Comando cuya salida se pega |
 |---|---|---|---|
-| 1 | `back2` tiene su propio nombre, IP y huella | `back2` | `hostnamectl`, `ip -br a` y `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` |
+| 1 | `back2` tiene su propio nombre, IP y huella | `back2` | `hostnamectl`, `ip -br a` y `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub` (los avisos `Failed to query … Access denied` de `hostnamectl` sin `sudo` son normales) |
 | 2 | La configuración del balanceador | Principal | `cat /etc/nginx/sites-available/balanceo.tuapellido.test` |
 | 3 | La configuración es correcta | Principal | `sudo nginx -t` |
 | 4 | HTTP redirige a HTTPS | Tu ordenador | `curl.exe -I http://balanceo.tuapellido.test` |
 | 5 | El reparto por turnos | Tu ordenador | Las seis peticiones del apartado 4 |
-| 6 | El reparto con pesos | Tu ordenador | Las seis peticiones con `weight=3` |
+| 6 | El reparto con pesos | Tu ordenador | Las ocho peticiones con `weight=3` |
 | 7 | La caída de un servidor sin errores | Tu ordenador y principal | Las seis peticiones con Nginx parado en `back1`, y las últimas líneas de `balanceo.error.log` |
 | 8 | El `504` y el `502` cuando caen los dos | Tu ordenador y principal | Las peticiones del apartado 5 y la línea `no live upstreams` de `balanceo.error.log` |
 | 9 | Las dos páginas en el navegador | Tu ordenador | **Captura** de cada una, con la barra de direcciones |

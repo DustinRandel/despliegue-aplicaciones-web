@@ -19,7 +19,17 @@ Práctica nueva. Parte del apartado "HTTPS" y "Redirección HTTP a HTTPS" del P1
 VALIDADA el 05/10/2026 (VM Debian 13.7, nginx 1.26.3, OpenSSL 3.5.7, curl 8.21 de Windows, Chrome 154).
   OpenSSL 3.5 negocia el grupo híbrido post-cuántico X25519MLKEM768: explicado en un recuadro.
   El curl.exe de Windows (Schannel) habla HTTP/1.1; el navegador, HTTP/2 (se ve en el registro).
-PENDIENTE: capturas del aviso del navegador y del visor de certificados (las hará el profesor con su VM).
+
+Validado en VM el 15/11/2026 (VM importada de DAW-debian.ova con el estado de la P2.1; nginx 1.26.3, OpenSSL 3.5.7,
+curl 8.12.1 de Windows, Chrome 157). Todo funciona tal como está escrito. Cambios:
+  - Apartado 6 y evidencia 9: tras entrar con el navegador, "tail -n 3" del registro muestra las peticiones de CSS,
+    imágenes y fuentes, no el 301 y el 200 de la portada. Ahora se filtra con grep '"GET / ' | tail -n 2.
+  - Apartado 5: el grep 'Protocol' sacaba además dos líneas "    Protocol  : TLSv1.3" del resumen de la sesión.
+    Ahora '^Protocol'; salida real (el orden de las líneas es otro).
+  - Salidas reales actualizadas (ls, x509, curl con el mensaje de error completo). Avisado de los puntos y signos +
+    que imprime openssl al generar la clave.
+PENDIENTE DE CAPTURA: aviso "La conexión no es privada" y visor de certificados. Chrome sin ventana no muestra el
+aviso (falla con ERR_CERT_AUTHORITY_INVALID, comprobado el 15/11): las hace el profesor con su VM.
 -->
 
 # Práctica 2.2 - HTTPS en Nginx
@@ -84,6 +94,8 @@ sudo openssl req -x509 -newkey rsa:2048 -nodes -days 365 \
 | `-subj` | Los datos del titular: país, organización, unidad y **nombre común** (`CN`) |
 | `-addext "subjectAltName=…"` | Los nombres para los que vale el certificado. **Los navegadores actuales solo miran este campo**: sin él, el certificado no vale para tu dominio aunque el `CN` coincida |
 
+Mientras genera la clave, `openssl` escribe una ristra de puntos y signos `+`: está buscando los números primos de la clave RSA. Es normal.
+
 Repite el comando para `web2`, cambiando `web1` por `web2` en las **cuatro** líneas en las que aparece.
 
 Comprueba que tienes los cuatro ficheros:
@@ -94,10 +106,10 @@ sudo ls -l /etc/nginx/ssl
 
 ```
 total 16
--rw-r--r-- 1 root root 1330 Oct  5 00:05 web1.garcia.test.crt
--rw------- 1 root root 1704 Oct  5 00:05 web1.garcia.test.key
--rw-r--r-- 1 root root 1330 Oct  5 00:05 web2.garcia.test.crt
--rw------- 1 root root 1704 Oct  5 00:05 web2.garcia.test.key
+-rw-r--r-- 1 root root 1330 Nov 15 19:32 web1.garcia.test.crt
+-rw------- 1 root root 1704 Nov 15 19:32 web1.garcia.test.key
+-rw-r--r-- 1 root root 1330 Nov 15 19:32 web2.garcia.test.crt
+-rw------- 1 root root 1704 Nov 15 19:32 web2.garcia.test.key
 ```
 
 ### Qué hay dentro de un certificado
@@ -109,11 +121,13 @@ sudo openssl x509 -in /etc/nginx/ssl/web1.garcia.test.crt -noout -subject -issue
 ```
 subject=C=ES, O=2DAW, OU=Despliegue - Garcia, CN=web1.garcia.test
 issuer=C=ES, O=2DAW, OU=Despliegue - Garcia, CN=web1.garcia.test
-notBefore=Oct  4 22:05:58 2026 GMT
-notAfter=Oct  4 22:05:58 2027 GMT
-X509v3 Subject Alternative Name:
+notBefore=Nov 15 18:32:16 2026 GMT
+notAfter=Nov 15 18:32:16 2027 GMT
+X509v3 Subject Alternative Name: 
     DNS:web1.garcia.test
 ```
+
+Las fechas van en hora GMT: una hora menos que en España en invierno.
 
 Fíjate en que **`subject` e `issuer` son iguales**: el titular del certificado y quien lo firma son la misma persona, tú. Eso es exactamente lo que significa "autofirmado", y es la razón por la que el navegador no se va a fiar.
 
@@ -201,7 +215,7 @@ curl.exe -I http://web1.garcia.test
 ```
 HTTP/1.1 301 Moved Permanently
 Server: nginx
-Date: Sun, 04 Oct 2026 22:06:05 GMT
+Date: Sun, 15 Nov 2026 18:32:33 GMT
 Content-Type: text/html
 Content-Length: 162
 Connection: keep-alive
@@ -218,6 +232,11 @@ curl.exe -I https://web1.garcia.test
 
 ```
 curl: (60) schannel: SEC_E_UNTRUSTED_ROOT (0x80090325) - The certificate chain was issued by an authority that is not trusted.
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
 ```
 
 `curl` se niega: no conoce a quien ha firmado el certificado. Es el comportamiento correcto. Para probar a pesar de ello, la opción `-k` le dice que no compruebe el certificado (**solo** para pruebas con certificados propios):
@@ -229,8 +248,13 @@ curl.exe -kI https://web1.garcia.test
 ```
 HTTP/1.1 200 OK
 Server: nginx
+Date: Sun, 15 Nov 2026 18:32:33 GMT
 Content-Type: text/html
 Content-Length: 14522
+Last-Modified: Sun, 15 Nov 2026 18:24:18 GMT
+Connection: keep-alive
+ETag: "6af9f8d2-38ba"
+Accept-Ranges: bytes
 ```
 
 ### HTTPS en el navegador
@@ -253,15 +277,15 @@ Ya dentro, pulsa en el icono de la izquierda de la barra de direcciones y abre l
 `openssl s_client` hace de cliente TLS y te enseña lo que se negocia. Desde la sesión SSH de tu máquina:
 
 ```sh
-openssl s_client -connect localhost:443 -servername web1.garcia.test </dev/null 2>/dev/null | grep -E '^subject|^issuer|Protocol|Cipher is|Negotiated TLS1.3 group'
+openssl s_client -connect localhost:443 -servername web1.garcia.test </dev/null 2>/dev/null | grep -E '^subject|^issuer|^Protocol|Cipher is|Negotiated TLS1.3 group'
 ```
 
 ```
 subject=C=ES, O=2DAW, OU=Despliegue - Garcia, CN=web1.garcia.test
 issuer=C=ES, O=2DAW, OU=Despliegue - Garcia, CN=web1.garcia.test
-Protocol: TLSv1.3
 Negotiated TLS1.3 group: X25519MLKEM768
 New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
 ```
 
 | Línea | Qué te dice | Dónde está en la teoría |
@@ -292,15 +316,15 @@ Con `web2` llega el certificado de `web2`. Sin nombre (`-noservername`), Nginx n
 
 ## 6. Los registros
 
-Entra en `http://web1.garcia.test` desde el navegador (con `http://`) y mira el registro:
+Entra en `http://web1.garcia.test` desde el navegador (con `http://`) y mira el registro. Además de la portada, el navegador pide el CSS, las imágenes y las fuentes de la página, así que las últimas líneas serán de esos ficheros. Quédate solo con las peticiones de la portada (`GET /`):
 
 ```sh
-sudo tail -n 3 /var/log/nginx/web1.access.log
+sudo grep '"GET / ' /var/log/nginx/web1.access.log | tail -n 2
 ```
 
 ```
-192.168.56.1 - - [05/Oct/2026:00:06:18 +0200] "GET / HTTP/1.1" 301 162 "-" "Mozilla/5.0 (...)"
-192.168.56.1 - - [05/Oct/2026:00:06:18 +0200] "GET / HTTP/2.0" 200 3875 "-" "Mozilla/5.0 (...)"
+192.168.56.1 - - [15/Nov/2026:19:32:55 +0100] "GET / HTTP/1.1" 301 162 "-" "Mozilla/5.0 (...)"
+192.168.56.1 - - [15/Nov/2026:19:32:55 +0100] "GET / HTTP/2.0" 200 3875 "-" "Mozilla/5.0 (...)"
 ```
 
 Primero la petición que llegó por HTTP y recibió el `301`; después la que llegó por HTTPS y recibió el `200`. Fíjate en la versión: la primera es `HTTP/1.1` y la segunda `HTTP/2.0`. En cuanto hay cifrado, el navegador pasa a HTTP/2.
@@ -350,7 +374,7 @@ Un **PDF** llamado `P2.2-Apellido-Nombre.pdf` con portada, las evidencias de la 
 | 6 | HTTP redirige a HTTPS en los dos sitios | Tu ordenador | `curl.exe -I http://web1.tuapellido.test` y lo mismo con `web2` |
 | 7 | HTTPS responde en los dos sitios | Tu ordenador | `curl.exe -kI https://web1.tuapellido.test` y lo mismo con `web2` |
 | 8 | TLS 1.3 y SNI | Debian | Los dos `openssl s_client` del apartado 5, con `web1` y con `web2` |
-| 9 | El registro muestra la redirección | Debian | `sudo tail -n 3 /var/log/nginx/web1.access.log` (un `301` seguido de un `200`) |
+| 9 | El registro muestra la redirección | Debian | El `grep` del apartado 6 sobre `web1.access.log` (un `301` seguido de un `200`) |
 | 10 | El certificado en el navegador | Tu ordenador | **Captura** del visor de certificados con tus datos |
 
 Cada evidencia, con **una frase tuya** explicando qué demuestra.

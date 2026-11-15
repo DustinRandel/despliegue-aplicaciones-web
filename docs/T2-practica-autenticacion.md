@@ -21,7 +21,18 @@ Reescrita a partir de old.P1.2.md ("Práctica 2.2 – Autenticación en Nginx").
 
 VALIDADA el 05/10/2026 (VM Debian 13.7, nginx 1.26.3). htpasswd -B genera bcrypt ($2y$05$) y nginx lo acepta.
   Comprobado: 600 en .htpasswd -> 500 + "Permission denied"; 640 root:www-data -> 200.
-PENDIENTE: captura de la ventana de usuario y contraseña del navegador.
+
+Validado en VM el 15/11/2026, a continuación de la P2.2 (nginx 1.26.3, curl 8.12.1 de Windows). Comprobados también
+la tarea de satisfy (all: sin=401, mala=401, buena=200; any desde la IP permitida: 200 siempre) y la cuestión 5
+(600 -> 500 y "[crit] open() "/etc/nginx/.htpasswd" failed (13: Permission denied)"). Cambios:
+  - Apartado 4: el curl -v se lanza DESDE LA VM, que no resuelve web2.garcia.test: no salía nada. Ahora lleva
+    --resolve web2.garcia.test:443:127.0.0.1 y el recuadro que explica --resolve se ha movido aquí, donde se usa
+    por primera vez (el apartado 6 remite a él).
+  - Apartado 3: añadida la cuarta prueba (usuario inexistente "nadie") que el registro de ejemplo ya mostraba, y
+    salidas y registros reales de la prueba sobre la portada (se quita la nota de que eran de elements.html).
+  - htpasswd -c crea el fichero 644, legible por todos: se dice antes del chmod, para que se vea por qué hace falta.
+PENDIENTE DE CAPTURA: ventana de usuario y contraseña del navegador. Chrome sin ventana no la muestra: la hace el
+profesor con su VM.
 -->
 
 # Práctica 2.3 - Autenticación y control de acceso en Nginx
@@ -74,15 +85,15 @@ sudo cat /etc/nginx/.htpasswd
 ```
 
 ```
-ana:$2y$05$dDHxyJNUs7HbizkUys8ceeM2TWFAnJaot3V3RJVUm9qrXmnwRm8aG
-garcia:$2y$05$vsyk6nY.pJo5w8Wj.tU6r.oRQVQubpSVVCkcs4HI3pCgR78UXwqEq
+ana:$2y$05$5OdbGYoRp5vbFXEjH6.CZekql/T1GQv2I0St.2K8ukLFLDkeFxqjq
+garcia:$2y$05$OTUhiHrTTCVSnKMDOsyE0OlLTW4W/zyRcvvzevEUhU946yP6DcRHe
 ```
 
-Una línea por usuario: el nombre y el hash. La contraseña no aparece en ningún sitio.
+Una línea por usuario: el nombre y el hash. La contraseña no aparece en ningún sitio. El `$2y$` del principio indica que el hash es bcrypt.
 
 ### Permisos del fichero
 
-Nginx lee este fichero desde sus trabajadores, que son `www-data`. Que lo pueda leer `www-data`, pero nadie más:
+`htpasswd` crea el fichero con permisos `644` (`-rw-r--r--`): **cualquier** usuario de la máquina puede leer los hashes e intentar adivinar las contraseñas probando millones de combinaciones. Nginx lee este fichero desde sus trabajadores, que son `www-data`. Que lo pueda leer `www-data`, pero nadie más:
 
 ```sh
 sudo chown root:www-data /etc/nginx/.htpasswd
@@ -91,7 +102,7 @@ ls -l /etc/nginx/.htpasswd
 ```
 
 ```
--rw-r----- 1 root www-data 133 Oct  5 00:06 /etc/nginx/.htpasswd
+-rw-r----- 1 root www-data 133 Nov 15 19:33 /etc/nginx/.htpasswd
 ```
 
 ## 3. Proteger un sitio entero
@@ -130,48 +141,59 @@ Pruébalo también con `curl`, desde PowerShell:
 curl.exe -kI https://web2.garcia.test
 curl.exe -kI -u ana:contraseña_mala https://web2.garcia.test
 curl.exe -kI -u ana:tu_contraseña https://web2.garcia.test
+curl.exe -kI -u nadie:loquesea https://web2.garcia.test
 ```
 
 ```
 HTTP/1.1 401 Unauthorized
-WWW-Authenticate: Basic realm="Zona privada de web2"
+Server: nginx
 ...
+WWW-Authenticate: Basic realm="Zona privada de web2"
+
 HTTP/1.1 401 Unauthorized
-WWW-Authenticate: Basic realm="Zona privada de web2"
+Server: nginx
 ...
+WWW-Authenticate: Basic realm="Zona privada de web2"
+
 HTTP/1.1 200 OK
+Server: nginx
+...
+
+HTTP/1.1 401 Unauthorized
 ...
 ```
 
-Sin credenciales, `401` y la cabecera `WWW-Authenticate`, que es la que hace que el navegador muestre la ventana. Con una contraseña mala, otra vez `401`. Con la buena, `200`.
+Sin credenciales, `401` y la cabecera `WWW-Authenticate`, que es la que hace que el navegador muestre la ventana. Con una contraseña mala, otra vez `401`. Con la buena, `200`. Con un usuario que no existe, `401`.
 
 ### Qué queda en los registros
 
 ```sh
-sudo tail -n 3 /var/log/nginx/web2.access.log
+sudo tail -n 4 /var/log/nginx/web2.access.log
 sudo tail -n 2 /var/log/nginx/web2.error.log
 ```
 
 ```
-192.168.56.1 - ana [05/Oct/2026:00:07:00 +0200] "HEAD /elements.html HTTP/1.1" 401 0 "-" "curl/8.21.0"
-192.168.56.1 - ana [05/Oct/2026:00:07:01 +0200] "HEAD /elements.html HTTP/1.1" 200 0 "-" "curl/8.21.0"
-192.168.56.1 - nadie [05/Oct/2026:00:07:11 +0200] "HEAD /elements.html HTTP/1.1" 401 0 "-" "curl/8.21.0"
+192.168.56.1 - - [15/Nov/2026:19:33:50 +0100] "HEAD / HTTP/1.1" 401 0 "-" "curl/8.12.1"
+192.168.56.1 - ana [15/Nov/2026:19:33:50 +0100] "HEAD / HTTP/1.1" 401 0 "-" "curl/8.12.1"
+192.168.56.1 - ana [15/Nov/2026:19:33:50 +0100] "HEAD / HTTP/1.1" 200 0 "-" "curl/8.12.1"
+192.168.56.1 - nadie [15/Nov/2026:19:33:50 +0100] "HEAD / HTTP/1.1" 401 0 "-" "curl/8.12.1"
 
-2026/10/05 00:07:00 [error] 1857#1857: *33 user "ana": password mismatch, client: 192.168.56.1, server: web2.garcia.test, request: "HEAD /elements.html HTTP/1.1", host: "web2.garcia.test"
-2026/10/05 00:07:11 [error] 1857#1857: *35 user "nadie" was not found in "/etc/nginx/.htpasswd", client: 192.168.56.1, server: web2.garcia.test, request: "HEAD /elements.html HTTP/1.1", host: "web2.garcia.test"
+2026/11/15 19:33:50 [error] 1235#1235: *17 user "ana": password mismatch, client: 192.168.56.1, server: web2.garcia.test, request: "HEAD / HTTP/1.1", host: "web2.garcia.test"
+2026/11/15 19:33:50 [error] 1234#1234: *19 user "nadie" was not found in "/etc/nginx/.htpasswd", client: 192.168.56.1, server: web2.garcia.test, request: "HEAD / HTTP/1.1", host: "web2.garcia.test"
 ```
-
-*(Estas líneas son de una prueba sobre `elements.html`, la página que protegerás en el apartado 5; en tu registro verás la ruta que hayas pedido.)*
 
 El registro de accesos guarda ahora el **usuario** en el tercer campo, donde antes había un `-`: el que se intentó, aunque la contraseña fuera mala. El de errores dice qué ha fallado: una contraseña que no coincide (`password mismatch`) o un usuario que no existe (`was not found`).
 
 ## 4. Lo que viaja por la red
 
-Pídele a `curl` que te enseñe lo que envía:
+Pídele a `curl` que te enseñe lo que envía. Esta vez, desde la sesión SSH de la máquina virtual:
 
 ```sh
-curl -vsk -u ana:tu_contraseña https://web2.garcia.test -o /dev/null 2>&1 | grep -i '> authorization'
+curl -vsk -u ana:tu_contraseña --resolve web2.garcia.test:443:127.0.0.1 https://web2.garcia.test -o /dev/null 2>&1 | grep -i '> authorization'
 ```
+
+!!! info "`--resolve`"
+    La máquina virtual no tiene tu fichero `hosts`, así que no sabe que `web2.garcia.test` es ella misma: sin esta opción, `curl` no llega a conectar y no verías nada. `--resolve` le dice a qué IP conectar para ese nombre y ese puerto, sin tocar ningún fichero.
 
 ```
 > Authorization: Basic YW5hOkNsYXZlLUFuYTE=
@@ -247,10 +269,17 @@ curl -sk --resolve web1.garcia.test:443:127.0.0.1 -o /dev/null -w "%{http_code}\
 200     ← desde la propia máquina virtual
 ```
 
-Desde tu ordenador, `403`. Desde la máquina, que se conecta a sí misma (`127.0.0.1`), `200`. Mira el registro de errores de `web1`: dice que el acceso está prohibido "por regla" (*by rule*).
+Desde tu ordenador, `403`. Desde la máquina, que se conecta a sí misma (`127.0.0.1`, con el `--resolve` del apartado 4), `200`. Mira el registro de errores de `web1`:
 
-!!! info "`--resolve`"
-    La máquina virtual no tiene tu fichero `hosts`, así que no sabe que `web1.garcia.test` es ella misma. `--resolve` le dice a `curl` a qué IP conectar para ese nombre, sin tocar ningún fichero.
+```sh
+sudo tail -n 1 /var/log/nginx/web1.error.log
+```
+
+```
+2026/11/15 19:34:39 [error] 1420#1420: *25 access forbidden by rule, client: 192.168.56.1, server: web1.garcia.test, request: "GET / HTTP/1.1", host: "web1.garcia.test"
+```
+
+El acceso está prohibido "por regla" (*by rule*): lo ha rechazado tu `deny`, no un problema de permisos.
 
 ### Combinar IP y contraseña
 
@@ -337,7 +366,7 @@ Un **PDF** llamado `P2.3-Apellido-Nombre.pdf` con portada, las evidencias (en te
 | 1 | Los dos usuarios existen, con hash | Debian | `sudo cat /etc/nginx/.htpasswd` |
 | 2 | Permisos del fichero de usuarios | Debian | `ls -l /etc/nginx/.htpasswd` |
 | 3 | La configuración de `web2` con `elements.html` protegida | Debian | `cat /etc/nginx/sites-available/web2.tuapellido.test` |
-| 4 | Sin credenciales, `401`; con ellas, `200` | Tu ordenador | Los tres `curl.exe -kI` del apartado 3, sobre `elements.html` |
+| 4 | Sin credenciales, `401`; con ellas, `200` | Tu ordenador | Los cuatro `curl.exe -kI` del apartado 3, sobre `https://web2.tuapellido.test/elements.html` |
 | 5 | El usuario queda registrado | Debian | `sudo tail -n 5 /var/log/nginx/web2.access.log` |
 | 6 | Un usuario inexistente y una contraseña mala, en el registro de errores | Debian | `sudo tail -n 5 /var/log/nginx/web2.error.log` |
 | 7 | La contraseña viaja en base64 | Debian | El `curl -v` y el `base64 -d` del apartado 4 |

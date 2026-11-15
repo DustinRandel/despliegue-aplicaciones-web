@@ -27,7 +27,18 @@ Reescrita a partir de old.P1.3.md ("Práctica 2.3 – Proxy inverso con Nginx").
   - Sitio nuevo app.apellido.test por HTTP (el HTTPS en el proxy llega en la 2.5, con el balanceo).
 
 VALIDADA el 05/10/2026: principal .10 + clon enlazado back1 .11 (512 MB) desde base-limpia, nginx 1.26.3.
-PENDIENTE: captura de VirtualBox del diálogo de clonado.
+
+Validado en VM el 15/11/2026: principal .10 (estado de la P2.3) + clon enlazado back1 .11 de 512 MB desde base-limpia,
+siguiendo los pasos de la página (hostname, interfaces, rm + dpkg-reconfigure de las claves, reboot). Todo funciona.
+Cambios:
+  - ERROR DE LA PÁGINA: los curl.exe -w "%{http_code}\n" del apartado 7 tenían el \n convertido en un salto de
+    línea real (comando partido en dos líneas: al copiarlo no funciona). Corregido.
+  - Avisado de lo que sale y no es un error: "sudo: unable to resolve host debian-tuapellido-back1" entre los dos
+    comandos del nombre, y la salida de dpkg-reconfigure (tres claves nuevas y "ssh.socket is a disabled or a static
+    unit not running, not starting it.").
+  - Salidas y registros reales (curl 8.12.1 de Windows; curl -I completo). Repetida la trampa del reload: la primera
+    petición tras activar app.garcia.test devolvió la página de bienvenida de Nginx (el recuadro ya lo avisaba).
+PENDIENTE DE CAPTURA: diálogo de clonado de VirtualBox (es la interfaz gráfica de VirtualBox: la hace el profesor).
 -->
 
 # Práctica 2.4 - Proxy inverso con Nginx
@@ -101,6 +112,8 @@ sudo hostnamectl set-hostname debian-tuapellido-back1
 sudo sed -i 's/^127\.0\.1\.1.*/127.0.1.1\tdebian-tuapellido-back1/' /etc/hosts
 ```
 
+El segundo comando avisará `sudo: unable to resolve host debian-tuapellido-back1`: la máquina ya tiene el nombre nuevo, pero `/etc/hosts` todavía no. Es justo lo que arregla ese comando; no volverá a salir.
+
 **La IP**: en `/etc/network/interfaces`, cambia `192.168.56.10` por `192.168.56.11`:
 
 ```sh
@@ -114,7 +127,17 @@ sudo rm /etc/ssh/ssh_host_*
 sudo dpkg-reconfigure openssh-server
 ```
 
-Reinicia el clon:
+```
+Creating SSH2 RSA key; this may take some time ...
+3072 SHA256:/z8eaw+FMCPsUtdXNdQ7+KbWAm1/p7oqWEyBrjgcMYw root@debian-garcia-back1 (RSA)
+Creating SSH2 ECDSA key; this may take some time ...
+256 SHA256:9ds/HtuFbX5bJ2LSrpyVjH/Myu8Wm5poaA7adg4dlLY root@debian-garcia-back1 (ECDSA)
+Creating SSH2 ED25519 key; this may take some time ...
+256 SHA256:0LH4c6ncgLOppX80jLOw2xNsSHPSxsuGTHCb11GSQgM root@debian-garcia-back1 (ED25519)
+ssh.socket is a disabled or a static unit not running, not starting it.
+```
+
+Tres claves nuevas, ya con el nombre nuevo. La última línea no es un error: en tu máquina, SSH no arranca por *socket*. Apunta la huella `ED25519`: la necesitarás al conectarte. Reinicia el clon:
 
 ```sh
 sudo reboot
@@ -215,8 +238,8 @@ sudo tail -n 1 /var/log/nginx/access.log          # en back1
 ```
 
 ```
-192.168.56.1 - - [05/Oct/2026:00:10:49 +0200] "GET / HTTP/1.1" 200 264 "-" "curl/8.21.0"     ← principal
-192.168.56.10 - - [05/Oct/2026:00:10:49 +0200] "GET / HTTP/1.0" 200 264 "-" "curl/8.21.0"    ← back1
+192.168.56.1 - - [15/Nov/2026:19:39:51 +0100] "GET / HTTP/1.1" 200 264 "-" "curl/8.12.1"     ← principal
+192.168.56.10 - - [15/Nov/2026:19:39:51 +0100] "GET / HTTP/1.0" 200 264 "-" "curl/8.12.1"    ← back1
 ```
 
 La principal ve a tu ordenador (`192.168.56.1`). `back1` ve al **proxy** (`192.168.56.10`): para él, el cliente es el proxy. Si `back1` tuviera que saber quién es el usuario de verdad (para estadísticas, para bloquear una IP…), estaría perdido.
@@ -264,9 +287,14 @@ curl.exe -I http://app.garcia.test
 ```
 HTTP/1.1 200 OK
 Server: nginx
+Date: Sun, 15 Nov 2026 18:40:13 GMT
 Content-Type: text/html
 Content-Length: 264
+Connection: keep-alive
+Last-Modified: Sun, 15 Nov 2026 18:39:35 GMT
+ETag: "6af9fc67-108"
 X-Servidor: debian-garcia-back1
+Accept-Ranges: bytes
 X-Proxy: debian-garcia
 ```
 
@@ -287,7 +315,7 @@ sudo tail -n 1 /var/log/nginx/app.error.log
 ```
 
 ```
-2026/10/05 00:11:11 [error] 949#949: *6 connect() failed (111: Connection refused) while connecting to upstream, client: 192.168.56.1, server: app.garcia.test, request: "HEAD / HTTP/1.1", upstream: "http://192.168.56.11:80/", host: "app.garcia.test"
+2026/11/15 19:40:26 [error] 1006#1006: *12 connect() failed (111: Connection refused) while connecting to upstream, client: 192.168.56.1, server: app.garcia.test, request: "GET / HTTP/1.1", upstream: "http://192.168.56.11:80/", host: "app.garcia.test"
 ```
 
 `Connection refused`: `back1` está encendida, pero nadie escucha en su puerto 80. Vuelve a arrancar Nginx en `back1` (`sudo systemctl start nginx`).
@@ -312,10 +340,8 @@ La IP de quien se conecta de verdad sigue disponible en otra variable, `$realip_
 Si la conexión no viene del proxy, responde `403` sin mirar nada más. Recarga Nginx en `back1` y prueba las dos rutas desde tu ordenador:
 
 ```powershell
-curl.exe -s -o NUL -w "%{http_code}
-" http://192.168.56.11
-curl.exe -s -o NUL -w "%{http_code}
-" http://app.garcia.test
+curl.exe -s -o NUL -w "%{http_code}\n" http://192.168.56.11
+curl.exe -s -o NUL -w "%{http_code}\n" http://app.garcia.test
 ```
 
 ```
@@ -326,8 +352,8 @@ curl.exe -s -o NUL -w "%{http_code}
 Directamente, `403`. A través del proxy, `200`. Y el registro de `back1` sigue mostrando la IP real en las dos:
 
 ```
-192.168.56.1 - - [05/Oct/2026:00:11:40 +0200] "GET / HTTP/1.1" 403 146 "-" "curl/8.21.0"
-192.168.56.1 - - [05/Oct/2026:00:11:40 +0200] "GET / HTTP/1.0" 200 264 "-" "curl/8.21.0"
+192.168.56.1 - - [15/Nov/2026:19:40:32 +0100] "GET / HTTP/1.1" 403 146 "-" "curl/8.12.1"
+192.168.56.1 - - [15/Nov/2026:19:40:32 +0100] "GET / HTTP/1.0" 200 264 "-" "curl/8.12.1"
 ```
 
 La primera llegó directa (`HTTP/1.1`) y fue rechazada; la segunda llegó por el proxy (`HTTP/1.0`) y se sirvió.
@@ -392,7 +418,7 @@ Un **PDF** llamado `P2.4-Apellido-Nombre.pdf` con portada, las evidencias (en te
 
 | # | Qué hay que demostrar | Dónde | Comando cuya salida se pega |
 |---|---|---|---|
-| 1 | `back1` tiene su propio nombre e IP | `back1` | `hostnamectl` e `ip -br a` |
+| 1 | `back1` tiene su propio nombre e IP | `back1` | `hostnamectl` e `ip -br a` (sin `sudo`, `hostnamectl` empieza con dos avisos `Failed to query … Access denied`: son normales) |
 | 2 | `back1` tiene sus propias claves de host | `back1` | `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`, comparada con la de la principal |
 | 3 | La configuración del proxy | Principal | `cat /etc/nginx/sites-available/app.tuapellido.test` |
 | 4 | La configuración de `back1` (IP real, cabecera y restricción al proxy) | `back1` | `grep -v '^\s*#' /etc/nginx/sites-available/default` |
