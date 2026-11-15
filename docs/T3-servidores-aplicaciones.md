@@ -27,8 +27,9 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
     hilo con bucle de eventos). Se explica en el apartado 6.
   * javax -> jakarta: cualquier tutorial antiguo con javax.servlet NO funciona en Tomcat 10. Recuadro en el 4.
 - DECISIÓN A CONFIRMAR: la P3.1 original es WildFly (descarga manual, servicio a mano, más RAM). Se sustituye
-  por Tomcat 10 de los repositorios de Debian 13 (paquete tomcat10 10.1.55, servicio systemd ya hecho, ~200 MB
-  de RAM medidos). WildFly queda explicado en la tabla del apartado 4. Si se prefiere WildFly, rehacer la P3.1.
+  por Tomcat 10 de los repositorios de Debian 13 (paquete tomcat10, servicio systemd ya hecho, ~145 MB
+  de RAM con la aplicación, medidos en la VM). WildFly queda explicado en la tabla del apartado 4. Si se prefiere
+  WildFly, rehacer la P3.1.
 - La P3.4 original (React en Netlify) no se adapta: necesita cuentas externas y la parte de despliegue continuo
   encaja mejor en el Tema 7. Queda mencionada en el desplegable final.
 - ESCENARIO: las tres prácticas en la máquina principal .10 (sin clones). Nginx delante de tres servidores de
@@ -36,9 +37,20 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
 - VALIDACIÓN (27/10/2026): todos los comandos y salidas se han ejecutado en un contenedor Debian 13 (trixie) con
   systemd y los mismos paquetes que la VM (nginx 1.26.3, tomcat10 10.1.55, openjdk 21.0.12.1, maven 3.9.9,
   nodejs 20.19.2, npm 9.2.0, python 3.13.5; de PyPI/npm: Flask 3.1.3, gunicorn 26.2.0, express 5.3.0, nodemon
-  3.1.14). En las salidas solo se han cambiado las IP del contenedor (172.17.0.x) por las del escenario
-  (192.168.56.x). PENDIENTE DE VALIDAR EN LA VM: la actividad del bloque 1 (ss -tlnp con sshd y el Nginx de la
-  P2.x; no tiene salida pegada) y los curl.exe desde Windows.
+  3.1.14).
+- Validado en VM el 15/11/2026: VM importada de DAW-debian.ova (Debian 13.7, kernel 6.12.107, 2 GB) con el estado
+  final del Tema 2 (Nginx con web1 por HTTPS y web2) y las tres prácticas hechas en orden en la misma máquina.
+  Versiones de hoy: openjdk 21.0.13 y tomcat10 10.1.60 (el resto, igual). Todas las salidas de esta página son ya
+  de la VM. Cambios:
+  * Actividad del bloque 1 comprobada: ss -tlnp muestra nginx (80 y 443) y sshd (22, escucha directamente, sin
+    activación por socket); ps muestra el maestro de Nginx como root y los trabajadores como www-data.
+  * Apartado 2: "Solo Nginx está en 0.0.0.0" era falso (sshd también, y Nginx en 443 tras la P2.2). Salida de
+    ss real y texto corregido.
+  * systemctl status SIN sudo no enseña las líneas del registro (el usuario no está en adm ni en systemd-journal):
+    ahora "sudo systemctl status" y se explica por qué. Lo mismo en P3.2 y P3.3.
+  * Flask de desarrollo anuncia la IP del NAT (10.0.2.15), no la .10. Salida real; se explica en la P3.3.
+  * Debian no trae pip para el sistema ("pip: command not found"); el externally-managed-environment solo sale
+    con python3-pip instalado. Texto corregido y salida completa real.
 -->
 
 # Tema 3 - Servidores de aplicaciones: despliegue de aplicaciones web
@@ -139,14 +151,15 @@ Un **socket Unix** es un fichero especial por el que dos procesos de la misma m�
 Al final del tema, esto es lo que escucha en tu máquina (`sudo ss -tlnxp`, recortado):
 
 ```
-u_str LISTEN 0  0    /run/flask/flask.sock   users:(("gunicorn",pid=236,fd=3),("gunicorn",pid=235,fd=3),("gunicorn",pid=226,fd=3))
-tcp   LISTEN 0  511  0.0.0.0:80              users:(("nginx",pid=110,fd=11),…)
-tcp   LISTEN 0  511  127.0.0.1:3000          users:(("node",pid=225,fd=21))
-tcp   LISTEN 0  100  [::ffff:127.0.0.1]:8080 users:(("java",pid=96,fd=39))
-tcp   LISTEN 0  511  [::]:80                 users:(("nginx",pid=110,fd=12),…)
+u_str LISTEN 0  2048  /run/flask/flask.sock   users:(("gunicorn",pid=15698,fd=3),("gunicorn",pid=15697,fd=3),("gunicorn",pid=15694,fd=3))
+tcp   LISTEN 0  511   127.0.0.1:3000          users:(("node",pid=14867,fd=21))
+tcp   LISTEN 0  511   0.0.0.0:443             users:(("nginx",pid=15479,fd=7),…)
+tcp   LISTEN 0  511   0.0.0.0:80              users:(("nginx",pid=15479,fd=5),…)
+tcp   LISTEN 0  128   0.0.0.0:22              users:(("sshd",pid=709,fd=6))
+tcp   LISTEN 0  100   [::ffff:127.0.0.1]:8080 users:(("java",pid=3445,fd=39))
 ```
 
-Solo Nginx está en `0.0.0.0`. Tomcat aparece como `[::ffff:127.0.0.1]` porque Java escucha en IPv6 con una dirección que representa la `127.0.0.1` de IPv4: sigue siendo solo local.
+Hacia fuera solo están abiertos Nginx (80 y 443) y SSH (22), que es por donde administras la máquina. Las tres aplicaciones son solo locales. Tomcat aparece como `[::ffff:127.0.0.1]` porque Java escucha en IPv6 con una dirección que representa la `127.0.0.1` de IPv4: sigue siendo solo local.
 
 !!! info "Puertos por encima de 1024"
     En Linux, solo `root` puede abrir los puertos por debajo de 1024. Por eso los servidores de aplicaciones usan 8080, 3000 u 8000: así se ejecutan con un usuario sin privilegios, y el único que necesita el 80 y el 443 es Nginx.
@@ -217,22 +230,22 @@ Los comandos son siempre los mismos:
 ```sh
 sudo systemctl daemon-reload              # tras crear o editar un fichero de unidad
 sudo systemctl enable --now node-app      # arrancar ahora y en cada arranque
-systemctl status node-app                 # estado y últimas líneas del registro
+sudo systemctl status node-app            # estado y últimas líneas del registro
 sudo systemctl restart node-app           # tras desplegar una versión nueva
 sudo journalctl -u node-app -n 20         # registro del servicio
 ```
 
-Lo que imprime la aplicación (`console.log` en Node, `print` en Python, el registro de Tomcat) va al **diario** de `systemd`, y se lee con `journalctl`. Así se ve un servicio sano (`systemctl status`, recortado):
+Lo que imprime la aplicación (`console.log` en Node, `print` en Python, el registro de Tomcat) va al **diario** de `systemd`, y se lee con `journalctl`. Tu usuario no puede leer el diario del sistema: por eso `journalctl` lleva `sudo`, y `systemctl status` también si quieres ver las líneas del registro (sin `sudo` solo enseña el estado). Así se ve un servicio sano (`sudo systemctl status`, recortado):
 
 ```
 ● node-app.service - Aplicación Node.js de node.garcia.test
      Loaded: loaded (/etc/systemd/system/node-app.service; enabled; preset: enabled)
-     Active: active (running) since Tue 2026-10-27 12:40:24 CET; 3s ago
-   Main PID: 225 (node)
-     Memory: 21.8M (peak: 22.6M)
+     Active: active (running) since Sun 2026-11-15 18:44:20 CET; 2s ago
+   Main PID: 14728 (node)
+     Memory: 20.9M (peak: 21.3M)
 
-Oct 27 12:40:24 debian-garcia systemd[1]: Started node-app.service - Aplicación Node.js de node.garcia.test.
-Oct 27 12:40:24 debian-garcia node[225]: Escuchando en http://127.0.0.1:3000
+Nov 15 18:44:20 debian-garcia systemd[1]: Started node-app.service - Aplicación Node.js de node.garcia.test.
+Nov 15 18:44:20 debian-garcia node[14728]: Escuchando en http://127.0.0.1:3000
 ```
 
 `enabled` significa que arrancará con la máquina; `active (running)`, que está en marcha ahora. Son cosas distintas: un servicio puede estar en marcha pero no habilitado, y al revés.
@@ -357,9 +370,9 @@ El paquete `tomcat10` de Debian 13 deja Tomcat 10.1 instalado como servicio, eje
 Desplegar es **copiar el WAR a `webapps/`**: Tomcat vigila esa carpeta, descomprime el WAR y lo publica en unos segundos. Si sustituyes el fichero por una versión nueva, retira la antigua y despliega la nueva sin reiniciar. Lo verás en el diario:
 
 ```
-Oct 27 12:41:22 debian-garcia tomcat10[280]: Undeploying context [/saludo]
-Oct 27 12:41:22 debian-garcia tomcat10[280]: Deploying web application archive [/var/lib/tomcat10/webapps/saludo.war]
-Oct 27 12:41:22 debian-garcia tomcat10[280]: Deployment of web application archive [/var/lib/tomcat10/webapps/saludo.war] has finished in [358] ms
+Nov 15 16:48:13 debian-garcia tomcat10[3445]: Undeploying context [/saludo]
+Nov 15 16:48:13 debian-garcia tomcat10[3445]: Deploying web application archive [/var/lib/tomcat10/webapps/saludo.war]
+Nov 15 16:48:15 debian-garcia tomcat10[3445]: Deployment of web application archive [/var/lib/tomcat10/webapps/saludo.war] has finished in [1,268] ms
 ```
 
 ### El modelo moderno: Spring Boot
@@ -505,7 +518,7 @@ Flask incluye un servidor para desarrollar, y él mismo avisa de que no es para 
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5000
- * Running on http://192.168.56.10:5000
+ * Running on http://10.0.2.15:5000
 Press CTRL+C to quit
 ```
 
@@ -516,10 +529,10 @@ Press CTRL+C to quit
 **Gunicorn** es el servidor WSGI más usado. Al arrancar con `gunicorn --workers 2 app:app` (el objeto `app` del fichero `app.py`) crea un proceso **maestro** que no atiende peticiones, sino que vigila a los **trabajadores** (*workers*). Así se ven con `ps -o user,pid,ppid,cmd -C gunicorn` (el primero es el maestro; los otros dos, sus hijos):
 
 ```
-USER       PID  PPID CMD
-www-data   226     1 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
-www-data   235   226 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
-www-data   236   226 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
+USER         PID    PPID CMD
+www-data   15694       1 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
+www-data   15697   15694 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
+www-data   15698   15694 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
 ```
 
 Los trabajadores son **procesos**, no hilos. Con el tipo de trabajador por defecto (`sync`), cada uno atiende **una petición cada vez**: con dos trabajadores, como mucho dos peticiones simultáneas. Si un trabajador muere, el maestro arranca otro. La recomendación de partida de la documentación es `(2 × núcleos) + 1` trabajadores; en una máquina virtual pequeña, 2 bastan.
@@ -529,7 +542,7 @@ Los trabajadores son **procesos**, no hilos. Con el tipo de trabajador por defec
 
 ### Entornos virtuales
 
-Cada aplicación Python necesita sus propias versiones de sus librerías, y no pueden mezclarse con las del sistema (Debian usa Python para sus propias herramientas). Si intentas instalar con `pip` para todo el sistema, Debian 13 te lo impide:
+Cada aplicación Python necesita sus propias versiones de sus librerías, y no pueden mezclarse con las del sistema (Debian usa Python para sus propias herramientas). Por eso Debian 13 ni siquiera trae `pip` para el sistema (`pip: command not found`), y, aunque instales el paquete `python3-pip`, te impide usarlo para instalar librerías en todo el sistema:
 
 ```
 error: externally-managed-environment
@@ -538,11 +551,20 @@ error: externally-managed-environment
 ╰─> To install Python packages system-wide, try apt install
     python3-xyz, where xyz is the package you are trying to
     install.
-
+    
     If you wish to install a non-Debian-packaged Python package,
     create a virtual environment using python3 -m venv path/to/venv.
     Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
     sure you have python3-full installed.
+    
+    If you wish to install a non-Debian packaged Python application,
+    it may be easiest to use pipx install xyz, which will manage a
+    virtual environment for you. Make sure you have pipx installed.
+    
+    See /usr/share/doc/python3.13/README.venv for more information.
+
+note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
+hint: See PEP 668 for the detailed specification.
 ```
 
 La solución es un **entorno virtual**: una carpeta (por convención, `.venv`) con su propio `python`, su propio `pip` y sus propias librerías.
@@ -580,7 +602,7 @@ location / {
 `/run` se borra en cada arranque, así que la carpeta del socket la crea `systemd` al arrancar el servicio con `RuntimeDirectory=flask`, con el usuario del servicio como propietario. Si el servicio está parado, el socket no existe, y Nginx responde `502`:
 
 ```
-[crit] 765#765: *23 connect() to unix:/run/flask/flask.sock failed (2: No such file or directory) while connecting to upstream, client: 192.168.56.1, server: flask.garcia.test, request: "GET /api/hora HTTP/1.1", upstream: "http://unix:/run/flask/flask.sock:/api/hora", host: "flask.garcia.test"
+[crit] 15478#15478: *71 connect() to unix:/run/flask/flask.sock failed (2: No such file or directory) while connecting to upstream, client: 192.168.56.1, server: flask.garcia.test, request: "GET /api/hora HTTP/1.1", upstream: "http://unix:/run/flask/flask.sock:/api/hora", host: "flask.garcia.test"
 ```
 
 ---

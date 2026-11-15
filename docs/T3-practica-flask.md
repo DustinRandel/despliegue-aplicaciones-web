@@ -26,9 +26,24 @@ Netlify, que no se adaptan). Cambios:
     tarda el doble), el worker que muere y el maestro que lo repone, y el 502 con el socket ausente.
   - El ejercicio final del original (repo raul-profesor/Practica-3.5) no se incluye.
 
-VALIDADA el 27/10/2026 en contenedor Debian 13 con systemd. Salidas reales; adaptadas solo las IP, el usuario
-(alumno -> garcia), la zona horaria de las líneas de Gunicorn lanzado a mano y la ruta CGroup.
-PENDIENTE DE VALIDAR EN LA VM: si python3-venv ya viene instalado en la .ova; los curl.exe desde Windows.
+VALIDADA el 27/10/2026 en contenedor Debian 13 con systemd.
+
+Validado en VM el 15/11/2026, a continuación de la P3.2 en la misma VM (Debian 13.7, kernel 6.12.107, 2 GB):
+python 3.13.5, Flask 3.1.3, gunicorn 26.2.0. Todas las salidas son ya de la VM sin adaptar; curl.exe desde el
+Windows anfitrión. Cambios y hallazgos:
+  - python3-venv NO viene en la .ova (python3 -m venv falla por falta de ensurepip): el apt del paso 2 hace falta.
+    Son 4 paquetes, 2,8 MB.
+  - El servidor de desarrollo de Flask anuncia "Running on http://10.0.2.15:5000" (la IP del NAT, la de la ruta
+    por defecto), no la .10. Explicado: 0.0.0.0 incluye la .10 aunque no la nombre.
+  - Gunicorn lanzado a mano desde SSH crea el socket de control en /run/user/<uid>/gunicorn.ctl (XDG_RUNTIME_DIR),
+    no en ~/.gunicorn como en el contenedor. El servicio con www-data sí intenta /var/www/.gunicorn: comprobado
+    en la VM el "Control server error: [Errno 13] Permission denied: '/var/www/.gunicorn'" sin --no-control-socket.
+  - Fuera del entorno virtual, "pip" da "command not found" (la .ova no trae python3-pip). El
+    externally-managed-environment solo sale con python3-pip instalado (comprobado). Corregido el recuadro.
+  - systemctl status sin sudo no enseña las líneas del registro: ahora "sudo systemctl status flask-app"
+    (también en la evidencia 5). Con una terminal de 120 columnas las líneas largas salen cortadas con "…" y el
+    aviso "Hint: Some lines were ellipsized": se pega así y se explica -l.
+  - Captura nueva: T3-flask-api.png.
 -->
 
 # Práctica 3.3 - Aplicación Flask con Gunicorn por un socket Unix
@@ -59,6 +74,8 @@ PENDIENTE DE VALIDAR EN LA VM: si python3-venv ya viene instalado en la .ova; lo
 Esta vez la aplicación no abre ningún puerto: Nginx y Gunicorn se hablan por un fichero especial, el socket.
 
 ## 2. El entorno virtual
+
+Debian trae Python 3.13, pero no el módulo para crear entornos virtuales: sin el paquete `python3-venv`, `python3 -m venv` falla diciendo que `ensurepip is not available`. Instálalo y prepara la carpeta:
 
 ```sh
 sudo apt install python3-venv
@@ -97,7 +114,7 @@ pip freeze
 ```
 
 ```
-Successfully installed Flask-3.1.3 blinker-1.9.0 click-8.5.0 gunicorn-26.2.0 itsdangerous-2.2.0 jinja2-3.1.6 markupsafe-3.0.4 werkzeug-3.1.9
+Successfully installed Flask-3.1.3 Jinja2-3.1.6 MarkupSafe-3.0.4 Werkzeug-3.1.9 blinker-1.9.0 click-8.5.0 gunicorn-26.2.0 itsdangerous-2.2.0
 ```
 
 ```
@@ -113,8 +130,8 @@ Werkzeug==3.1.9
 
 Has pedido dos paquetes y hay ocho: Flask depende de otros seis. `pip freeze` muestra todo lo instalado en el entorno, con su versión exacta.
 
-!!! tip "Si `pip` dice `externally-managed-environment`"
-    Es que el entorno virtual no está activado y estás usando el `pip` del sistema (apartado 6 de la teoría). Vuelve a la carpeta y haz `source .venv/bin/activate`.
+!!! tip "Si sale `pip: command not found`"
+    Es que el entorno virtual no está activado (el *prompt* no empieza por `(.venv)`): Debian no trae `pip` para el sistema, solo el que hay dentro de cada entorno virtual. Vuelve a la carpeta y haz `source .venv/bin/activate`. Si en otra máquina tienes instalado el `pip` del sistema, el error será `externally-managed-environment` (apartado 6 de la teoría), y la solución es la misma.
 
 ## 3. La aplicación
 
@@ -173,11 +190,11 @@ flask --app app run --host 0.0.0.0
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5000
- * Running on http://192.168.56.10:5000
+ * Running on http://10.0.2.15:5000
 Press CTRL+C to quit
 ```
 
-Entra en `http://192.168.56.10:5000/api/hora` desde tu navegador. Funciona, pero lee el aviso: es un servidor para programar, sin la robustez ni el rendimiento de uno de producción. Para con `Ctrl+C`.
+Flask solo nombra una de las IP de la máquina, la `10.0.2.15` de la tarjeta NAT (la que usa para salir a Internet), pero `0.0.0.0` significa **todas**, también la `192.168.56.10`. Entra en `http://192.168.56.10:5000/api/hora` desde tu navegador. Funciona, pero lee el aviso: es un servidor para programar, sin la robustez ni el rendimiento de uno de producción. Para con `Ctrl+C`.
 
 ## 5. Gunicorn, a mano
 
@@ -188,15 +205,15 @@ gunicorn --workers 2 --bind 0.0.0.0:8000 app:app
 ```
 
 ```
-[2026-10-27 12:38:59 +0100] [707] [INFO] Starting gunicorn 26.2.0
-[2026-10-27 12:38:59 +0100] [707] [INFO] Listening at: http://0.0.0.0:8000 (707)
-[2026-10-27 12:38:59 +0100] [707] [INFO] Using worker: sync
-[2026-10-27 12:38:59 +0100] [709] [INFO] Booting worker with pid: 709
-[2026-10-27 12:38:59 +0100] [710] [INFO] Booting worker with pid: 710
-[2026-10-27 12:38:59 +0100] [707] [INFO] Control socket listening at /home/garcia/.gunicorn/gunicorn.ctl
+[2026-11-15 18:47:19 +0100] [15260] [INFO] Starting gunicorn 26.2.0
+[2026-11-15 18:47:19 +0100] [15260] [INFO] Listening at: http://0.0.0.0:8000 (15260)
+[2026-11-15 18:47:19 +0100] [15260] [INFO] Using worker: sync
+[2026-11-15 18:47:19 +0100] [15261] [INFO] Booting worker with pid: 15261
+[2026-11-15 18:47:20 +0100] [15262] [INFO] Booting worker with pid: 15262
+[2026-11-15 18:47:20 +0100] [15260] [INFO] Control socket listening at /run/user/1001/gunicorn.ctl
 ```
 
-Lee las líneas: el maestro (PID 707) escucha en el puerto 8000, usa trabajadores `sync` y arranca dos (709 y 710). La última línea es el **socket de control** de las versiones recientes de Gunicorn, que permite administrarlo mientras funciona; lo crea en la carpeta personal del usuario. Volverás a él en el apartado 6.
+Lee las líneas: el maestro (PID 15260) escucha en el puerto 8000, usa trabajadores `sync` y arranca dos (15261 y 15262). La última línea es el **socket de control** de las versiones recientes de Gunicorn, que permite administrarlo mientras funciona. Lo crea en la carpeta temporal de tu sesión, `/run/user/<tu número de usuario>`, y, si no la hay, en la carpeta personal (`~/.gunicorn`). Volverás a él en el apartado 6.
 
 Entra en `http://192.168.56.10:8000/api/hora` y recarga varias veces: el `pid` es el de uno de los trabajadores. Para con `Ctrl+C` y sal del entorno virtual:
 
@@ -230,42 +247,46 @@ WantedBy=multi-user.target
 - `ExecStart` llama directamente al `gunicorn` del entorno virtual: no hace falta activarlo.
 - `--bind unix:/run/flask/flask.sock`: en lugar de un puerto, un socket Unix.
 - `RuntimeDirectory=flask`: al arrancar, `systemd` crea `/run/flask`, propiedad de `www-data`, y la borra al parar. `/run` se vacía en cada arranque, así que no puedes crearla tú a mano una vez y olvidarte.
-- `--no-control-socket`: el socket de control del apartado 5 se crea en la carpeta personal del usuario, y la de `www-data` es `/var/www`, donde no puede escribir. Sin esta opción, el servicio funciona pero registra `Control server error: [Errno 13] Permission denied: '/var/www/.gunicorn'`.
+- `--no-control-socket`: un servicio no tiene sesión, así que Gunicorn intentaría crear el socket de control del apartado 5 en la carpeta personal del usuario. La de `www-data` es `/var/www`, donde no puede escribir. Sin esta opción, el servicio funciona pero registra `Control server error: [Errno 13] Permission denied: '/var/www/.gunicorn'`.
 
 ```sh
 sudo systemctl daemon-reload
 sudo systemctl enable --now flask-app
-systemctl status flask-app
+sudo systemctl status flask-app
 ```
 
 ```
 ● flask-app.service - Aplicación Flask de flask.garcia.test (Gunicorn)
      Loaded: loaded (/etc/systemd/system/flask-app.service; enabled; preset: enabled)
-     Active: active (running) since Tue 2026-10-27 12:53:57 CET; 1s ago
-   Main PID: 1199 (gunicorn)
-     Memory: 46.5M (peak: 47M)
-        CPU: 456ms
+     Active: active (running) since Sun 2026-11-15 18:47:54 CET; 3s ago
+ Invocation: 5b10b3ba21d44b5ead2d0dc706b85405
+   Main PID: 15423 (gunicorn)
+      Tasks: 3 (limit: 2317)
+     Memory: 46.6M (peak: 47M)
+        CPU: 703ms
      CGroup: /system.slice/flask-app.service
-             ├─1199 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
-             ├─1202 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
-             └─1203 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
+             ├─15423 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --worke…
+             ├─15425 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --worke…
+             └─15426 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --worke…
 
-Oct 27 12:53:57 debian-garcia systemd[1]: Started flask-app.service - Aplicación Flask de flask.garcia.test (Gunicorn).
-Oct 27 12:53:58 debian-garcia gunicorn[1199]: [2026-10-27 12:53:58 +0100] [1199] [INFO] Starting gunicorn 26.2.0
-Oct 27 12:53:58 debian-garcia gunicorn[1199]: [2026-10-27 12:53:58 +0100] [1199] [INFO] Listening at: unix:/run/flask/flask.sock (1199)
-Oct 27 12:53:58 debian-garcia gunicorn[1199]: [2026-10-27 12:53:58 +0100] [1199] [INFO] Using worker: sync
-Oct 27 12:53:58 debian-garcia gunicorn[1202]: [2026-10-27 12:53:58 +0100] [1202] [INFO] Booting worker with pid: 1202
-Oct 27 12:53:58 debian-garcia gunicorn[1203]: [2026-10-27 12:53:58 +0100] [1203] [INFO] Booting worker with pid: 1203
+Nov 15 18:47:54 debian-garcia systemd[1]: Started flask-app.service - Aplicación Flask de flask.garcia.test (Gunicorn).
+Nov 15 18:47:54 debian-garcia gunicorn[15423]: [2026-11-15 18:47:54 +0100] [15423] [INFO] Starting gunicorn 26.2.0
+Nov 15 18:47:54 debian-garcia gunicorn[15423]: [2026-11-15 18:47:54 +0100] [15423] [INFO] Listening at: unix:/ru…(15423)
+Nov 15 18:47:54 debian-garcia gunicorn[15423]: [2026-11-15 18:47:54 +0100] [15423] [INFO] Using worker: sync
+Nov 15 18:47:54 debian-garcia gunicorn[15425]: [2026-11-15 18:47:54 +0100] [15425] [INFO] Booting worker with pid: 15425
+Nov 15 18:47:54 debian-garcia gunicorn[15426]: [2026-11-15 18:47:54 +0100] [15426] [INFO] Booting worker with pid: 15426
+Hint: Some lines were ellipsized, use -l to show in full.
 ```
 
-Tres procesos: el maestro y dos trabajadores. Mira el socket:
+Tres procesos: el maestro y dos trabajadores. Las líneas largas salen cortadas (`…`) para que quepan en la terminal; con `sudo systemctl status -l flask-app` las ves enteras. Recuerda que el `sudo` es para ver el registro: sin él, `systemctl status` no lo muestra. Mira el socket:
 
 ```sh
 ls -l /run/flask
 ```
 
 ```
-srwxrwxrwx 1 www-data www-data 0 Oct 27 12:53 flask.sock
+total 0
+srwxrwxrwx 1 www-data www-data 0 Nov 15 18:47 flask.sock
 ```
 
 La `s` del principio indica que es un socket. Lo ha creado Gunicorn, como `www-data`, que es también el usuario de los trabajadores de Nginx.
@@ -299,8 +320,12 @@ curl.exe http://flask.garcia.test/api/hora
 ```
 
 ```
-{"cliente":"192.168.56.1","hora":"12:54:19","pid":1214,"servidor":"debian-garcia"}
+{"cliente":"192.168.56.1","hora":"18:48:03","pid":15426,"servidor":"debian-garcia"}
 ```
+
+En el navegador:
+
+![](img/T3-flask-api.png)
 
 ### Cómo se reparten las peticiones
 
@@ -315,17 +340,17 @@ done; wait
 ```
 
 ```
-petición 1: 200 en 3.003430 s
-petición 3: 200 en 3.003360 s
-petición 2: 200 en 6.004739 s
+petición 2: 200 en 3.004562 s
+petición 1: 200 en 3.004413 s
+petición 3: 200 en 5.997347 s
 ```
 
-Dos trabajadores `sync`, dos peticiones a la vez: la tercera espera a que uno quede libre y tarda el doble. Cambia `--workers 2` por `--workers 3` en el servicio, haz `sudo systemctl daemon-reload` y `sudo systemctl restart flask-app`, y repite:
+Dos trabajadores `sync`, dos peticiones a la vez: la tercera espera a que uno quede libre y tarda el doble. Cuál de las tres es la lenta cambia de una vez a otra. Cambia `--workers 2` por `--workers 3` en el servicio, haz `sudo systemctl daemon-reload` y `sudo systemctl restart flask-app`, y repite:
 
 ```
-petición 3: 200 en 3.003671 s
-petición 2: 200 en 3.003586 s
-petición 1: 200 en 3.003692 s
+petición 1: 200 en 3.008126 s
+petición 2: 200 en 3.007562 s
+petición 3: 200 en 3.009762 s
 ```
 
 Deja después el servicio otra vez con `--workers 2`. Más trabajadores atienden más peticiones a la vez, pero cada uno es un proceso con su propia memoria: no se puede subir sin límite.
@@ -337,16 +362,17 @@ Deja después el servicio otra vez con `--workers 2`. Más trabajadores atienden
 Mata uno de los trabajadores (no el maestro):
 
 ```sh
-sudo kill -9 1202       # el PID de un trabajador de tu systemctl status
+ps -o user,pid,ppid,cmd -C gunicorn     # el maestro tiene PPID 1; sus trabajadores, el PID del maestro
+sudo kill -9 15622      # el PID de uno de los trabajadores
 sudo journalctl -u flask-app -n 2
 ```
 
 ```
-Oct 27 12:53:59 debian-garcia gunicorn[1199]: [2026-10-27 12:53:59 +0100] [1199] [ERROR] Worker (pid:1202) was sent SIGKILL! Perhaps out of memory?
-Oct 27 12:53:59 debian-garcia gunicorn[1214]: [2026-10-27 12:53:59 +0100] [1214] [INFO] Booting worker with pid: 1214
+Nov 15 18:48:43 debian-garcia gunicorn[15619]: [2026-11-15 18:48:43 +0100] [15619] [ERROR] Worker (pid:15622) was sent SIGKILL! Perhaps out of memory?
+Nov 15 18:48:43 debian-garcia gunicorn[15669]: [2026-11-15 18:48:43 +0100] [15669] [INFO] Booting worker with pid: 15669
 ```
 
-El maestro lo ha detectado y ha arrancado otro (1214) al momento. El «*Perhaps out of memory?*» es solo una suposición de Gunicorn: el motivo más habitual de que alguien mate un trabajador con `SIGKILL` es que el sistema se quede sin memoria. `systemd` ni se ha enterado: el servicio sigue en marcha. Es la segunda red de seguridad, por debajo de `Restart=on-failure`.
+El maestro lo ha detectado y ha arrancado otro (15669) al momento. (Los PID no coinciden con los del `systemctl status` de antes porque el servicio se ha reiniciado al cambiar los trabajadores.) El «*Perhaps out of memory?*» es solo una suposición de Gunicorn: el motivo más habitual de que alguien mate un trabajador con `SIGKILL` es que el sistema se quede sin memoria. `systemd` ni se ha enterado: el servicio sigue en marcha. Es la segunda red de seguridad, por debajo de `Restart=on-failure`.
 
 ### El servicio está parado
 
@@ -366,7 +392,7 @@ sudo tail -n 1 /var/log/nginx/flask.error.log
 ```
 
 ```
-2026/10/27 12:51:51 [crit] 104#104: *29 connect() to unix:/run/flask/flask.sock failed (2: No such file or directory) while connecting to upstream, client: 192.168.56.1, server: flask.garcia.test, request: "GET /api/hora HTTP/1.1", upstream: "http://unix:/run/flask/flask.sock:/api/hora", host: "flask.garcia.test"
+2026/11/15 18:48:45 [crit] 15478#15478: *71 connect() to unix:/run/flask/flask.sock failed (2: No such file or directory) while connecting to upstream, client: 192.168.56.1, server: flask.garcia.test, request: "GET /api/hora HTTP/1.1", upstream: "http://unix:/run/flask/flask.sock:/api/hora", host: "flask.garcia.test"
 ```
 
 Compáralo con el de la práctica 3.1: allí era `Connection refused` (el puerto existe, pero nadie escucha); aquí, `No such file or directory` (el socket ni siquiera existe). Arranca otra vez el servicio con `sudo systemctl start flask-app`.
@@ -408,7 +434,7 @@ Un **PDF** llamado `P3.3-Apellido-Nombre.pdf` con portada, las evidencias (en te
 | 2 | Las dependencias | Principal | `cat requirements.txt` y `pip freeze` |
 | 3 | La aplicación | Principal | `cat app.py` |
 | 4 | El servidor de desarrollo y su aviso | Principal | La salida de `flask --app app run --host 0.0.0.0` |
-| 5 | El servicio | Principal | `cat /etc/systemd/system/flask-app.service` y `systemctl status flask-app` |
+| 5 | El servicio | Principal | `cat /etc/systemd/system/flask-app.service` y `sudo systemctl status -l flask-app` |
 | 6 | El socket | Principal | `ls -l /run/flask` y la línea de `flask.sock` en `sudo ss -xlp` |
 | 7 | La configuración de Nginx | Principal | `cat /etc/nginx/sites-available/flask.tuapellido.test` |
 | 8 | La aplicación a través del proxy, con la IP real | Tu ordenador | `curl.exe http://flask.tuapellido.test/api/hora` |

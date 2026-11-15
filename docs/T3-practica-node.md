@@ -19,10 +19,23 @@ Reescrita a partir de P3.2-NodeJS-Express.md. Cambios:
   - nodejs 20.19.2 y npm 9.2.0 de Debian 13; npm descarga express 5.3.0 y nodemon 3.1.14 (versiones de hoy:
     pueden subir, el material no depende de la versión exacta).
 
-VALIDADA el 27/10/2026 en contenedor Debian 13 con systemd. Salidas reales; adaptadas solo las IP del contenedor
-al escenario y la ruta CGroup (en el contenedor lleva delante /docker/<id>).
-PENDIENTE DE VALIDAR EN LA VM: curl.exe desde Windows; tamaño de "apt install nodejs npm" (npm de Debian arrastra
-muchos paquetes node-*).
+VALIDADA el 27/10/2026 en contenedor Debian 13 con systemd.
+
+Validado en VM el 15/11/2026, a continuación de la P3.1 en la misma VM (Debian 13.7, kernel 6.12.107, 2 GB):
+nodejs 20.19.2, npm 9.2.0, express 5.3.0, nodemon 3.1.14. Todas las salidas son ya de la VM y los curl.exe, del
+Windows anfitrión. Cambios y hallazgos:
+  - "apt install nodejs npm" instala 564 paquetes (npm de Debian arrastra cientos de node-*): 199 MB de descarga,
+    865 MB en disco. Avisado en el apartado 2.
+  - Evidencia 4: tras "npm ci --omit=dev", "npm ls" a secas termina con "npm ERR! code ELSPROBLEMS" y
+    "UNMET DEPENDENCY nodemon" (exit 1). Ahora se pide "npm ls --omit=dev" y se explica el error.
+  - "npm install --save-dev nodemon" avisa hoy de "2 moderate severity vulnerabilities" (minimatch, dependencia de
+    nodemon). Es de desarrollo y no llega al servidor (npm ci --omit=dev: 0 vulnerabilidades). Explicado, con el
+    aviso de NO hacer "npm audit fix --force" (bajaría nodemon de versión).
+  - systemctl status SIN sudo no enseña las líneas del registro (el usuario no está en adm ni en systemd-journal).
+    La salida pegada sí las tenía: ahora "sudo systemctl status node-app" (también en la evidencia 5).
+  - Salidas actualizadas: "30 packages are looking for funding", npm ls con └──, líneas Invocation y Tasks del
+    status de systemd 257. EADDRINUSE comprobado con el servicio en marcha.
+  - Captura nueva: T3-node-inicio.png.
 -->
 
 # Práctica 3.2 - Aplicación Node.js con Express como servicio
@@ -64,6 +77,8 @@ v20.19.2
 9.2.0
 ```
 
+La instalación es grande: el `npm` de Debian arrastra cientos de paquetes `node-*` (unos 560 paquetes, 200 MB de descarga y casi 900 MB en disco). Es normal.
+
 ## 3. Crear el proyecto
 
 La aplicación vivirá en `/var/www`, como las webs del Tema 2, y será **tuya** (el servicio solo necesitará leerla):
@@ -99,9 +114,9 @@ npm install express
 ```
 
 ```
-added 65 packages, and audited 66 packages in 931ms
+added 65 packages, and audited 66 packages in 5s
 
-29 packages are looking for funding
+30 packages are looking for funding
   run `npm fund` for details
 
 found 0 vulnerabilities
@@ -115,9 +130,9 @@ npm ls
 ```
 
 ```
-node_modules  package-lock.json  package.json
+node_modules  package.json  package-lock.json
 node.garcia.test@1.0.0 /var/www/node.garcia.test
-`-- express@5.3.0
+└── express@5.3.0
 ```
 
 - `package.json` tiene ahora `"dependencies": { "express": "^5.3.0" }`.
@@ -202,6 +217,22 @@ sh: 1: nodemon: not found
 
 ```sh
 npm install --save-dev nodemon
+```
+
+Es posible que `npm` termine avisando de vulnerabilidades, por ejemplo:
+
+```
+2 moderate severity vulnerabilities
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+```
+
+`npm audit` te dice cuáles son: un fallo conocido en una librería que usa nodemon. Es una dependencia **de desarrollo**, que no llegará al servidor (lo comprobarás en el apartado 6). **No** hagas `npm audit fix --force`: instalaría una versión anterior de nodemon, un cambio que puede romper cosas, solo para silenciar el aviso. Arranca en modo desarrollo:
+
+```sh
 npm run dev
 ```
 
@@ -221,7 +252,7 @@ curl http://127.0.0.1:3000/api/hora
 ```
 
 ```
-{"hora":"12:38:20","servidor":"debian-garcia","pid":583,"entorno":"sin definir","cliente":"127.0.0.1"}
+{"hora":"18:42:19","servidor":"debian-garcia","pid":14303,"entorno":"sin definir","cliente":"127.0.0.1"}
 ```
 
 Desde tu navegador, `http://192.168.56.10:3000` **no** responde: la aplicación escucha solo en local. Para probarla desde fuera, para con `Ctrl+C` y arráncala con otra dirección, sin tocar el código:
@@ -237,7 +268,7 @@ HOST=0.0.0.0 npm start
 Escuchando en http://0.0.0.0:3000
 ```
 
-Ahora sí: entra en `http://192.168.56.10:3000/api/hora`. Esto es para probar; en producción irá detrás de Nginx. Para con `Ctrl+C`.
+Ahora sí: entra en `http://192.168.56.10:3000/api/hora`. Como no hay proxy de por medio, el cliente es directamente tu IP, `192.168.56.1`. Esto es para probar; en producción irá detrás de Nginx. Para con `Ctrl+C`.
 
 ## 6. Preparar las dependencias de producción
 
@@ -250,16 +281,27 @@ ls node_modules/.bin
 ```
 
 ```
-added 65 packages, and audited 66 packages in 358ms
+added 65 packages, and audited 66 packages in 2s
 
-29 packages are looking for funding
+30 packages are looking for funding
   run `npm fund` for details
 
 found 0 vulnerabilities
 ls: cannot access 'node_modules/.bin': No such file or directory
 ```
 
-Vuelven a ser 65 paquetes, las versiones exactas del `package-lock.json`, y nodemon no está.
+Vuelven a ser 65 paquetes, las versiones exactas del `package-lock.json`, nodemon no está y las vulnerabilidades del apartado 5 han desaparecido: eran de lo que no se instala en producción. Para ver lo instalado, `npm ls` necesita saber que has dejado fuera lo de desarrollo:
+
+```sh
+npm ls --omit=dev
+```
+
+```
+node.garcia.test@1.0.0 /var/www/node.garcia.test
+└── express@5.3.0
+```
+
+Sin `--omit=dev`, `npm ls` compara con todo el `package.json`, echa en falta nodemon y termina con un error (`npm ERR! code ELSPROBLEMS` y `UNMET DEPENDENCY nodemon@^3.1.14`). No es un fallo: es justo lo que has pedido.
 
 ## 7. La aplicación como servicio
 
@@ -290,31 +332,36 @@ Se ejecuta con `www-data`, que puede **leer** la aplicación pero no modificarla
 ```sh
 sudo systemctl daemon-reload
 sudo systemctl enable --now node-app
-systemctl status node-app
+sudo systemctl status node-app
 ```
 
 ```
 ● node-app.service - Aplicación Node.js de node.garcia.test
      Loaded: loaded (/etc/systemd/system/node-app.service; enabled; preset: enabled)
-     Active: active (running) since Tue 2026-10-27 12:51:17 CET; 1s ago
-   Main PID: 1012 (node)
-     Memory: 21.5M (peak: 22.5M)
-        CPU: 203ms
+     Active: active (running) since Sun 2026-11-15 18:44:20 CET; 2s ago
+ Invocation: 767f6526928643ffadb41d8f84be97a9
+   Main PID: 14728 (node)
+      Tasks: 7 (limit: 2317)
+     Memory: 20.9M (peak: 21.3M)
+        CPU: 525ms
      CGroup: /system.slice/node-app.service
-             └─1012 /usr/bin/node app.js
+             └─14728 /usr/bin/node app.js
 
-Oct 27 12:51:17 debian-garcia systemd[1]: Started node-app.service - Aplicación Node.js de node.garcia.test.
-Oct 27 12:51:17 debian-garcia node[1012]: Escuchando en http://127.0.0.1:3000
+Nov 15 18:44:20 debian-garcia systemd[1]: Started node-app.service - Aplicación Node.js de node.garcia.test.
+Nov 15 18:44:20 debian-garcia node[14728]: Escuchando en http://127.0.0.1:3000
 ```
 
-Unos 22 MB, frente a los 200 de Tomcat. Comprueba que ahora el entorno es `production`:
+!!! info "¿Por qué `sudo` para ver el estado?"
+    `systemctl status` funciona sin `sudo`, pero entonces **no** muestra las últimas líneas del registro: tu usuario no puede leer el diario del sistema (no está en los grupos `adm` ni `systemd-journal`). Con `sudo` las ves.
+
+Unos 21 MB, frente a los 150 de Tomcat. Comprueba que ahora el entorno es `production`:
 
 ```sh
 curl http://127.0.0.1:3000/api/hora
 ```
 
 ```
-{"hora":"12:51:18","servidor":"debian-garcia","pid":1012,"entorno":"production","cliente":"127.0.0.1"}
+{"hora":"18:44:23","servidor":"debian-garcia","pid":14728,"entorno":"production","cliente":"127.0.0.1"}
 ```
 
 !!! tip "Si el servicio falla al arrancar"
@@ -325,16 +372,16 @@ curl http://127.0.0.1:3000/api/hora
 Mata el proceso a la fuerza, como si hubiera fallado:
 
 ```sh
-sudo kill -9 1012       # usa el Main PID de tu systemctl status
+sudo kill -9 14728      # usa el Main PID de tu systemctl status
 sudo journalctl -u node-app -n 5
 ```
 
 ```
-Oct 27 12:51:18 debian-garcia systemd[1]: node-app.service: Main process exited, code=killed, status=9/KILL
-Oct 27 12:51:18 debian-garcia systemd[1]: node-app.service: Failed with result 'signal'.
-Oct 27 12:51:18 debian-garcia systemd[1]: node-app.service: Scheduled restart job, restart counter is at 1.
-Oct 27 12:51:18 debian-garcia systemd[1]: Started node-app.service - Aplicación Node.js de node.garcia.test.
-Oct 27 12:51:19 debian-garcia node[1028]: Escuchando en http://127.0.0.1:3000
+Nov 15 18:44:24 debian-garcia systemd[1]: node-app.service: Main process exited, code=killed, status=9/KILL
+Nov 15 18:44:24 debian-garcia systemd[1]: node-app.service: Failed with result 'signal'.
+Nov 15 18:44:25 debian-garcia systemd[1]: node-app.service: Scheduled restart job, restart counter is at 1.
+Nov 15 18:44:25 debian-garcia systemd[1]: Started node-app.service - Aplicación Node.js de node.garcia.test.
+Nov 15 18:44:25 debian-garcia node[14768]: Escuchando en http://127.0.0.1:3000
 ```
 
 Al instante vuelve a estar en marcha, con otro PID. Es lo que hace `Restart=on-failure`. Si la paras tú con `systemctl stop`, no la levanta: eso no es un fallo.
@@ -361,7 +408,11 @@ server {
 }
 ```
 
-Actívalo, `sudo nginx -t`, recarga, y añade `node.garcia.test` a tu `hosts`. Desde tu ordenador:
+Actívalo, `sudo nginx -t`, recarga, y añade `node.garcia.test` a tu `hosts`. Entra en `http://node.garcia.test`:
+
+![](img/T3-node-inicio.png)
+
+Desde PowerShell:
 
 ```powershell
 curl.exe http://node.garcia.test/api/hora
@@ -369,18 +420,18 @@ curl.exe -I http://node.garcia.test/api/hora
 ```
 
 ```
-{"hora":"12:51:21","servidor":"debian-garcia","pid":1028,"entorno":"production","cliente":"192.168.56.1"}
+{"hora":"18:44:31","servidor":"debian-garcia","pid":14768,"entorno":"production","cliente":"192.168.56.1"}
 ```
 
 ```
 HTTP/1.1 200 OK
 Server: nginx
-Date: Tue, 27 Oct 2026 11:51:21 GMT
+Date: Sun, 15 Nov 2026 17:44:31 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 103
+Content-Length: 106
 Connection: keep-alive
 X-Powered-By: Express
-ETag: W/"67-XHrwdUjTRur8yRzCTZNr2Vutj+k"
+ETag: W/"6a-DxUuZY7WKztvgbVkiu0rK8hcZ1U"
 ```
 
 El cliente es tu IP real gracias a `trust proxy`. Y fíjate en `X-Powered-By: Express`: la aplicación anuncia a cualquiera con qué está hecha, lo que facilita buscar fallos conocidos de esa tecnología. Lo quitarás en el siguiente apartado.
@@ -401,9 +452,9 @@ sudo journalctl -u node-app -n 3
 ```
 
 ```
-Oct 27 12:51:21 debian-garcia systemd[1]: Stopped node-app.service - Aplicación Node.js de node.garcia.test.
-Oct 27 12:51:21 debian-garcia systemd[1]: Started node-app.service - Aplicación Node.js de node.garcia.test.
-Oct 27 12:51:22 debian-garcia node[1045]: Escuchando en http://127.0.0.1:3000
+Nov 15 18:44:45 debian-garcia systemd[1]: Stopped node-app.service - Aplicación Node.js de node.garcia.test.
+Nov 15 18:44:45 debian-garcia systemd[1]: Started node-app.service - Aplicación Node.js de node.garcia.test.
+Nov 15 18:44:45 debian-garcia node[14867]: Escuchando en http://127.0.0.1:3000
 ```
 
 ```powershell
@@ -413,11 +464,11 @@ curl.exe -I http://node.garcia.test/api/hora
 ```
 HTTP/1.1 200 OK
 Server: nginx
-Date: Tue, 27 Oct 2026 11:51:23 GMT
+Date: Sun, 15 Nov 2026 17:44:46 GMT
 Content-Type: application/json; charset=utf-8
-Content-Length: 103
+Content-Length: 106
 Connection: keep-alive
-ETag: W/"67-1hECdryAO8ylJjZs6eVS+EprvUQ"
+ETag: W/"6a-a7zn10nIxvx+81uM0sC09kQ4BZY"
 ```
 
 Si un despliegue nuevo añadiera dependencias, el orden sería: actualizar el código, `npm ci --omit=dev`, `sudo systemctl restart node-app`, y comprobar.
@@ -461,8 +512,8 @@ Un **PDF** llamado `P3.2-Apellido-Nombre.pdf` con portada, las evidencias (en te
 | 1 | Las versiones instaladas | Principal | `node -v` y `npm -v` |
 | 2 | El proyecto | Principal | `cat package.json` y `cat app.js` |
 | 3 | El error de nodemon y su solución | Principal | `npm run dev` antes y después de instalarlo |
-| 4 | Las dependencias de producción | Principal | `npm ci --omit=dev` y `npm ls` |
-| 5 | El servicio | Principal | `cat /etc/systemd/system/node-app.service` y `systemctl status node-app` |
+| 4 | Las dependencias de producción | Principal | `npm ci --omit=dev` y `npm ls --omit=dev` |
+| 5 | El servicio | Principal | `cat /etc/systemd/system/node-app.service` y `sudo systemctl status node-app` |
 | 6 | El reinicio automático | Principal | `sudo journalctl -u node-app -n 5` tras el `kill -9` |
 | 7 | Quién ejecuta la aplicación y dónde escucha | Principal | `ps -o user,pid,cmd -C node` y `sudo ss -tlnp` (líneas de los puertos 80 y 3000) |
 | 8 | La configuración de Nginx | Principal | `cat /etc/nginx/sites-available/node.tuapellido.test` |
