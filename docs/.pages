@@ -14,6 +14,13 @@ nav:
         - T2-practica-autenticacion.md
         - T2-practica-proxy.md
         - T2-practica-balanceo.md
+    - Tema 3:
+      - Teoría:
+        - T3-servidores-aplicaciones.md
+      - Prácticas:
+        - T3-practica-tomcat.md
+        - T3-practica-node.md
+        - T3-practica-flask.md
     - Créditos: creditos.md
 
 # Cómo funciona este fichero:
