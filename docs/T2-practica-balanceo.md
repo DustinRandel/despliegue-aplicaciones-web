@@ -5,6 +5,9 @@ title: 'Práctica 2.5 - Balanceo de carga'
 <!--
 NOTA PARA EL PROFESOR (no se muestra al alumnado):
 
+ENTREGA (16/11/2026): cuenta como ejercicio, solo el documento de evidencias, sin demostración ni
+entrevista (decisión del profesor para P2.2–P2.5).
+
 Reescrita a partir de old.P1.4.md (balanceo) y old.P1.5.md (proxy y balanceo con SSL). Cambios:
   - Un solo documento: el balanceador ya nace con HTTPS (los certificados se aprendieron en la P2.2), así que la
     antigua 2.5 queda absorbida como un apartado.
@@ -303,9 +306,9 @@ Apaga las tres máquinas y toma las instantáneas `p2.5-balanceo` en la principa
 
 ## Entrega
 
-Igual que en las prácticas anteriores: **documento de evidencias (40 %)** y **demostración en clase (60 %)**.
+Esta práctica cuenta como un **ejercicio**: se califica solo con el **documento de evidencias**. No hay demostración en clase.
 
-### Parte 1 — Documento de evidencias (40 %)
+### Documento de evidencias
 
 Un **PDF** llamado `P2.5-Apellido-Nombre.pdf` con portada, las evidencias (en texto, con comando y *prompt*) y las respuestas a las cuestiones.
 
@@ -321,19 +324,17 @@ Un **PDF** llamado `P2.5-Apellido-Nombre.pdf` con portada, las evidencias (en te
 | 8 | El `504` y el `502` cuando caen los dos | Tu ordenador y principal | Las peticiones del apartado 5 y la línea `no live upstreams` de `balanceo.error.log` |
 | 9 | Las dos páginas en el navegador | Tu ordenador | **Captura** de cada una, con la barra de direcciones |
 
-### Parte 2 — Demostración en clase (60 %)
-
-Mini entrevista individual en la mesa del profesor, con las tres máquinas encendidas: muestras el reparto en el navegador, haces la tarea que se te pida (por ejemplo, apagar un servidor y explicar qué pasa) y explicas una decisión o un concepto.
+Cada evidencia, con **una frase tuya** explicando qué demuestra.
 
 ### Criterios de evaluación
 
-| Parte | Criterio | Peso |
-|---|---|---|
-| Documento | Las nueve evidencias están completas, en texto (salvo las capturas) y explicadas | 25 % |
-| Documento | Las cinco cuestiones están respondidas con corrección y criterio propio | 15 % |
-| Demostración | El balanceador reparte por HTTPS entre `back1` y `back2`, y sigue funcionando si cae uno | 20 % |
-| Demostración | Realizas la tarea que se te pide y explicas lo que haces | 20 % |
-| Demostración | Explicas una decisión o un concepto con tus palabras | 20 % |
+| Criterio | Peso |
+|---|---|
+| Las nueve evidencias están completas, en texto (salvo las capturas), y muestran el resultado que se pide | 50 % |
+| Cada evidencia lleva una frase tuya que explica qué demuestra | 20 % |
+| Las cinco cuestiones están respondidas con corrección y criterio propio | 30 % |
+
+Si en el documento aparecen una máquina o unos dominios que no son los tuyos (el *hostname*, el apellido de los dominios), esa evidencia cuenta como no superada.
 
 ### Antes de entregar, comprueba que…
 

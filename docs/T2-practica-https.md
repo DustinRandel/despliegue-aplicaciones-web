@@ -5,6 +5,9 @@ title: 'Práctica 2.2 - HTTPS en Nginx'
 <!--
 NOTA PARA EL PROFESOR (no se muestra al alumnado):
 
+ENTREGA (16/11/2026): cuenta como ejercicio, solo el documento de evidencias, sin demostración ni
+entrevista (decisión del profesor para P2.2–P2.5).
+
 Práctica nueva. Parte del apartado "HTTPS" y "Redirección HTTP a HTTPS" del P1.1.md original (que solo decía
 "apoyaos en una búsqueda en Internet") y de la parte de certificados de old.P1.5.md. Cambios:
   - Guiada paso a paso, sobre los dos sitios de la P2.1 (web1/web2.apellido.test), en la máquina principal .10.
@@ -358,9 +361,9 @@ En VirtualBox, toma la instantánea `p2.2-https`.
 
 ## Entrega
 
-Igual que en las prácticas anteriores: **documento de evidencias (40 %)** y **demostración en clase (60 %)**.
+Esta práctica cuenta como un **ejercicio**: se califica solo con el **documento de evidencias**. No hay demostración en clase.
 
-### Parte 1 — Documento de evidencias (40 %)
+### Documento de evidencias
 
 Un **PDF** llamado `P2.2-Apellido-Nombre.pdf` con portada, las evidencias de la tabla (en texto, con el comando y el *prompt*) y las respuestas a las cuestiones.
 
@@ -379,26 +382,15 @@ Un **PDF** llamado `P2.2-Apellido-Nombre.pdf` con portada, las evidencias de la 
 
 Cada evidencia, con **una frase tuya** explicando qué demuestra.
 
-### Parte 2 — Demostración en clase (60 %)
-
-Mini entrevista individual en la mesa del profesor, con tu ordenador:
-
-1. Abres `http://web1.tuapellido.test` en el navegador y muestras que acaba en HTTPS con tu certificado.
-2. Haces la tarea que se te pida en ese momento.
-3. Explicas en voz alta una de tus decisiones o uno de los conceptos de la práctica.
-
-!!! info "Cómo se califica"
-    **Una demostración que no funciona no se compensa con un documento impecable**: la práctica queda pendiente hasta que funcione.
-
 ### Criterios de evaluación
 
-| Parte | Criterio | Peso |
-|---|---|---|
-| Documento | Las diez evidencias están completas, en texto (salvo la captura) y explicadas | 25 % |
-| Documento | Las cinco cuestiones están respondidas con corrección y criterio propio | 15 % |
-| Demostración | Los dos sitios sirven por HTTPS con su certificado y HTTP redirige | 20 % |
-| Demostración | Realizas la tarea que se te pide y explicas lo que haces | 20 % |
-| Demostración | Explicas una decisión o un concepto con tus palabras | 20 % |
+| Criterio | Peso |
+|---|---|
+| Las diez evidencias están completas, en texto (salvo la captura), y muestran el resultado que se pide | 50 % |
+| Cada evidencia lleva una frase tuya que explica qué demuestra | 20 % |
+| Las cinco cuestiones están respondidas con corrección y criterio propio | 30 % |
+
+Si en el documento aparecen una máquina o unos dominios que no son los tuyos (el *hostname*, el apellido de los dominios), esa evidencia cuenta como no superada.
 
 ### Antes de entregar, comprueba que…
 

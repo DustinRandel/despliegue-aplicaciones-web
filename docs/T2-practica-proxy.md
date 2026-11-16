@@ -5,6 +5,9 @@ title: 'Práctica 2.4 - Proxy inverso'
 <!--
 NOTA PARA EL PROFESOR (no se muestra al alumnado):
 
+ENTREGA (16/11/2026): cuenta como ejercicio, solo el documento de evidencias, sin demostración ni
+entrevista (decisión del profesor para P2.2–P2.5).
+
 Reescrita a partir de old.P1.3.md ("Práctica 2.3 – Proxy inverso con Nginx"). Cambios:
   - ESCENARIO (decidido con el profesor): la máquina principal .10 hace de proxy (no cambia el hosts ni el HTTPS
     de la 2.2) y se clona un servidor de detrás LIGERO: debian-apellido-back1, 192.168.56.11, 512 MB de RAM,
@@ -410,9 +413,9 @@ Apaga las dos máquinas y toma una instantánea de cada una: `p2.4-proxy` en la 
 
 ## Entrega
 
-Igual que en las prácticas anteriores: **documento de evidencias (40 %)** y **demostración en clase (60 %)**.
+Esta práctica cuenta como un **ejercicio**: se califica solo con el **documento de evidencias**. No hay demostración en clase.
 
-### Parte 1 — Documento de evidencias (40 %)
+### Documento de evidencias
 
 Un **PDF** llamado `P2.4-Apellido-Nombre.pdf` con portada, las evidencias (en texto, con comando y *prompt*) y las respuestas a las cuestiones.
 
@@ -428,19 +431,17 @@ Un **PDF** llamado `P2.4-Apellido-Nombre.pdf` con portada, las evidencias (en te
 | 8 | `back1` solo acepta al proxy | Tu ordenador | Los dos `curl.exe` del apartado 7 |
 | 9 | Las máquinas en VirtualBox | Tu ordenador | **Captura** de VirtualBox con las dos máquinas y sus instantáneas |
 
-### Parte 2 — Demostración en clase (60 %)
-
-Mini entrevista individual en la mesa del profesor, con las dos máquinas encendidas: muestras `app.tuapellido.test` en el navegador, haces la tarea que se te pida (por ejemplo, provocar y explicar un `502`) y explicas una decisión o un concepto.
+Cada evidencia, con **una frase tuya** explicando qué demuestra.
 
 ### Criterios de evaluación
 
-| Parte | Criterio | Peso |
-|---|---|---|
-| Documento | Las nueve evidencias están completas, en texto (salvo la captura) y explicadas | 25 % |
-| Documento | Las cinco cuestiones están respondidas con corrección y criterio propio | 15 % |
-| Demostración | `app.tuapellido.test` llega a `back1` a través del proxy, y `back1` no acepta conexiones directas | 20 % |
-| Demostración | Realizas la tarea que se te pide y explicas lo que haces | 20 % |
-| Demostración | Explicas una decisión o un concepto con tus palabras | 20 % |
+| Criterio | Peso |
+|---|---|
+| Las nueve evidencias están completas, en texto (salvo la captura), y muestran el resultado que se pide | 50 % |
+| Cada evidencia lleva una frase tuya que explica qué demuestra | 20 % |
+| Las cinco cuestiones están respondidas con corrección y criterio propio | 30 % |
+
+Si en el documento aparecen una máquina o unos dominios que no son los tuyos (el *hostname*, el apellido de los dominios), esa evidencia cuenta como no superada.
 
 ### Antes de entregar, comprueba que…
 

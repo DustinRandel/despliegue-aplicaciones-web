@@ -5,6 +5,9 @@ title: 'Práctica 2.3 - Autenticación y control de acceso'
 <!--
 NOTA PARA EL PROFESOR (no se muestra al alumnado):
 
+ENTREGA (16/11/2026): cuenta como ejercicio, solo el documento de evidencias, sin demostración ni
+entrevista (decisión del profesor para P2.2–P2.5).
+
 Reescrita a partir de old.P1.2.md ("Práctica 2.2 – Autenticación en Nginx"). Cambios:
   - Va DESPUÉS de HTTPS (P2.2): la autenticación básica manda usuario y contraseña en base64, que no es cifrado.
     Se demuestra con curl -v (cabecera Authorization) y base64 -d.
@@ -355,9 +358,9 @@ Apaga la máquina con `sudo poweroff` y toma la instantánea `p2.3-auth`.
 
 ## Entrega
 
-Igual que en las prácticas anteriores: **documento de evidencias (40 %)** y **demostración en clase (60 %)**.
+Esta práctica cuenta como un **ejercicio**: se califica solo con el **documento de evidencias**. No hay demostración en clase.
 
-### Parte 1 — Documento de evidencias (40 %)
+### Documento de evidencias
 
 Un **PDF** llamado `P2.3-Apellido-Nombre.pdf` con portada, las evidencias (en texto, con comando y *prompt*) y las respuestas a las cuestiones.
 
@@ -373,19 +376,17 @@ Un **PDF** llamado `P2.3-Apellido-Nombre.pdf` con portada, las evidencias (en te
 | 8 | Denegación por IP | Los dos | Los dos `curl` del apartado 6 (`403` y `200`) |
 | 9 | La tarea de `satisfy` | Debian | La configuración del `location` con `satisfy all` y con `satisfy any`, y una frase sobre cada una |
 
-### Parte 2 — Demostración en clase (60 %)
-
-Mini entrevista individual en la mesa del profesor: muestras la zona protegida en una ventana de incógnito, haces la tarea que se te pida y explicas una decisión o un concepto.
+Cada evidencia, con **una frase tuya** explicando qué demuestra.
 
 ### Criterios de evaluación
 
-| Parte | Criterio | Peso |
-|---|---|---|
-| Documento | Las nueve evidencias están completas, en texto y explicadas | 25 % |
-| Documento | Las cinco cuestiones están respondidas con corrección y criterio propio | 15 % |
-| Demostración | `elements.html` pide usuario y contraseña, y el resto de la web no | 20 % |
-| Demostración | Realizas la tarea que se te pide y explicas lo que haces | 20 % |
-| Demostración | Explicas una decisión o un concepto con tus palabras | 20 % |
+| Criterio | Peso |
+|---|---|
+| Las nueve evidencias están completas, en texto, y muestran el resultado que se pide | 50 % |
+| Cada evidencia lleva una frase tuya que explica qué demuestra | 20 % |
+| Las cinco cuestiones están respondidas con corrección y criterio propio | 30 % |
+
+Si en el documento aparecen una máquina o unos dominios que no son los tuyos (el *hostname*, el apellido de los dominios), esa evidencia cuenta como no superada.
 
 ### Antes de entregar, comprueba que…
 
