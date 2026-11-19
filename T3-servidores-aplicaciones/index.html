@@ -1,0 +1,2938 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes y prácticas del módulo 0614 - 2º DAW">
+      
+      
+        <meta name="author" content="Dustin Randel de Lara García">
+      
+      
+        <link rel="canonical" href="https://dustinrandel.github.io/despliegue-aplicaciones-web/T3-servidores-aplicaciones/">
+      
+      
+        <link rel="prev" href="../T2-practica-balanceo/">
+      
+      
+        <link rel="next" href="../T3-practica-tomcat/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>Tema 3 - Servidores de aplicaciones - Despliegue de aplicaciones web</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Carlito:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Carlito";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link rel="icon" type="image/png" sizes="48x48" href="../assets/favicon-48.png">
+  <link rel="icon" sizes="any" href="../assets/favicon.ico">
+  <link rel="apple-touch-icon" href="../assets/logo.png">
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#tema-3-servidores-de-aplicaciones-despliegue-de-aplicaciones-web" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-header__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Despliegue de aplicaciones web
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Tema 3 - Servidores de aplicaciones
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-nav__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    Despliegue de aplicaciones web
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 1
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-introduccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1 - Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-practica-maquina-virtual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 2
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-arquitectura-web/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2 - Arquitectura web
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-nginx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.1 - Servidor web Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-https/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.2 - HTTPS en Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-autenticacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.3 - Autenticación y control de acceso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.4 - Proxy inverso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-balanceo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.5 - Balanceo de carga
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 3
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 3
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 3 - Servidores de aplicaciones
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 3 - Servidores de aplicaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#como-se-organiza-este-tema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cómo se organiza este tema
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-que-es-un-servidor-de-aplicaciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Qué es un servidor de aplicaciones
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Qué es un servidor de aplicaciones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#por-que-un-nginx-delante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por qué un Nginx delante
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-como-se-hablan-el-servidor-web-y-el-de-aplicaciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Cómo se hablan el servidor web y el de aplicaciones
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Cómo se hablan el servidor web y el de aplicaciones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dos-conversaciones-distintas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dos conversaciones distintas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#donde-escucha-0000-127001-o-un-socket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dónde escucha: 0.0.0.0, 127.0.0.1 o un socket
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-que-es-desplegar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Qué es desplegar
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Qué es desplegar">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#artefacto-y-entornos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artefacto y entornos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#los-pasos-de-un-despliegue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Los pasos de un despliegue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#que-la-aplicacion-siga-viva-servicios-con-systemd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Que la aplicación siga viva: servicios con systemd
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buenas-practicas-de-despliegue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Buenas prácticas de despliegue
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-aplicaciones-java-servlets-maven-y-tomcat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Aplicaciones Java: servlets, Maven y Tomcat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Aplicaciones Java: servlets, Maven y Tomcat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#servlets-y-contenedores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Servlets y contenedores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-aplicacion-empaquetada-war" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La aplicación empaquetada: WAR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maven" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maven
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tomcat-en-debian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tomcat en Debian
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#el-modelo-moderno-spring-boot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El modelo moderno: Spring Boot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-nodejs-y-express" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Node.js y Express
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Node.js y Express">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nodejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#express" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Express
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#npm-y-packagejson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        npm y package.json
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scripts-de-npm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scripts de npm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variables-de-entorno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables de entorno
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-python-flask-wsgi-y-gunicorn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Python: Flask, WSGI y Gunicorn
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Python: Flask, WSGI y Gunicorn">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flask
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wsgi-y-gunicorn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WSGI y Gunicorn
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#entornos-virtuales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entornos virtuales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gunicorn-por-un-socket-unix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gunicorn por un socket Unix
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 4
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referencias
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T3-practica-tomcat/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 3.1 - Aplicación Java en Tomcat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T3-practica-node/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 3.2 - Aplicación Node.js con Express
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T3-practica-flask/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 3.3 - Aplicación Flask con Gunicorn
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../creditos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Créditos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#como-se-organiza-este-tema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cómo se organiza este tema
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-que-es-un-servidor-de-aplicaciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Qué es un servidor de aplicaciones
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Qué es un servidor de aplicaciones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#por-que-un-nginx-delante" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Por qué un Nginx delante
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-como-se-hablan-el-servidor-web-y-el-de-aplicaciones" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Cómo se hablan el servidor web y el de aplicaciones
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Cómo se hablan el servidor web y el de aplicaciones">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dos-conversaciones-distintas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dos conversaciones distintas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#donde-escucha-0000-127001-o-un-socket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dónde escucha: 0.0.0.0, 127.0.0.1 o un socket
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-que-es-desplegar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Qué es desplegar
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Qué es desplegar">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#artefacto-y-entornos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artefacto y entornos
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#los-pasos-de-un-despliegue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Los pasos de un despliegue
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#que-la-aplicacion-siga-viva-servicios-con-systemd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Que la aplicación siga viva: servicios con systemd
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buenas-practicas-de-despliegue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Buenas prácticas de despliegue
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-aplicaciones-java-servlets-maven-y-tomcat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Aplicaciones Java: servlets, Maven y Tomcat
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Aplicaciones Java: servlets, Maven y Tomcat">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#servlets-y-contenedores" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Servlets y contenedores
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-aplicacion-empaquetada-war" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La aplicación empaquetada: WAR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#maven" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maven
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tomcat-en-debian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tomcat en Debian
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#el-modelo-moderno-spring-boot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El modelo moderno: Spring Boot
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-nodejs-y-express" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Node.js y Express
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Node.js y Express">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nodejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#express" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Express
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#npm-y-packagejson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        npm y package.json
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scripts-de-npm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scripts de npm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variables-de-entorno" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variables de entorno
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-python-flask-wsgi-y-gunicorn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Python: Flask, WSGI y Gunicorn
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Python: Flask, WSGI y Gunicorn">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flask
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wsgi-y-gunicorn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WSGI y Gunicorn
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#entornos-virtuales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entornos virtuales
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gunicorn-por-un-socket-unix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gunicorn por un socket Unix
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cierre-del-bloque-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cierre del bloque 4
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referencias
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="tema-3-servidores-de-aplicaciones-despliegue-de-aplicaciones-web">Tema 3 - Servidores de aplicaciones: despliegue de aplicaciones web<a class="headerlink" href="#tema-3-servidores-de-aplicaciones-despliegue-de-aplicaciones-web" title="Permanent link">&para;</a></h1>
+<div class="admonition abstract">
+<p class="admonition-title">Qué vas a aprender en este tema</p>
+<ul>
+<li>Qué es un servidor de aplicaciones y por qué casi siempre tiene un Nginx delante.</li>
+<li>Cómo se comunican el servidor web y el de aplicaciones: HTTP, sockets Unix, FastCGI y WSGI.</li>
+<li>Qué significa desplegar una aplicación y qué pasos se repiten en cualquier tecnología.</li>
+<li>Cómo convertir una aplicación en un servicio del sistema con <code>systemd</code>.</li>
+<li>Cómo se empaqueta y se despliega una aplicación Java (Maven, WAR, Tomcat), una de Node.js (npm, Express) y una de Python (entornos virtuales, Flask, Gunicorn).</li>
+</ul>
+</div>
+<h2 id="como-se-organiza-este-tema">Cómo se organiza este tema<a class="headerlink" href="#como-se-organiza-este-tema" title="Permanent link">&para;</a></h2>
+<p>La teoría y las prácticas van intercaladas, en cuatro bloques. Cada bloque termina con unas cuestiones de repaso y un recuadro <strong>Ahora toca</strong> que indica la práctica que se hace en ese momento.</p>
+<table>
+<thead>
+<tr>
+<th>Bloque</th>
+<th>Teoría</th>
+<th>Al terminar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Del servidor web al de aplicaciones</td>
+<td>Apartados 1, 2 y 3</td>
+<td>Actividad en clase con <code>ss</code> y <code>systemctl</code></td>
+</tr>
+<tr>
+<td>2. Java</td>
+<td>Apartado 4</td>
+<td><a href="../T3-practica-tomcat/">Práctica 3.1</a>: Maven y Tomcat detrás de Nginx</td>
+</tr>
+<tr>
+<td>3. Node.js</td>
+<td>Apartado 5</td>
+<td><a href="../T3-practica-node/">Práctica 3.2</a>: Express como servicio detrás de Nginx</td>
+</tr>
+<tr>
+<td>4. Python</td>
+<td>Apartado 6</td>
+<td><a href="../T3-practica-flask/">Práctica 3.3</a>: Flask y Gunicorn por un socket Unix</td>
+</tr>
+</tbody>
+</table>
+<p>Las tres prácticas se hacen en tu máquina principal (<code>192.168.56.10</code>), la del Tema 2. Al final tendrás un solo Nginx delante de tres servidores de aplicaciones distintos:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                                  ┌──► Tomcat    127.0.0.1:8080          java.tuapellido.test
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a> Tu ordenador ──► Nginx :80 ──────┼──► Node.js   127.0.0.1:3000          node.tuapellido.test
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a> 192.168.56.1    192.168.56.10    └──► Gunicorn  /run/flask/flask.sock   flask.tuapellido.test
+</code></pre></div>
+<hr />
+<h2 id="1-que-es-un-servidor-de-aplicaciones">1. Qué es un servidor de aplicaciones<a class="headerlink" href="#1-que-es-un-servidor-de-aplicaciones" title="Permanent link">&para;</a></h2>
+<p>En el Tema 2 viste la diferencia entre contenido <strong>estático</strong> (ficheros que ya existen) y <strong>dinámico</strong> (una respuesta que se genera en cada petición). Nginx es excelente con lo estático, pero no ejecuta código Java, JavaScript ni Python. Para eso está el <strong>servidor de aplicaciones</strong>: un programa que mantiene <strong>cargado en memoria</strong> el código de la aplicación y, en cada petición, lo ejecuta y genera la respuesta.</p>
+<p>Lo de "cargado en memoria" es la clave. En los inicios de la web, el servidor ejecutaba un programa nuevo en cada petición (<strong>CGI</strong>): arrancar el proceso, cargar el intérprete, conectar con la base de datos, responder y morir. Con decenas de peticiones por segundo era insostenible. Un servidor de aplicaciones arranca <strong>una vez</strong> y atiende peticiones sin parar.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Servidor web</th>
+<th>Servidor de aplicaciones</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qué hace</td>
+<td>Sirve ficheros y reenvía peticiones</td>
+<td>Ejecuta el código de la aplicación</td>
+</tr>
+<tr>
+<td>Contenido</td>
+<td>Estático: HTML, CSS, imágenes, JavaScript del navegador</td>
+<td>Dinámico: JSON de una API, páginas generadas, sesiones</td>
+</tr>
+<tr>
+<td>Ejemplos</td>
+<td>Nginx, Apache, Caddy</td>
+<td>Tomcat, WildFly, Gunicorn, PHP-FPM, Node.js</td>
+</tr>
+<tr>
+<td>Dónde escucha</td>
+<td>Puertos públicos 80 y 443</td>
+<td>Un puerto interno (8080, 3000…) o un socket Unix</td>
+</tr>
+<tr>
+<td>Coste por petición</td>
+<td>Muy bajo</td>
+<td>Mayor: ejecuta código y suele consultar una base de datos</td>
+</tr>
+</tbody>
+</table>
+<p>Cada lenguaje tiene los suyos:</p>
+<table>
+<thead>
+<tr>
+<th>Lenguaje</th>
+<th>Servidor de aplicaciones</th>
+<th>Lo verás en</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Java</td>
+<td>Tomcat, Jetty, WildFly, GlassFish</td>
+<td>Práctica 3.1</td>
+</tr>
+<tr>
+<td>JavaScript</td>
+<td>Node.js: la propia aplicación es el servidor</td>
+<td>Práctica 3.2</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>Gunicorn, uWSGI (y Uvicorn para aplicaciones asíncronas)</td>
+<td>Práctica 3.3</td>
+</tr>
+<tr>
+<td>PHP</td>
+<td>PHP-FPM</td>
+<td>Desplegable final</td>
+</tr>
+</tbody>
+</table>
+<h3 id="por-que-un-nginx-delante">Por qué un Nginx delante<a class="headerlink" href="#por-que-un-nginx-delante" title="Permanent link">&para;</a></h3>
+<p>Tomcat, Node.js y Gunicorn saben responder HTTP directamente. Aun así, en producción casi siempre tienen un servidor web delante haciendo de <strong>proxy inverso</strong>, como en la práctica 2.4:</p>
+<ul>
+<li><strong>Un único punto de entrada.</strong> Un solo servicio escucha en los puertos 80 y 443 y reparte por nombre (<code>java.</code>, <code>node.</code>, <code>flask.</code>) entre aplicaciones que escuchan en puertos internos.</li>
+<li><strong>HTTPS en un solo sitio.</strong> El certificado se configura en Nginx (práctica 2.2), no en cada aplicación.</li>
+<li><strong>Estáticos rápidos.</strong> Nginx sirve imágenes y CSS sin molestar a la aplicación.</li>
+<li><strong>Protección.</strong> Los clientes lentos o maliciosos se los come Nginx; la aplicación solo recibe peticiones completas.</li>
+<li><strong>Escalar.</strong> Con varias copias de la aplicación, Nginx las balancea (práctica 2.5).</li>
+</ul>
+<p>Por eso el servidor de aplicaciones escucha <strong>solo en local</strong>: nadie de fuera debe poder saltarse el proxy.</p>
+<h2 id="2-como-se-hablan-el-servidor-web-y-el-de-aplicaciones">2. Cómo se hablan el servidor web y el de aplicaciones<a class="headerlink" href="#2-como-se-hablan-el-servidor-web-y-el-de-aplicaciones" title="Permanent link">&para;</a></h2>
+<h3 id="dos-conversaciones-distintas">Dos conversaciones distintas<a class="headerlink" href="#dos-conversaciones-distintas" title="Permanent link">&para;</a></h3>
+<p>En cada petición hay <strong>dos</strong> conversaciones, y conviene no mezclarlas:</p>
+<ol>
+<li><strong>Nginx ↔ servidor de aplicaciones.</strong> Viajan peticiones completas, por la red local o por un socket. Normalmente en <strong>HTTP</strong>; en PHP, en <strong>FastCGI</strong>.</li>
+<li><strong>Servidor de aplicaciones ↔ tu código.</strong> Dentro del mismo proceso: el servidor llama a tu código siguiendo una interfaz estándar de su lenguaje.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Tecnología</th>
+<th>Nginx → servidor de aplicaciones</th>
+<th>Servidor de aplicaciones → tu código</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Java (Tomcat)</td>
+<td>HTTP, <code>proxy_pass http://127.0.0.1:8080</code></td>
+<td>API de <strong>servlets</strong> de Jakarta EE</td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td>HTTP, <code>proxy_pass http://127.0.0.1:3000</code></td>
+<td>No hay intermediario: tu código abre el puerto</td>
+</tr>
+<tr>
+<td>Python (Gunicorn)</td>
+<td>HTTP por un socket Unix, <code>proxy_pass http://unix:…</code></td>
+<td><strong>WSGI</strong></td>
+</tr>
+<tr>
+<td>PHP (PHP-FPM)</td>
+<td>FastCGI, <code>fastcgi_pass unix:/run/php/…</code></td>
+<td>El intérprete PHP ejecuta el script</td>
+</tr>
+</tbody>
+</table>
+<p>Gracias a esas interfaces estándar puedes cambiar de servidor sin tocar la aplicación: un servlet funciona igual en Tomcat que en Jetty, y una aplicación Flask igual con Gunicorn que con uWSGI.</p>
+<h3 id="donde-escucha-0000-127001-o-un-socket">Dónde escucha: <code>0.0.0.0</code>, <code>127.0.0.1</code> o un socket<a class="headerlink" href="#donde-escucha-0000-127001-o-un-socket" title="Permanent link">&para;</a></h3>
+<p>Un servicio que escucha en un puerto lo hace en una dirección concreta de la máquina:</p>
+<table>
+<thead>
+<tr>
+<th>Escucha en</th>
+<th>Quién puede conectarse</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0.0.0.0:3000</code> (o <code>*:3000</code>)</td>
+<td>Cualquiera que llegue a la máquina, por cualquier interfaz</td>
+<td>Solo para probar desde tu ordenador</td>
+</tr>
+<tr>
+<td><code>127.0.0.1:3000</code></td>
+<td>Solo programas de la propia máquina</td>
+<td>Aplicación detrás de un proxy en la misma máquina</td>
+</tr>
+<tr>
+<td><code>/run/flask/flask.sock</code></td>
+<td>Procesos de la máquina con permiso sobre el fichero</td>
+<td>Igual, sin pasar por TCP</td>
+</tr>
+</tbody>
+</table>
+<p>Un <strong>socket Unix</strong> es un fichero especial por el que dos procesos de la misma máquina se comunican. Es algo más rápido que TCP y se protege con permisos de ficheros normales. Para Nginx da igual: le hablas HTTP en los dos casos.</p>
+<p>Al final del tema, esto es lo que escucha en tu máquina (<code>sudo ss -tlnxp</code>, recortado):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>u_str LISTEN 0  2048  /run/flask/flask.sock   users:(("gunicorn",pid=15698,fd=3),("gunicorn",pid=15697,fd=3),("gunicorn",pid=15694,fd=3))
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>tcp   LISTEN 0  511   127.0.0.1:3000          users:(("node",pid=14867,fd=21))
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>tcp   LISTEN 0  511   0.0.0.0:443             users:(("nginx",pid=15479,fd=7),…)
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>tcp   LISTEN 0  511   0.0.0.0:80              users:(("nginx",pid=15479,fd=5),…)
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>tcp   LISTEN 0  128   0.0.0.0:22              users:(("sshd",pid=709,fd=6))
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>tcp   LISTEN 0  100   [::ffff:127.0.0.1]:8080 users:(("java",pid=3445,fd=39))
+</code></pre></div>
+<p>Hacia fuera solo están abiertos Nginx (80 y 443) y SSH (22), que es por donde administras la máquina. Las tres aplicaciones son solo locales. Tomcat aparece como <code>[::ffff:127.0.0.1]</code> porque Java escucha en IPv6 con una dirección que representa la <code>127.0.0.1</code> de IPv4: sigue siendo solo local.</p>
+<div class="admonition info">
+<p class="admonition-title">Puertos por encima de 1024</p>
+<p>En Linux, solo <code>root</code> puede abrir los puertos por debajo de 1024. Por eso los servidores de aplicaciones usan 8080, 3000 u 8000: así se ejecutan con un usuario sin privilegios, y el único que necesita el 80 y el 443 es Nginx.</p>
+</div>
+<h2 id="3-que-es-desplegar">3. Qué es desplegar<a class="headerlink" href="#3-que-es-desplegar" title="Permanent link">&para;</a></h2>
+<p><strong>Desplegar</strong> es llevar una versión concreta de una aplicación desde el entorno donde se desarrolla hasta el servidor donde la usan, y dejarla <strong>funcionando y comprobada</strong>. No es "copiar ficheros": incluye preparar el entorno, instalar dependencias, configurar y arrancar.</p>
+<h3 id="artefacto-y-entornos">Artefacto y entornos<a class="headerlink" href="#artefacto-y-entornos" title="Permanent link">&para;</a></h3>
+<p>Lo que se lleva al servidor se llama <strong>artefacto</strong>, y depende de la tecnología:</p>
+<table>
+<thead>
+<tr>
+<th>Tecnología</th>
+<th>Se construye con</th>
+<th>Artefacto</th>
+<th>Dependencias</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Java</td>
+<td>Maven (<code>mvn package</code>)</td>
+<td>Un fichero <code>.war</code> (o un <code>.jar</code> ejecutable)</td>
+<td>Ya van dentro del artefacto</td>
+</tr>
+<tr>
+<td>Node.js</td>
+<td>No se compila</td>
+<td>El código + <code>package.json</code> + <code>package-lock.json</code></td>
+<td>Se instalan en el servidor con <code>npm ci</code></td>
+</tr>
+<tr>
+<td>Python</td>
+<td>No se compila</td>
+<td>El código + <code>requirements.txt</code></td>
+<td>Se instalan en el servidor con <code>pip</code>, en un entorno virtual</td>
+</tr>
+</tbody>
+</table>
+<p>Una aplicación pasa normalmente por varios <strong>entornos</strong> antes de llegar a los usuarios: <strong>desarrollo</strong> (el portátil de quien programa), <strong>pruebas</strong> o <strong>preproducción</strong> (una copia del servidor real) y <strong>producción</strong> (el servidor de verdad). En desarrollo se usan servidores cómodos que se recargan solos y muestran errores detallados; en producción, servidores robustos que no enseñan nada interno. Lo verás en las tres prácticas: <code>nodemon</code> frente a <code>node</code>, el servidor de pruebas de Flask frente a Gunicorn.</p>
+<h3 id="los-pasos-de-un-despliegue">Los pasos de un despliegue<a class="headerlink" href="#los-pasos-de-un-despliegue" title="Permanent link">&para;</a></h3>
+<p>Las tres prácticas siguen <strong>el mismo guion</strong>, con herramientas distintas:</p>
+<table>
+<thead>
+<tr>
+<th>Paso</th>
+<th>Java (P3.1)</th>
+<th>Node.js (P3.2)</th>
+<th>Python (P3.3)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Entorno de ejecución</td>
+<td><code>apt install default-jdk-headless maven tomcat10</code></td>
+<td><code>apt install nodejs npm</code></td>
+<td><code>apt install python3-venv</code></td>
+</tr>
+<tr>
+<td>2. Código</td>
+<td>Proyecto Maven</td>
+<td><code>package.json</code> + <code>app.js</code></td>
+<td><code>requirements.txt</code> + <code>app.py</code></td>
+</tr>
+<tr>
+<td>3. Dependencias</td>
+<td>Maven, al construir</td>
+<td><code>npm ci --omit=dev</code></td>
+<td><code>pip install -r requirements.txt</code></td>
+</tr>
+<tr>
+<td>4. Artefacto</td>
+<td><code>mvn package</code> → <code>saludo.war</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>5. Servicio</td>
+<td>Lo trae el paquete: <code>tomcat10</code></td>
+<td>Lo escribes tú: <code>node-app.service</code></td>
+<td>Lo escribes tú: <code>flask-app.service</code></td>
+</tr>
+<tr>
+<td>6. Publicar</td>
+<td>Nginx → <code>127.0.0.1:8080</code></td>
+<td>Nginx → <code>127.0.0.1:3000</code></td>
+<td>Nginx → socket Unix</td>
+</tr>
+<tr>
+<td>7. Comprobar</td>
+<td><code>curl</code>, <code>journalctl</code>, registros de Nginx</td>
+<td>Igual</td>
+<td>Igual</td>
+</tr>
+</tbody>
+</table>
+<p>Si entiendes el guion, desplegar en una tecnología nueva es buscar qué herramienta hace cada paso.</p>
+<h3 id="que-la-aplicacion-siga-viva-servicios-con-systemd">Que la aplicación siga viva: servicios con <code>systemd</code><a class="headerlink" href="#que-la-aplicacion-siga-viva-servicios-con-systemd" title="Permanent link">&para;</a></h3>
+<p>Si arrancas una aplicación desde tu sesión SSH (<code>node app.js</code>), muere al cerrar la terminal, no arranca sola al reiniciar la máquina y, si falla, nadie la levanta. Para eso está <strong><code>systemd</code></strong>, el gestor de servicios de Debian, el mismo que arranca SSH y Nginx. Un servicio se describe en un fichero de <strong>unidad</strong> en <code>/etc/systemd/system/</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">[Unit]</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="na">Description</span><span class="o">=</span><span class="s">Aplicación Node.js de node.garcia.test</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="na">After</span><span class="o">=</span><span class="s">network.target</span><span class="w">                       </span><span class="c1"># (1)!</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">[Service]</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="na">User</span><span class="o">=</span><span class="s">www-data</span><span class="w">                              </span><span class="c1"># (2)!</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="na">Group</span><span class="o">=</span><span class="s">www-data</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="na">WorkingDirectory</span><span class="o">=</span><span class="s">/var/www/node.garcia.test</span><span class="w"> </span><span class="c1"># (3)!</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="na">Environment</span><span class="o">=</span><span class="s">NODE_ENV=production</span><span class="w">            </span><span class="c1"># (4)!</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="na">ExecStart</span><span class="o">=</span><span class="s">/usr/bin/node app.js</span><span class="w">             </span><span class="c1"># (5)!</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="na">Restart</span><span class="o">=</span><span class="s">on-failure</span><span class="w">                         </span><span class="c1"># (6)!</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="k">[Install]</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span><span class="w">                 </span><span class="c1"># (7)!</span>
+</code></pre></div>
+<ol>
+<li>Arranca después de que la red esté lista.</li>
+<li>Con qué usuario se ejecuta. Nunca <code>root</code>: si alguien explota un fallo de la aplicación, tendrá los permisos de este usuario.</li>
+<li>Desde qué carpeta (la que contiene la aplicación).</li>
+<li>Variables de entorno que recibe la aplicación.</li>
+<li>El comando que arranca la aplicación, con <strong>ruta absoluta</strong>.</li>
+<li>Si el proceso muere por un error, <code>systemd</code> lo vuelve a arrancar.</li>
+<li>Qué hace <code>enable</code>: arrancarlo en el arranque normal del sistema.</li>
+</ol>
+<p>Los comandos son siempre los mismos:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload<span class="w">              </span><span class="c1"># tras crear o editar un fichero de unidad</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>node-app<span class="w">      </span><span class="c1"># arrancar ahora y en cada arranque</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>node-app<span class="w">            </span><span class="c1"># estado y últimas líneas del registro</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>node-app<span class="w">           </span><span class="c1"># tras desplegar una versión nueva</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w"> </span>node-app<span class="w"> </span>-n<span class="w"> </span><span class="m">20</span><span class="w">         </span><span class="c1"># registro del servicio</span>
+</code></pre></div>
+<p>Lo que imprime la aplicación (<code>console.log</code> en Node, <code>print</code> en Python, el registro de Tomcat) va al <strong>diario</strong> de <code>systemd</code>, y se lee con <code>journalctl</code>. Tu usuario no puede leer el diario del sistema: por eso <code>journalctl</code> lleva <code>sudo</code>, y <code>systemctl status</code> también si quieres ver las líneas del registro (sin <code>sudo</code> solo enseña el estado). Así se ve un servicio sano (<code>sudo systemctl status</code>, recortado):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>● node-app.service - Aplicación Node.js de node.garcia.test
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>     Loaded: loaded (/etc/systemd/system/node-app.service; enabled; preset: enabled)
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>     Active: active (running) since Sun 2026-11-15 18:44:20 CET; 2s ago
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>   Main PID: 14728 (node)
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>     Memory: 20.9M (peak: 21.3M)
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>Nov 15 18:44:20 debian-garcia systemd[1]: Started node-app.service - Aplicación Node.js de node.garcia.test.
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>Nov 15 18:44:20 debian-garcia node[14728]: Escuchando en http://127.0.0.1:3000
+</code></pre></div>
+<p><code>enabled</code> significa que arrancará con la máquina; <code>active (running)</code>, que está en marcha ahora. Son cosas distintas: un servicio puede estar en marcha pero no habilitado, y al revés.</p>
+<h3 id="buenas-practicas-de-despliegue">Buenas prácticas de despliegue<a class="headerlink" href="#buenas-practicas-de-despliegue" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>El código sale de Git</strong>, no de un pendrive ni de "la versión buena de mi portátil". Así sabes exactamente qué versión hay en producción.</li>
+<li><strong>No se edita en producción.</strong> Un cambio hecho a mano en el servidor se pierde en el siguiente despliegue y nadie sabe que existió.</li>
+<li><strong>Poder volver atrás.</strong> Guarda la versión anterior del artefacto antes de sustituirla. Si la nueva falla, restaurar debe ser un paso, no una tarde.</li>
+<li><strong>Comprueba después de desplegar</strong>: una petición real y un vistazo al registro. "El comando no ha dado error" no significa que la aplicación funcione.</li>
+<li><strong>Los secretos, fuera del código.</strong> Contraseñas y claves van en variables de entorno o ficheros de configuración del servidor, nunca en el repositorio.</li>
+<li><strong>Despliega cuando haya poco uso y alguien pueda arreglarlo.</strong> Un viernes por la tarde no es buen momento.</li>
+</ul>
+<hr />
+<h2 id="cierre-del-bloque-1">Cierre del bloque 1<a class="headerlink" href="#cierre-del-bloque-1" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 1</p>
+<p>¿Por qué una aplicación en producción escucha en <code>127.0.0.1</code> y no en <code>0.0.0.0</code>? ¿Quién recibe entonces las peticiones de los usuarios?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 2</p>
+<p>Explica la diferencia entre <code>systemctl enable</code> y <code>systemctl start</code>. ¿Qué pasaría al reiniciar la máquina si solo hicieras <code>start</code>?</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Ahora toca: actividad en clase (sin entrega)</p>
+<p>En tu máquina principal, tal como quedó tras el Tema 2:</p>
+<ol>
+<li><code>sudo ss -tlnp</code>. ¿Qué programas escuchan, en qué puertos y en qué direcciones? ¿Cuáles aceptan conexiones de fuera?</li>
+<li><code>systemctl cat nginx</code>. Localiza <code>ExecStart</code>. ¿Por qué Nginx no necesita <code>User=</code>? (Pista: busca la directiva <code>user</code> en <code>/etc/nginx/nginx.conf</code> y mira con qué usuario corren sus procesos con <code>ps -o user,cmd -C nginx</code>).</li>
+<li><code>sudo journalctl -u nginx -n 5</code> y <code>systemctl is-enabled ssh</code>.</li>
+</ol>
+</div>
+<hr />
+<h2 id="4-aplicaciones-java-servlets-maven-y-tomcat">4. Aplicaciones Java: servlets, Maven y Tomcat<a class="headerlink" href="#4-aplicaciones-java-servlets-maven-y-tomcat" title="Permanent link">&para;</a></h2>
+<h3 id="servlets-y-contenedores">Servlets y contenedores<a class="headerlink" href="#servlets-y-contenedores" title="Permanent link">&para;</a></h3>
+<p>Java se compila a <strong>bytecode</strong> (ficheros <code>.class</code>), que ejecuta la máquina virtual de Java (<strong>JVM</strong>). Una aplicación web Java clásica está formada por <strong>servlets</strong>: clases que atienden peticiones HTTP. Un servlet no abre ningún puerto; lo hace el <strong>contenedor de servlets</strong>, que recibe la petición, decide qué servlet la atiende según la URL, lo ejecuta en uno de sus hilos y devuelve la respuesta.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nd">@WebServlet</span><span class="p">(</span><span class="s">"/api/saludo"</span><span class="p">)</span><span class="w">                      </span><span class="c1">// URL que atiende</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SaludoServlet</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">HttpServlet</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nd">@Override</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">doGet</span><span class="p">(</span><span class="n">HttpServletRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">HttpServletResponse</span><span class="w"> </span><span class="n">resp</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">        </span><span class="n">resp</span><span class="p">.</span><span class="na">setContentType</span><span class="p">(</span><span class="s">"application/json;charset=UTF-8"</span><span class="p">);</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="n">resp</span><span class="p">.</span><span class="na">getWriter</span><span class="p">().</span><span class="na">println</span><span class="p">(</span><span class="s">"{\"mensaje\": \"Hola\"}"</span><span class="p">);</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>doGet</code> atiende el método <code>GET</code>; habría un <code>doPost</code> para <code>POST</code>, etc. Todo lo demás (puerto, hilos, cabeceras) es cosa del contenedor.</p>
+<p>El estándar se llama <strong>Jakarta EE</strong> (antes Java EE) y tiene dos niveles de servidor:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Contenedor de servlets</th>
+<th>Servidor Jakarta EE completo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ejemplos</td>
+<td><strong>Tomcat</strong>, Jetty</td>
+<td>WildFly (antes JBoss), GlassFish, Payara</td>
+</tr>
+<tr>
+<td>Qué incluye</td>
+<td>Servlets, JSP, WebSocket</td>
+<td>Además: transacciones, persistencia (JPA), mensajería, servicios REST…</td>
+</tr>
+<tr>
+<td>Consumo</td>
+<td>Ligero</td>
+<td>Más pesado</td>
+</tr>
+<tr>
+<td>Cuándo</td>
+<td>Aplicaciones web y API sencillas; base de Spring Boot</td>
+<td>Aplicaciones empresariales que usan esos servicios</td>
+</tr>
+</tbody>
+</table>
+<p>Tomcat es, con diferencia, el más usado, y es el que trae Debian en sus repositorios.</p>
+<div class="admonition warning">
+<p class="admonition-title"><code>javax</code> o <code>jakarta</code>: el error del tutorial antiguo</p>
+<p>En 2017, Oracle cedió Java EE a la Fundación Eclipse, que lo rebautizó como Jakarta EE, y desde Jakarta EE 9 (2020) los paquetes se llaman <code>jakarta.servlet…</code> en lugar de <code>javax.servlet…</code>. <strong>Tomcat 10 y posteriores solo entienden <code>jakarta</code></strong>. Un servlet de un tutorial antiguo con <code>import javax.servlet…</code> compila contra la librería antigua, se despliega sin un solo error en el registro… y su URL devuelve <code>404</code>, porque Tomcat no lo reconoce como servlet. Los ficheros estáticos del mismo WAR sí se sirven, lo que despista todavía más. Si copias código de Internet, mira los <code>import</code>.</p>
+</div>
+<h3 id="la-aplicacion-empaquetada-war">La aplicación empaquetada: WAR<a class="headerlink" href="#la-aplicacion-empaquetada-war" title="Permanent link">&para;</a></h3>
+<p>Una aplicación web Java se distribuye en un fichero <strong>WAR</strong> (<em>Web Application Archive</em>): un ZIP con una estructura fija. Estos son los ficheros del de la práctica 3.1 (<code>jar tf saludo.war</code>, sin las carpetas):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>META-INF/MANIFEST.MF
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>WEB-INF/classes/es/sjo/daw/SaludoServlet.class      ← el código compilado
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>index.html                                          ← estáticos, en la raíz
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>META-INF/maven/es.sjo.daw/saludo/pom.xml
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>META-INF/maven/es.sjo.daw/saludo/pom.properties
+</code></pre></div>
+<ul>
+<li>Lo que está en la raíz se sirve tal cual: <code>index.html</code>, CSS, imágenes.</li>
+<li><code>WEB-INF/</code> <strong>nunca</strong> se sirve al navegador. Contiene <code>classes/</code> (tu código compilado), <code>lib/</code> (las librerías que necesite) y, opcionalmente, <code>web.xml</code> (configuración; con anotaciones como <code>@WebServlet</code> ya no hace falta).</li>
+</ul>
+<p>En el servidor, cada WAR es un <strong>contexto</strong>: una aplicación independiente con su propia URL. El nombre del fichero decide la ruta: <code>saludo.war</code> se publica en <code>/saludo/</code>, y <code>ROOT.war</code> (o la carpeta <code>ROOT/</code>) en <code>/</code>.</p>
+<h3 id="maven">Maven<a class="headerlink" href="#maven" title="Permanent link">&para;</a></h3>
+<p>Construir un WAR a mano (compilar con las librerías correctas, colocar cada fichero en su sitio, comprimir) es tedioso y fácil de hacer mal. <strong>Maven</strong> lo automatiza a partir de un fichero que describe el proyecto, el <strong><code>pom.xml</code></strong> (<em>Project Object Model</em>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">&lt;groupId&gt;</span>es.sjo.daw<span class="nt">&lt;/groupId&gt;</span><span class="w">              </span><span class="cm">&lt;!-- quién: normalmente un dominio al revés --&gt;</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">&lt;artifactId&gt;</span>saludo<span class="nt">&lt;/artifactId&gt;</span><span class="w">            </span><span class="cm">&lt;!-- qué: el nombre del proyecto --&gt;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nt">&lt;version&gt;</span>1.0<span class="nt">&lt;/version&gt;</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nt">&lt;packaging&gt;</span>war<span class="nt">&lt;/packaging&gt;</span><span class="w">                 </span><span class="cm">&lt;!-- qué artefacto generar --&gt;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="nt">&lt;dependency&gt;</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="nt">&lt;groupId&gt;</span>jakarta.servlet<span class="nt">&lt;/groupId&gt;</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="nt">&lt;artifactId&gt;</span>jakarta.servlet-api<span class="nt">&lt;/artifactId&gt;</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="nt">&lt;version&gt;</span>6.0.0<span class="nt">&lt;/version&gt;</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="nt">&lt;scope&gt;</span>provided<span class="nt">&lt;/scope&gt;</span><span class="w">                  </span><span class="cm">&lt;!-- la pone Tomcat: no se mete en el WAR --&gt;</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="nt">&lt;/dependency&gt;</span>
+</code></pre></div>
+<p>Maven aporta tres cosas:</p>
+<ul>
+<li><strong>Una estructura fija.</strong> El código va en <code>src/main/java</code>, los ficheros web en <code>src/main/webapp</code> y el resultado aparece en <code>target/</code>. Cualquiera que conozca Maven entiende cualquier proyecto.</li>
+<li><strong>Dependencias automáticas.</strong> Declaras qué librerías necesitas y Maven las descarga de <strong>Maven Central</strong> y las guarda en <code>~/.m2/repository</code>. La primera construcción descarga mucho; las siguientes, nada.</li>
+<li><strong>Un ciclo de vida.</strong> Fases en orden: <code>validate</code> → <code>compile</code> → <code>test</code> → <code>package</code> → <code>verify</code> → <code>install</code> → <code>deploy</code>. Pedir una fase ejecuta todas las anteriores: <code>mvn package</code> valida, compila, pasa las pruebas y empaqueta.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title"><code>package</code> no es <code>install</code>, y <code>deploy</code> no es desplegar</p>
+<p><code>mvn package</code> deja el artefacto en <code>target/</code>: es lo que necesitas. <code>mvn install</code> además lo copia a tu repositorio local <code>~/.m2</code> para que lo usen <strong>otros proyectos</strong> como dependencia. Y <code>mvn deploy</code> lo sube a un repositorio de artefactos de la empresa; <strong>no</strong> lo instala en ningún servidor de aplicaciones.</p>
+</div>
+<h3 id="tomcat-en-debian">Tomcat en Debian<a class="headerlink" href="#tomcat-en-debian" title="Permanent link">&para;</a></h3>
+<p>El paquete <code>tomcat10</code> de Debian 13 deja Tomcat 10.1 instalado como servicio, ejecutándose con el usuario <code>tomcat</code> y escuchando en el puerto 8080. Reparte sus ficheros así:</p>
+<table>
+<thead>
+<tr>
+<th>Qué</th>
+<th>Dónde</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Programa (<code>CATALINA_HOME</code>)</td>
+<td><code>/usr/share/tomcat10</code></td>
+</tr>
+<tr>
+<td>Instancia (<code>CATALINA_BASE</code>)</td>
+<td><code>/var/lib/tomcat10</code></td>
+</tr>
+<tr>
+<td>Aplicaciones desplegadas</td>
+<td><code>/var/lib/tomcat10/webapps</code></td>
+</tr>
+<tr>
+<td>Configuración (<code>server.xml</code>, usuarios…)</td>
+<td><code>/etc/tomcat10</code></td>
+</tr>
+<tr>
+<td>Registros</td>
+<td><code>journalctl -u tomcat10</code> y <code>/var/log/tomcat10/</code></td>
+</tr>
+</tbody>
+</table>
+<p>Desplegar es <strong>copiar el WAR a <code>webapps/</code></strong>: Tomcat vigila esa carpeta, descomprime el WAR y lo publica en unos segundos. Si sustituyes el fichero por una versión nueva, retira la antigua y despliega la nueva sin reiniciar. Lo verás en el diario:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Nov 15 16:48:13 debian-garcia tomcat10[3445]: Undeploying context [/saludo]
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Nov 15 16:48:13 debian-garcia tomcat10[3445]: Deploying web application archive [/var/lib/tomcat10/webapps/saludo.war]
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Nov 15 16:48:15 debian-garcia tomcat10[3445]: Deployment of web application archive [/var/lib/tomcat10/webapps/saludo.war] has finished in [1,268] ms
+</code></pre></div>
+<h3 id="el-modelo-moderno-spring-boot">El modelo moderno: Spring Boot<a class="headerlink" href="#el-modelo-moderno-spring-boot" title="Permanent link">&para;</a></h3>
+<p>Hoy muchos proyectos Java usan <strong>Spring Boot</strong>, que da la vuelta al modelo: en lugar de instalar un Tomcat y desplegar WAR dentro, cada aplicación <strong>lleva su Tomcat embebido</strong> en un único <code>.jar</code> ejecutable que se arranca con <code>java -jar app.jar</code>. Es el mismo modelo de Node.js y de Gunicorn: un servicio de <code>systemd</code> por aplicación y un Nginx delante. El modelo del WAR sigue muy presente en empresas con un servidor que aloja muchas aplicaciones, y es el que entenderás primero.</p>
+<hr />
+<h2 id="cierre-del-bloque-2">Cierre del bloque 2<a class="headerlink" href="#cierre-del-bloque-2" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 3</p>
+<p>Un compañero copia un servlet de un tutorial de 2017, lo empaqueta y lo despliega en tu Tomcat 10. El despliegue no da errores, pero su URL devuelve <code>404</code>. ¿Qué es lo primero que miras en su código, y por qué?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 4</p>
+<p>¿Por qué la dependencia <code>jakarta.servlet-api</code> lleva <code>&lt;scope&gt;provided&lt;/scope&gt;</code>? ¿Qué pasaría si se metiera dentro del WAR?</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Ahora toca: Práctica 3.1 - Aplicación Java en Tomcat</p>
+<p><strong><a href="../T3-practica-tomcat/">Ir a la práctica 3.1</a>.</strong> Construirás un WAR con Maven, lo desplegarás en Tomcat, lo publicarás en <code>java.tuapellido.test</code> a través de Nginx y harás que Tomcat solo acepte conexiones locales. Usa los apartados 2, 3 y 4.</p>
+</div>
+<hr />
+<h2 id="5-nodejs-y-express">5. Node.js y Express<a class="headerlink" href="#5-nodejs-y-express" title="Permanent link">&para;</a></h2>
+<h3 id="nodejs">Node.js<a class="headerlink" href="#nodejs" title="Permanent link">&para;</a></h3>
+<p><strong>Node.js</strong> es un entorno de ejecución de JavaScript fuera del navegador, construido sobre V8, el motor de JavaScript de Chrome. No es un lenguaje ni un framework: es el programa que ejecuta tu JavaScript en el servidor.</p>
+<p>Su diferencia con Java es de fondo. Tomcat atiende cada petición en <strong>un hilo</strong> de un grupo de hilos. Node ejecuta tu código en <strong>un solo hilo</strong> con un <strong>bucle de eventos</strong>: cuando una petición tiene que esperar (leer un fichero, consultar una base de datos), Node no se queda parado, sino que atiende otras y vuelve cuando llegan los datos. Funciona muy bien con muchas conexiones que esperan mucho y calculan poco. La contrapartida: un cálculo largo bloquea <strong>todas</strong> las peticiones, y un proceso de Node usa un solo núcleo. Para aprovechar varios núcleos se arrancan varias copias y se balancean, como en la práctica 2.5.</p>
+<p>Otra diferencia: en Node <strong>la aplicación es el servidor</strong>. No hay un Tomcat donde desplegarla; tu propio código abre el puerto.</p>
+<h3 id="express">Express<a class="headerlink" href="#express" title="Permanent link">&para;</a></h3>
+<p>Node trae el módulo <code>http</code>, suficiente para responder peticiones, pero obliga a analizar a mano cada URL y cada cabecera. <strong>Express</strong> es el framework mínimo más usado para eso: asocia rutas a funciones y encadena funciones intermedias (<em>middleware</em>).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">express</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">'express'</span><span class="p">);</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">express</span><span class="p">();</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'/api/hora'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">           </span><span class="c1">// método GET, ruta /api/hora</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">({</span><span class="w"> </span><span class="nx">hora</span><span class="o">:</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Date</span><span class="p">().</span><span class="nx">toLocaleTimeString</span><span class="p">(</span><span class="s1">'es-ES'</span><span class="p">)</span><span class="w"> </span><span class="p">});</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">});</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nx">app</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mf">3000</span><span class="p">,</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">       </span><span class="c1">// el puerto lo abre tu código</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="nx">err</span><span class="p">;</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="p">});</span>
+</code></pre></div>
+<h3 id="npm-y-packagejson">npm y <code>package.json</code><a class="headerlink" href="#npm-y-packagejson" title="Permanent link">&para;</a></h3>
+<p><strong>npm</strong> es el gestor de paquetes de Node: descarga librerías del registro público <code>npmjs.com</code>. Cada proyecto se describe en <strong><code>package.json</code></strong>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"node.garcia.test"</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">"version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0.0"</span><span class="p">,</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nt">"main"</span><span class="p">:</span><span class="w"> </span><span class="s2">"app.js"</span><span class="p">,</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nt">"scripts"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="nt">"start"</span><span class="p">:</span><span class="w"> </span><span class="s2">"node app.js"</span><span class="p">,</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="nt">"dev"</span><span class="p">:</span><span class="w"> </span><span class="s2">"nodemon app.js"</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">  </span><span class="nt">"dependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">    </span><span class="nt">"express"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^5.3.0"</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">  </span><span class="nt">"devDependencies"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">    </span><span class="nt">"nodemon"</span><span class="p">:</span><span class="w"> </span><span class="s2">"^3.1.14"</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="p">}</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Campo o fichero</th>
+<th>Para qué sirve</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dependencies</code></td>
+<td>Lo que la aplicación necesita para <strong>funcionar</strong> (Express)</td>
+</tr>
+<tr>
+<td><code>devDependencies</code></td>
+<td>Lo que solo se necesita para <strong>desarrollar</strong> (nodemon, que reinicia la aplicación al guardar)</td>
+</tr>
+<tr>
+<td><code>^5.3.0</code></td>
+<td>Cualquier versión <code>5.x.y</code> igual o superior: admite mejoras, no cambios incompatibles</td>
+</tr>
+<tr>
+<td><code>package-lock.json</code></td>
+<td>Las versiones <strong>exactas</strong> que se instalaron, de todas las librerías y de sus dependencias. Va al repositorio</td>
+</tr>
+<tr>
+<td><code>node_modules/</code></td>
+<td>Las librerías descargadas. <strong>No</strong> va al repositorio: se regenera</td>
+</tr>
+</tbody>
+</table>
+<p>Dos comandos que parecen iguales:</p>
+<ul>
+<li><code>npm install</code>: instala lo que diga <code>package.json</code> y <strong>actualiza</strong> <code>package-lock.json</code> si hace falta. Para desarrollar.</li>
+<li><code>npm ci</code>: borra <code>node_modules</code> e instala <strong>exactamente</strong> lo que dice <code>package-lock.json</code>, sin tocarlo. Para desplegar: el servidor tendrá las mismas versiones que probaste. Con <code>--omit=dev</code> no instala las de desarrollo.</li>
+</ul>
+<h3 id="scripts-de-npm">Scripts de npm<a class="headerlink" href="#scripts-de-npm" title="Permanent link">&para;</a></h3>
+<p><code>npm start</code> y <code>npm run dev</code> ejecutan el comando que diga <code>scripts</code>. Al ejecutarlo, npm añade <code>node_modules/.bin</code> al <code>PATH</code>, y ahí están los ejecutables de las librerías instaladas. Por eso <code>"dev": "nodemon app.js"</code> funciona sin instalar nodemon en el sistema… siempre que esté en <code>node_modules</code>. Si no lo está:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>&gt; node.garcia.test@1.0.0 dev
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>&gt; nodemon app.js
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>sh: 1: nodemon: not found
+</code></pre></div>
+<p>La solución no es instalarlo para todo el sistema, sino instalar las dependencias del proyecto (<code>npm install</code>).</p>
+<h3 id="variables-de-entorno">Variables de entorno<a class="headerlink" href="#variables-de-entorno" title="Permanent link">&para;</a></h3>
+<p>La misma aplicación debe funcionar en tu portátil y en producción sin tocar el código. Lo que cambia entre entornos (puerto, contraseña de la base de datos, modo) se le pasa en <strong>variables de entorno</strong>, que en Node se leen con <code>process.env</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">PORT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">env</span><span class="p">.</span><span class="nx">PORT</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="mf">3000</span><span class="p">;</span>
+</code></pre></div>
+<p><code>NODE_ENV=production</code> es una convención: Express y muchas librerías la leen para desactivar mensajes de depuración y activar cachés. En el servicio de <code>systemd</code> se ponen con <code>Environment=</code>.</p>
+<hr />
+<h2 id="cierre-del-bloque-3">Cierre del bloque 3<a class="headerlink" href="#cierre-del-bloque-3" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 5</p>
+<p>¿Qué diferencia hay entre <code>dependencies</code> y <code>devDependencies</code>? ¿Por qué en el servidor se usa <code>npm ci --omit=dev</code> y no <code>npm install</code>?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 6</p>
+<p>Node atiende todas las peticiones en un solo hilo. ¿Por qué aun así aguanta muchas conexiones a la vez? ¿Qué tipo de código lo bloquearía?</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Ahora toca: Práctica 3.2 - Aplicación Node.js con Express</p>
+<p><strong><a href="../T3-practica-node/">Ir a la práctica 3.2</a>.</strong> Crearás una aplicación con Express, la convertirás en un servicio de <code>systemd</code> con el usuario <code>www-data</code> y la publicarás en <code>node.tuapellido.test</code>. Usa los apartados 3 y 5.</p>
+</div>
+<hr />
+<h2 id="6-python-flask-wsgi-y-gunicorn">6. Python: Flask, WSGI y Gunicorn<a class="headerlink" href="#6-python-flask-wsgi-y-gunicorn" title="Permanent link">&para;</a></h2>
+<h3 id="flask">Flask<a class="headerlink" href="#flask" title="Permanent link">&para;</a></h3>
+<p><strong>Flask</strong> es un <em>microframework</em> de Python: rutas, plantillas y poco más. Si necesitas base de datos, formularios o autenticación, añades librerías. En el otro extremo está <strong>Django</strong>, que lo trae todo.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">"/api/hora"</span><span class="p">)</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="k">def</span><span class="w"> </span><span class="nf">hora</span><span class="p">():</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">hora</span><span class="o">=</span><span class="s2">"12:00:00"</span><span class="p">)</span>
+</code></pre></div>
+<p>Flask incluye un servidor para desarrollar, y él mismo avisa de que no es para producción:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a> * Serving Flask app 'app'
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a> * Debug mode: off
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a> * Running on all addresses (0.0.0.0)
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a> * Running on http://127.0.0.1:5000
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a> * Running on http://10.0.2.15:5000
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>Press CTRL+C to quit
+</code></pre></div>
+<h3 id="wsgi-y-gunicorn">WSGI y Gunicorn<a class="headerlink" href="#wsgi-y-gunicorn" title="Permanent link">&para;</a></h3>
+<p><strong>WSGI</strong> (<em>Web Server Gateway Interface</em>, PEP 3333) es el estándar que dice cómo un servidor de Python llama a una aplicación: la aplicación es un objeto al que el servidor invoca en cada petición pasándole los datos de la petición, y que devuelve la respuesta. Un objeto <code>Flask</code> cumple ese estándar, así que cualquier servidor WSGI puede ejecutarlo. Es el equivalente Python de la API de servlets.</p>
+<p><strong>Gunicorn</strong> es el servidor WSGI más usado. Al arrancar con <code>gunicorn --workers 2 app:app</code> (el objeto <code>app</code> del fichero <code>app.py</code>) crea un proceso <strong>maestro</strong> que no atiende peticiones, sino que vigila a los <strong>trabajadores</strong> (<em>workers</em>). Así se ven con <code>ps -o user,pid,ppid,cmd -C gunicorn</code> (el primero es el maestro; los otros dos, sus hijos):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>USER         PID    PPID CMD
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>www-data   15694       1 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>www-data   15697   15694 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>www-data   15698   15694 /var/www/flask.garcia.test/.venv/bin/python3 /var/www/flask.garcia.test/.venv/bin/gunicorn --workers 2 --no-control-socket --bind unix:/run/flask/flask.sock app:app
+</code></pre></div>
+<p>Los trabajadores son <strong>procesos</strong>, no hilos. Con el tipo de trabajador por defecto (<code>sync</code>), cada uno atiende <strong>una petición cada vez</strong>: con dos trabajadores, como mucho dos peticiones simultáneas. Si un trabajador muere, el maestro arranca otro. La recomendación de partida de la documentación es <code>(2 × núcleos) + 1</code> trabajadores; en una máquina virtual pequeña, 2 bastan.</p>
+<div class="admonition info">
+<p class="admonition-title">El paralelo con Nginx</p>
+<p>Es el mismo esquema que viste en el Tema 2 con Nginx: un proceso maestro que gestiona y varios trabajadores que atienden. La diferencia es que un trabajador de Nginx atiende miles de conexiones a la vez y uno <code>sync</code> de Gunicorn, una sola.</p>
+</div>
+<h3 id="entornos-virtuales">Entornos virtuales<a class="headerlink" href="#entornos-virtuales" title="Permanent link">&para;</a></h3>
+<p>Cada aplicación Python necesita sus propias versiones de sus librerías, y no pueden mezclarse con las del sistema (Debian usa Python para sus propias herramientas). Por eso Debian 13 ni siquiera trae <code>pip</code> para el sistema (<code>pip: command not found</code>), y, aunque instales el paquete <code>python3-pip</code>, te impide usarlo para instalar librerías en todo el sistema:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>error: externally-managed-environment
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>× This environment is externally managed
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>╰─&gt; To install Python packages system-wide, try apt install
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>    python3-xyz, where xyz is the package you are trying to
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>    install.
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>    If you wish to install a non-Debian-packaged Python package,
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>    create a virtual environment using python3 -m venv path/to/venv.
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>    Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    sure you have python3-full installed.
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>    If you wish to install a non-Debian packaged Python application,
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>    it may be easiest to use pipx install xyz, which will manage a
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>    virtual environment for you. Make sure you have pipx installed.
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>    See /usr/share/doc/python3.13/README.venv for more information.
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a>
+<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a>note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
+<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>hint: See PEP 668 for the detailed specification.
+</code></pre></div>
+<p>La solución es un <strong>entorno virtual</strong>: una carpeta (por convención, <code>.venv</code>) con su propio <code>python</code>, su propio <code>pip</code> y sus propias librerías.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv<span class="w">             </span><span class="c1"># crearlo (paquete python3-venv)</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="nb">source</span><span class="w"> </span>.venv/bin/activate<span class="w">         </span><span class="c1"># activarlo: python y pip pasan a ser los de .venv</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt<span class="w">   </span><span class="c1"># instalar las dependencias dentro</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>deactivate<span class="w">                        </span><span class="c1"># salir</span>
+</code></pre></div>
+<p>Activar solo cambia el <code>PATH</code> de tu terminal. Un servicio no necesita activarlo: basta con llamar directamente a <code>/ruta/.venv/bin/gunicorn</code>.</p>
+<p>Las dependencias se declaran en <strong><code>requirements.txt</code></strong>, con versiones fijas para que producción tenga lo mismo que probaste (es el equivalente de <code>package-lock.json</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>Flask==3.1.3
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>gunicorn==26.2.0
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Otras herramientas</p>
+<p><code>pipenv</code>, <code>poetry</code> o <code>uv</code> hacen lo mismo (entorno virtual + fichero de dependencias con versiones exactas) con más comodidades. Por debajo, todas crean un entorno virtual como este.</p>
+</div>
+<h3 id="gunicorn-por-un-socket-unix">Gunicorn por un socket Unix<a class="headerlink" href="#gunicorn-por-un-socket-unix" title="Permanent link">&para;</a></h3>
+<p>En la práctica 3.3, Gunicorn no abrirá ningún puerto: escuchará en un socket Unix, <code>/run/flask/flask.sock</code>, y Nginx le hablará por ahí:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://unix:/run/flask/flask.sock</span><span class="p">;</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="kn">include</span><span class="w"> </span><span class="s">proxy_params</span><span class="p">;</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="p">}</span>
+</code></pre></div>
+<p><code>/run</code> se borra en cada arranque, así que la carpeta del socket la crea <code>systemd</code> al arrancar el servicio con <code>RuntimeDirectory=flask</code>, con el usuario del servicio como propietario. Si el servicio está parado, el socket no existe, y Nginx responde <code>502</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>[crit] 15478#15478: *71 connect() to unix:/run/flask/flask.sock failed (2: No such file or directory) while connecting to upstream, client: 192.168.56.1, server: flask.garcia.test, request: "GET /api/hora HTTP/1.1", upstream: "http://unix:/run/flask/flask.sock:/api/hora", host: "flask.garcia.test"
+</code></pre></div>
+<hr />
+<h2 id="cierre-del-bloque-4">Cierre del bloque 4<a class="headerlink" href="#cierre-del-bloque-4" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 7</p>
+<p>¿Qué es WSGI y qué problema resuelve? ¿Cuál es su equivalente en Java?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 8</p>
+<p>Gunicorn arranca con <code>--workers 2</code> y el trabajador es <code>sync</code>. Llegan tres peticiones lentas a la vez. ¿Qué pasa con la tercera? ¿Qué harías para atender más?</p>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Ahora toca: Práctica 3.3 - Aplicación Flask con Gunicorn</p>
+<p><strong><a href="../T3-practica-flask/">Ir a la práctica 3.3</a>.</strong> Crearás un entorno virtual, instalarás Flask y Gunicorn, convertirás Gunicorn en un servicio que escucha en un socket Unix y lo publicarás en <code>flask.tuapellido.test</code>. Usa los apartados 2, 3 y 6.</p>
+</div>
+<hr />
+<details class="info">
+<summary>Para saber más: PHP-FPM, PaaS y lo que viene</summary>
+<p><strong>PHP-FPM.</strong> PHP sigue el mismo modelo con otro protocolo. PHP-FPM (<em>FastCGI Process Manager</em>) mantiene un grupo de procesos PHP ya arrancados, y Nginx le pasa cada petición a un fichero <code>.php</code> por <strong>FastCGI</strong> (<code>fastcgi_pass unix:/run/php/php8.4-fpm.sock;</code>) en vez de por HTTP. Es la <em>P</em> de LEMP. Con Apache existía además <code>mod_php</code>, que mete el intérprete dentro de los propios procesos de Apache.</p>
+<p><strong>Plataformas como servicio (PaaS).</strong> Servicios como Render, Railway, Heroku o Google App Engine hacen por ti los pasos 1, 3, 5 y 6 del guion: subes el código (normalmente conectando un repositorio de GitHub) y ellos instalan el entorno, las dependencias, lo arrancan y lo publican con HTTPS. Para sitios estáticos, Netlify, Vercel o GitHub Pages. Cómodo… y una caja negra si no sabes qué hace por dentro.</p>
+<p><strong>Serverless (FaaS).</strong> Un paso más: subes funciones sueltas (AWS Lambda, Cloud Functions) que se ejecutan solo cuando llega una petición y se cobran por uso. Sigue habiendo servidores; simplemente no los gestionas tú.</p>
+<p><strong>Contenedores (Tema 6).</strong> Empaquetar la aplicación <strong>con</strong> su entorno de ejecución en una imagen, para que el paso 1 del guion desaparezca: lo que funciona en tu máquina funciona igual en el servidor.</p>
+<p><strong>Integración y despliegue continuos (Tema 7).</strong> Automatizar el guion entero: cada vez que se sube código al repositorio, un sistema lo construye, lo prueba y, si todo va bien, lo despliega sin intervención manual.</p>
+</details>
+<h2 id="referencias">Referencias<a class="headerlink" href="#referencias" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://tomcat.apache.org/tomcat-10.1-doc/index.html">Apache Tomcat 10.1 — Documentación</a></li>
+<li><a href="https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html">Apache Maven — Introducción al ciclo de vida</a></li>
+<li><a href="https://jakarta.ee/specifications/servlet/6.0/">Jakarta EE — Jakarta Servlet 6.0</a></li>
+<li><a href="https://nodejs.org/es/learn/getting-started/introduction-to-nodejs">Node.js — Introducción</a></li>
+<li><a href="https://expressjs.com/es/guide/routing.html">Express — Guía de enrutamiento</a></li>
+<li><a href="https://docs.npmjs.com/cli/commands/npm-ci">npm — <code>npm ci</code></a></li>
+<li><a href="https://flask.palletsprojects.com/en/stable/deploying/">Flask — Despliegue en producción</a></li>
+<li><a href="https://docs.gunicorn.org/en/stable/design.html">Gunicorn — Diseño (maestro y trabajadores)</a></li>
+<li><a href="https://peps.python.org/pep-0668/">PEP 668 — Entornos gestionados externamente</a></li>
+<li><a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html"><code>systemd.service</code> — Manual</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href="../T2-practica-balanceo/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Práctica 2.5 - Balanceo de carga">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Práctica 2.5 - Balanceo de carga
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../T3-practica-tomcat/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Práctica 3.1 - Aplicación Java en Tomcat">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                Práctica 3.1 - Aplicación Java en Tomcat
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Dustin Randel de Lara García, Sant Josep Obrer. Material docente del módulo 0614. Contiene obras derivadas de terceros; ver la página de Créditos.
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.footer", "navigation.indexes", "toc.follow", "search.highlight", "search.suggest", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cómo funciona SSH</title>
+<!--
+NOTA PARA EL PROFESOR:
+- Animación paso a paso de una conexión SSH (Tema 1, apartado 6). Se incrusta con un iframe
+  desde T1-introduccion.md y también funciona abierta sola (pantalla completa para proyectar).
+- Sin dependencias externas. Se adapta al modo claro/oscuro de la web (lee el atributo
+  data-md-color-scheme de la página padre) y ajusta la altura del iframe sola.
+- Teclado: flechas ← → para avanzar y retroceder; R repite la animación del paso.
+- El enlace directo a un paso es ssh.html#paso-N.
+- Valores hexadecimales y huellas: son de ejemplo, generados al azar.
+-->
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1d1d22;
+  --muted: #5d5d68;
+  --card: #f6f5f7;
+  --card2: #ffffff;
+  --border: #dcd8de;
+  --accent: #60102f;
+  --accent-fg: #ffffff;
+  --track: #cfcad2;
+  --term-bg: #16161b;
+  --term-fg: #e6e6e6;
+  --priv: #b3261e;  --priv-bg: #fcebea;
+  --pub: #1559b5;   --pub-bg: #e7effb;
+  --secret: #6d2a97; --secret-bg: #f2e8f9;
+  --data: #55555f;  --data-bg: #efeff2;
+  --ok: #2b7a32;    --ok-bg: #e7f4e8;
+  --bad: #b3261e;   --bad-bg: #fff4f3;
+  --enc: #3b3b44;   --enc-bg: #e2e2e8;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1e2029;
+    --fg: #e8e8ee;
+    --muted: #a3a3b1;
+    --card: #262833;
+    --card2: #2c2f3b;
+    --border: #3b3e4c;
+    --accent: #ff7043;
+    --accent-fg: #1e2029;
+    --track: #4a4d5c;
+    --term-bg: #121218;
+    --term-fg: #e6e6e6;
+    --priv: #f28b82;  --priv-bg: #3a2426;
+    --pub: #8ab4f8;   --pub-bg: #1f2a3c;
+    --secret: #d7aefb; --secret-bg: #33263f;
+    --data: #c3c3cf;  --data-bg: #30323e;
+    --ok: #81c995;    --ok-bg: #1f3426;
+    --bad: #f28b82;   --bad-bg: #3a2426;
+    --enc: #c3c3cf;   --enc-bg: #3a3c49;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1e2029;
+  --fg: #e8e8ee;
+  --muted: #a3a3b1;
+  --card: #262833;
+  --card2: #2c2f3b;
+  --border: #3b3e4c;
+  --accent: #ff7043;
+  --accent-fg: #1e2029;
+  --track: #4a4d5c;
+  --term-bg: #121218;
+  --term-fg: #e6e6e6;
+  --priv: #f28b82;  --priv-bg: #3a2426;
+  --pub: #8ab4f8;   --pub-bg: #1f2a3c;
+  --secret: #d7aefb; --secret-bg: #33263f;
+  --data: #c3c3cf;  --data-bg: #30323e;
+  --ok: #81c995;    --ok-bg: #1f3426;
+  --bad: #f28b82;   --bad-bg: #3a2426;
+  --enc: #c3c3cf;   --enc-bg: #3a3c49;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 15px/1.55 Roboto, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+code, .mono { font-family: "Roboto Mono", ui-monospace, Consolas, monospace; font-size: .9em; }
+code { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 0 .3em; overflow-wrap: anywhere; }
+.app { max-width: 1100px; margin: 0 auto; padding: 16px; }
+
+/* Cabecera y fases */
+.top { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.titles { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+h1 { font-size: 1.35rem; margin: 0; }
+.full { color: var(--accent); font-size: .9rem; text-decoration: none; }
+.full:hover { text-decoration: underline; }
+.phases { display: flex; flex-wrap: wrap; gap: 6px; }
+.phases button {
+  font: inherit; font-size: .8rem; cursor: pointer;
+  border: 1px solid var(--border); background: var(--card); color: var(--muted);
+  border-radius: 999px; padding: 3px 11px;
+}
+.phases button.done { color: var(--fg); }
+.phases button.on { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 600; }
+
+/* Escenario */
+.stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-areas: "c lane s" "e e e";
+  gap: 12px;
+}
+.stage[hidden] { display: none; }
+.actor { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; min-width: 0; }
+.actor.c { grid-area: c; }
+.actor.s { grid-area: s; }
+.actor.e { grid-area: e; }
+.actor.e.attacker { border-color: var(--bad); background: var(--bad-bg); }
+.actor-h { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.actor-h svg { width: 26px; height: 26px; flex: none; color: var(--muted); }
+.actor.e.attacker .actor-h svg { color: var(--bad); }
+.actor-h b { display: block; font-size: .95rem; line-height: 1.2; }
+.actor-h small { display: block; color: var(--muted); font-size: .75rem; line-height: 1.2; }
+.mem { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.actor.e .mem { flex-direction: row; flex-wrap: wrap; }
+.mem .none { color: var(--muted); font-size: .8rem; font-style: italic; }
+.it {
+  border-left: 4px solid var(--data); background: var(--data-bg);
+  border-radius: 5px; padding: 3px 7px; font-size: .8rem; line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.it b { font-family: "Roboto Mono", ui-monospace, Consolas, monospace; font-weight: 600; font-size: .78rem; }
+.it small { display: block; color: var(--muted); font-size: .72rem; }
+.it.priv { border-color: var(--priv); background: var(--priv-bg); }
+.it.pub { border-color: var(--pub); background: var(--pub-bg); }
+.it.secret { border-color: var(--secret); background: var(--secret-bg); }
+.it.ok { border-color: var(--ok); background: var(--ok-bg); }
+.it.bad { border-color: var(--bad); background: var(--bad-bg); border-style: dashed; border-left-style: solid; }
+.it.enc { border-color: var(--enc); background: repeating-linear-gradient(45deg, var(--enc-bg) 0 6px, var(--card) 6px 12px); }
+.it.new { animation: pop .7s ease-out; box-shadow: 0 0 0 2px var(--accent); }
+@keyframes pop { from { transform: scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.lane { grid-area: lane; display: flex; flex-direction: column; gap: 8px; min-width: 0; padding-top: 6px; }
+.track { position: relative; height: 34px; }
+.track::before { content: ""; position: absolute; left: 0; right: 0; top: 16px; height: 2px; background: var(--track); }
+.node {
+  position: absolute; left: 50%; top: 4px; transform: translateX(-50%);
+  background: var(--bad); color: #fff; font-size: .7rem; font-weight: 700;
+  border-radius: 999px; padding: 3px 9px; white-space: nowrap;
+}
+.node[hidden] { display: none; }
+.dot {
+  position: absolute; top: 8px; left: 0; width: 26px; height: 18px; margin-left: -13px;
+  border-radius: 4px; background: var(--card2); border: 2px solid var(--fg);
+  opacity: 0; transition: left .9s ease-in-out, opacity .2s;
+}
+.dot::after { content: ""; position: absolute; left: 3px; right: 3px; top: 2px; height: 6px; border-bottom: 2px solid var(--fg); border-left: 2px solid transparent; }
+.dot.enc { background: repeating-linear-gradient(45deg, var(--fg) 0 3px, var(--card2) 3px 6px); }
+.dot.show { opacity: 1; }
+.msgs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.msg {
+  display: flex; gap: 6px; align-items: baseline;
+  font-size: .78rem; line-height: 1.3; padding: 3px 6px; border-radius: 5px;
+  border: 1px solid transparent; color: var(--muted);
+}
+.msg .dir { font-family: "Roboto Mono", ui-monospace, Consolas, monospace; font-size: .7rem; font-weight: 700; flex: none; }
+.msg.enc .lbl::before { content: "🔒 "; }
+.msg.on { border-color: var(--accent); color: var(--fg); background: var(--card); }
+.msg.seen { color: var(--fg); }
+.lane-empty { font-size: .78rem; color: var(--muted); font-style: italic; text-align: center; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .75rem; color: var(--muted); margin: 8px 0 0; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.legend .l-priv::before { background: var(--priv); }
+.legend .l-pub::before { background: var(--pub); }
+.legend .l-secret::before { background: var(--secret); }
+.legend .l-ok::before { background: var(--ok); }
+.legend .l-enc::before { background: repeating-linear-gradient(45deg, var(--enc) 0 2px, transparent 2px 4px); }
+
+/* Controles */
+.controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 14px 0; flex-wrap: wrap; }
+.controls .mid { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: .85rem; }
+button.btn {
+  font: inherit; font-size: .9rem; cursor: pointer; border-radius: 8px; padding: 7px 14px;
+  border: 1px solid var(--border); background: var(--card); color: var(--fg);
+}
+button.btn:disabled { opacity: .4; cursor: default; }
+button.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 600; }
+button.btn.small { font-size: .8rem; padding: 4px 10px; }
+
+/* Narración */
+.story { border-top: 1px solid var(--border); padding-top: 12px; }
+.kicker { color: var(--accent); font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+h2 { font-size: 1.25rem; margin: 2px 0 8px; }
+.text p { margin: .5em 0; }
+.text ul, .text ol { margin: .4em 0; padding-left: 1.3em; }
+.k { font-weight: 700; }
+.k.priv { color: var(--priv); } .k.pub { color: var(--pub); } .k.secret { color: var(--secret); } .k.ok { color: var(--ok); } .k.bad { color: var(--bad); }
+.note {
+  border-left: 4px solid var(--accent); background: var(--card);
+  border-radius: 6px; padding: 8px 12px; margin: 10px 0; font-size: .9rem;
+}
+.widget { margin-top: 12px; }
+.box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin: 10px 0; }
+.box h3 { font-size: .95rem; margin: 0 0 8px; }
+.formula {
+  font-family: "Roboto Mono", ui-monospace, Consolas, monospace; font-size: .85rem;
+  background: var(--card2); border: 1px solid var(--border); border-radius: 6px;
+  padding: 8px 10px; overflow-wrap: anywhere; margin: 6px 0;
+}
+.term {
+  background: var(--term-bg); color: var(--term-fg); border-radius: 8px;
+  font-family: "Roboto Mono", ui-monospace, Consolas, monospace; font-size: .8rem; line-height: 1.45;
+  padding: 10px 12px; margin: 8px 0; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.term .p { color: #8fd18f; }
+.term .hl { background: #6b4b00; color: #ffe08a; }
+.term .red { color: #ff8a80; }
+.term .cm { color: #9a9aa8; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.two > * { min-width: 0; }
+table { border-collapse: collapse; width: 100%; font-size: .85rem; }
+th, td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; vertical-align: top; }
+th { background: var(--card); }
+.tbl { overflow-x: auto; }
+.chosen { color: var(--ok); font-weight: 700; }
+td .mono { font-size: .78rem; }
+.strike { text-decoration: line-through; color: var(--muted); }
+
+/* Pinturas */
+.paint-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0; font-size: .85rem; }
+.sw { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border); flex: none; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; color: var(--muted); }
+.sw.q { background: var(--card2); }
+.op { color: var(--muted); font-weight: 700; }
+input[type=color] { width: 40px; height: 34px; padding: 0; border: 1px solid var(--border); border-radius: 6px; background: none; cursor: pointer; }
+.result { font-weight: 700; margin-top: 8px; }
+.result.ok { color: var(--ok); }
+.result.bad { color: var(--bad); }
+
+/* Números */
+.dh-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dh-grid > * { min-width: 0; }
+.field { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0; font-size: .9rem; }
+.field input[type=number], .field select {
+  font: inherit; width: 7em; padding: 4px 6px; border-radius: 6px;
+  border: 1px solid var(--border); background: var(--card2); color: var(--fg);
+}
+.field input.err { border-color: var(--bad); }
+.big { font-size: 1.15rem; font-weight: 700; }
+.err-msg { color: var(--bad); font-size: .85rem; }
+
+.hexrow { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: .8rem; }
+.hexrow .mono { overflow-wrap: anywhere; }
+
+@media (max-width: 720px) {
+  .stage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "c s" "lane lane" "e e"; }
+  .two, .dh-grid { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .it.new { animation: none; }
+  .dot { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="titles">
+      <h1>Cómo funciona una conexión SSH</h1>
+      <a id="full" class="full" href="ssh.html" target="_blank" rel="noopener" hidden>Abrir en pantalla completa ↗</a>
+    </div>
+    <nav id="phases" class="phases" aria-label="Fases"></nav>
+  </header>
+
+  <section class="stage" id="stage" aria-label="Escenario">
+    <div class="actor c">
+      <div class="actor-h">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="10" rx="1.5"/><path d="M2 19h20"/></svg>
+        <div><b>Tu portátil</b><small>cliente SSH</small></div>
+      </div>
+      <ul class="mem" id="mem-c"></ul>
+    </div>
+    <div class="lane">
+      <div class="track"><span class="node" id="node" hidden>atacante</span><span class="dot" id="dot"></span></div>
+      <ol class="msgs" id="msgs"></ol>
+    </div>
+    <div class="actor s">
+      <div class="actor-h">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01M8 17.5h.01"/></svg>
+        <div><b>debian-tuapellido</b><small>192.168.56.10 · servidor SSH</small></div>
+      </div>
+      <ul class="mem" id="mem-s"></ul>
+    </div>
+    <div class="actor e" id="actor-e">
+      <div class="actor-h">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+        <div><b id="e-title">Espía en la red</b><small id="e-sub">ve todo lo que viaja por la red, pero no lo que hay dentro de cada máquina</small></div>
+      </div>
+      <ul class="mem" id="mem-e"></ul>
+    </div>
+  </section>
+  <div class="legend" id="legend">
+    <span class="l-priv">privado: nunca sale de su máquina</span>
+    <span class="l-pub">público: puede verlo cualquiera</span>
+    <span class="l-secret">secreto compartido: lo tienen los dos, nunca ha viajado</span>
+    <span class="l-ok">comprobado</span>
+    <span class="l-enc">cifrado</span>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← Anterior</button>
+    <div class="mid">
+      <span id="count"></span>
+      <button class="btn small" id="replay" title="Repetir la animación (R)">↻ Repetir</button>
+    </div>
+    <button class="btn primary" id="next">Siguiente →</button>
+  </div>
+
+  <section class="story" aria-live="polite">
+    <div class="kicker" id="kicker"></div>
+    <h2 id="title"></h2>
+    <div class="text" id="text"></div>
+    <div class="widget" id="widget"></div>
+  </section>
+</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ---------- Valores de ejemplo ---------- */
+const FP_SERVER = 'SHA256:Kuu3BdjJnAJEgwbZ4P4eW1MA8suktaEqzAsJ2o4kOqw';
+const FP_ATTACK = 'SHA256:0fyAMEHqRoWyR3bIDjB3NqGNtzQu3YzicRqcLn9tAhU';
+const HEX = {
+  qc: '4e4450cb291ddeceba75ce2019a763f44bfc7e052dc8a7ef44094e193f3f5f4f',
+  Qc: 'dc0e0c8f54d4b873871f1f96047243008ef9f3dd31010d5f736353a29cc59e42',
+  qs: '867b94414d53cd3f3d4a0818eaa85728acc2cf3d752ae0ed652f4b061fe721ea',
+  Qs: '6a6b7c4600c2eb2f94bd8927baf510b0bd1a9f84d37437c7f8ecacce74789cc8',
+  K:  '3efeb730566561f8d686f0d5779aec708a1c592935df4131a09e4cae789c8ec7'
+};
+
+const PHASES = ['Escenario', '1 · Negociación', '2 · Diffie-Hellman', '3 · Identidad del servidor',
+  '4 · Claves de sesión', '5 · Autenticación', '6 · Ataque MITM', 'Resumen'];
+
+/* ---------- Pasos ----------
+   packets: {f: origen, t: destino, l: etiqueta, enc: cifrado}. c = cliente, s = servidor, m = atacante. */
+const STEPS = [
+{
+  id: 'intro', phase: 0, title: 'Antes de conectar: qué tiene cada uno',
+  text: `
+<p>Vas a seguir, mensaje a mensaje, lo que ocurre cuando escribes <code>ssh usuario@192.168.56.10</code>. Arriba están los tres protagonistas y, en cada caja, <strong>lo que sabe cada uno</strong> en cada momento. En el centro irán apareciendo los mensajes que viajan por la red.</p>
+<ul>
+<li><strong>Tu portátil</strong> tiene el par de claves <code>ed25519</code> que generaste con <code>ssh-keygen</code>.</li>
+<li><strong>El servidor</strong> generó sus propias <em>claves de host</em> al instalar <code>openssh-server</code>. En su <code>authorized_keys</code> está tu clave pública.</li>
+<li><strong>El espía</strong> ve todo lo que pasa por la red (la wifi del aula, un router), pero no puede ver lo que hay dentro de cada máquina.</li>
+</ul>
+<p>Fíjate en los colores: lo <span class="k priv">rojo</span> es privado y no sale nunca de su máquina; lo <span class="k pub">azul</span> es público y puede verlo cualquiera; lo <span class="k secret">morado</span> es un secreto que tienen los dos extremos pero que <strong>nunca ha viajado por la red</strong>. Conseguir eso delante del espía es el truco central de SSH.</p>
+<p class="note">Avanza con los botones o con las flechas <kbd>←</kbd> <kbd>→</kbd> del teclado.</p>`
+},
+{
+  id: 'tcp', phase: 1, title: 'Conexión TCP al puerto 22',
+  packets: [{f: 'c', t: 's', l: 'SYN'}, {f: 's', t: 'c', l: 'SYN-ACK'}, {f: 'c', t: 's', l: 'ACK'}],
+  text: `
+<p>SSH funciona sobre TCP, así que lo primero es el saludo en tres pasos de TCP con el puerto 22 del servidor. Todavía no hay nada de SSH ni de cifrado.</p>
+<p>El espía ya sabe algo: <strong>quién habla con quién</strong>. Las direcciones IP y los puertos van en las cabeceras de cada paquete, y SSH no los oculta nunca.</p>`
+},
+{
+  id: 'version', phase: 1, title: 'Intercambio de versiones',
+  packets: [{f: 'c', t: 's', l: 'SSH-2.0-OpenSSH_for_Windows_9.5'}, {f: 's', t: 'c', l: 'SSH-2.0-OpenSSH_10.0p1 Debian-…'}],
+  text: `
+<p>Cada lado envía una línea de texto con la versión del protocolo (<code>2.0</code>; la 1 está obsoleta y es insegura) y la del programa. Va en claro: aún no existe ninguna clave.</p>
+<p>Los dos guardan ambas líneas, <code>V_C</code> y <code>V_S</code>, porque más adelante entrarán en un resumen que el servidor <strong>firmará</strong>. Si alguien las alterase por el camino, por ejemplo para forzar una versión antigua, las firmas no cuadrarían y la conexión se cortaría.</p>`
+},
+{
+  id: 'kexinit', phase: 1, title: 'KEXINIT: acordar los algoritmos',
+  packets: [{f: 'c', t: 's', l: 'KEXINIT (listas del cliente)'}, {f: 's', t: 'c', l: 'KEXINIT (listas del servidor)'}],
+  text: `
+<p>Cada lado envía un mensaje <code>KEXINIT</code> con los algoritmos que admite, <strong>en orden de preferencia</strong>, para cada tarea: intercambio de claves, clave de host, cifrado, integridad (MAC) y compresión. Los dos guardan estos mensajes (<code>I_C</code> e <code>I_S</code>).</p>
+<p>La regla es la misma para todas las categorías: <strong>gana el primer algoritmo de la lista del cliente que el servidor también admite</strong>. El orden del servidor no cuenta.</p>`,
+  widget: 'kex',
+  after: `<p class="note">Todo esto viaja en claro y no pasa nada. La seguridad no depende de ocultar qué algoritmo se usa, sino de las claves (es el <em>principio de Kerckhoffs</em>).</p>`
+},
+{
+  id: 'dhproblema', phase: 2, title: 'El problema: acordar un secreto delante del espía',
+  text: `
+<p>Para cifrar el resto de la conexión, cliente y servidor necesitan una <strong>clave simétrica común</strong>, porque el cifrado simétrico es el rápido. Pero no pueden enviarla: el espía la vería. Y no hay ningún canal seguro previo por el que mandarla.</p>
+<p>La solución es el <strong>intercambio de Diffie-Hellman</strong> (Whitfield Diffie y Martin Hellman, 1976):</p>
+<ol>
+<li>Cada lado inventa un número secreto y <strong>no lo envía</strong>.</li>
+<li>Envía solo una «mezcla» de ese secreto con un valor público.</li>
+<li>Combina la mezcla que recibe con su propio secreto.</li>
+</ol>
+<p>Los dos llegan al mismo resultado; el espía, que ha visto las dos mezclas, no.</p>
+<p class="note"><strong>Idea clave:</strong> el secreto compartido <strong>no se cifra ni se envía</strong>. Cada lado lo <strong>calcula</strong> por su cuenta. Funciona porque mezclar es fácil y deshacer la mezcla es, en la práctica, imposible.</p>`
+},
+{
+  id: 'dhcolores', phase: 2, title: 'La idea, con pinturas',
+  text: `
+<p>Imagina que mezclar pinturas es fácil pero separar una mezcla en sus colores originales es imposible.</p>
+<ol>
+<li>Se acuerda en público un <strong>color común</strong>.</li>
+<li>Cada uno elige un <strong>color secreto</strong> y lo mezcla con el común.</li>
+<li>Se intercambian las mezclas. El espía las ve.</li>
+<li>Cada uno añade <strong>su</strong> color secreto a la mezcla que ha recibido.</li>
+</ol>
+<p>Los dos terminan con la misma mezcla de los tres colores. El espía tiene el común y las dos mezclas, pero para llegar a la final necesitaría uno de los colores secretos. Cambia los colores y compruébalo.</p>`,
+  widget: 'paint'
+},
+{
+  id: 'dhnumeros', phase: 2, title: 'Ahora con números',
+  text: `
+<p>En lugar de pinturas se usa la <strong>aritmética modular</strong>. «Mezclar» es elevar a una potencia y quedarse con el resto de dividir entre un primo <code>p</code>.</p>
+<ul>
+<li>Calcular <code>g<sup>a</sup> mod p</code> es rápido.</li>
+<li>Deshacerlo, es decir, encontrar <code>a</code> conociendo <code>g<sup>a</sup> mod p</code>, es el <strong>problema del logaritmo discreto</strong>. Con números grandes no se sabe resolver en un tiempo razonable.</li>
+</ul>
+<p>Cambia los números secretos: los dos lados llegan siempre al mismo <code>K</code>, porque <code>(g<sup>b</sup>)<sup>a</sup> = g<sup>ab</sup> = (g<sup>a</sup>)<sup>b</sup></code>.</p>`,
+  widget: 'dh'
+},
+{
+  id: 'dhreal', phase: 2, title: 'En SSH de verdad: X25519 con claves efímeras',
+  packets: [{f: 'c', t: 's', l: 'KEX_ECDH_INIT: Q_C'}, {f: 's', t: 'c', l: 'KEX_ECDH_REPLY: Q_S + K_S + firma'}],
+  text: `
+<p>SSH usa la misma idea, pero sobre una <strong>curva elíptica</strong> en lugar de potencias módulo <code>p</code>: el algoritmo <code>curve25519-sha256</code> (X25519). La privada es un número aleatorio de 32 bytes, y la pública se obtiene «multiplicándola» por un punto fijo de la curva, que hace el papel de <code>g</code>.</p>
+<ul>
+<li>El cliente envía su pública <code>Q_C</code> en <code>KEX_ECDH_INIT</code>.</li>
+<li>El servidor responde con su pública <code>Q_S</code> en <code>KEX_ECDH_REPLY</code>, junto con su clave de host <code>K_S</code> y una firma. Esas dos cosas se explican en la fase 3.</li>
+<li>Cada uno calcula <code>K</code> con su privada y la pública del otro.</li>
+</ul>
+<p>Estas claves son <strong>efímeras</strong>: se generan para esta conexión y se borran en cuanto se ha calculado <code>K</code>. Por eso, si algún día alguien robara las claves del servidor, no podría descifrar conexiones antiguas que hubiera grabado. A esto se le llama <em>secreto hacia delante</em> (<em>forward secrecy</em>).</p>`,
+  widget: 'x25519'
+},
+{
+  id: 'sinfirma', phase: 3, title: 'Diffie-Hellman no sabe con quién está hablando',
+  text: `
+<p>Diffie-Hellman protege contra el espía que <strong>solo escucha</strong>. Pero no dice nada de <strong>quién</strong> está al otro lado. Si alguien se pusiera en medio e hiciera un Diffie-Hellman contigo haciéndose pasar por el servidor, compartirías <code>K</code>… con el atacante. El servidor tiene que demostrar quién es.</p>
+<p>Para eso, los dos lados calculan <code>H</code>, un <strong>resumen</strong> (hash SHA-256) de todo lo que ha pasado hasta ahora, <code>K</code> incluido. Si un solo byte de la negociación hubiera cambiado por el camino, cada lado obtendría un <code>H</code> distinto.</p>
+<p>El <code>H</code> de la primera negociación es además el <strong>identificador de la sesión</strong> (<code>session_id</code>). El espía no puede calcularlo porque no conoce <code>K</code>.</p>`,
+  widget: 'hash'
+},
+{
+  id: 'firmahost', phase: 3, title: 'El servidor firma H con su clave de host',
+  text: `
+<p>Aquí entra la criptografía asimétrica, pero para <strong>firmar</strong>, no para cifrar:</p>
+<ul>
+<li><strong>Firmar</strong> se hace con la clave privada.</li>
+<li><strong>Verificar</strong> la firma se hace con la pública, y puede hacerlo cualquiera.</li>
+</ul>
+<p>El servidor firmó <code>H</code> con su clave de host privada y mandó la firma en <code>KEX_ECDH_REPLY</code>, junto con su clave de host pública <code>K_S</code>. Tu cliente calcula su propio <code>H</code> y comprueba la firma con <code>K_S</code>.</p>
+<ul>
+<li>Nadie puede fabricar una firma válida sin la clave privada.</li>
+<li>La firma solo sirve para <strong>este</strong> <code>H</code>, que incluye las claves efímeras de esta conexión. No se puede reutilizar una firma grabada de otra conexión.</li>
+</ul>
+<p class="note">Con esto el cliente sabe que al otro lado está <strong>quien tiene la privada de <code>K_S</code></strong>. Pero ¿quién le dice que <code>K_S</code> es la de <em>tu</em> servidor y no la de un impostor?</p>`,
+  widget: 'sign'
+},
+{
+  id: 'huella', phase: 3, title: 'La huella y known_hosts',
+  text: `
+<p>La <strong>huella</strong> es el resumen SHA-256 de <code>K_S</code>, escrito en base64. Es mucho más corta que la clave y sirve para compararla a ojo.</p>
+<p>La primera vez tu cliente no conoce esa huella y te pregunta. <strong>Es el único momento del protocolo en que la seguridad depende de ti</strong>: compárala con la que obtienes dentro del servidor, como hiciste en la práctica.</p>
+<p>Si coincide y respondes <code>yes</code>, la huella se guarda en <code>known_hosts</code>. Desde entonces el cliente la comprueba solo en cada conexión.</p>`,
+  widget: 'fingerprint'
+},
+{
+  id: 'claves', phase: 4, title: 'Derivar las claves de sesión',
+  packets: [{f: 'c', t: 's', l: 'NEWKEYS'}, {f: 's', t: 'c', l: 'NEWKEYS'}],
+  text: `
+<p>Con <code>K</code> y <code>H</code>, cada lado calcula por su cuenta <strong>seis claves</strong>, aplicando el hash y cambiando solo una letra. Cada sentido de la comunicación tiene las suyas:</p>
+<ul>
+<li>un vector inicial (IV);</li>
+<li>una clave de cifrado;</li>
+<li>una clave de integridad.</li>
+</ul>
+<p>Después, los dos envían <code>NEWKEYS</code>: «a partir del siguiente paquete, todo va cifrado». Las privadas efímeras y los datos de la negociación ya no hacen falta y se descartan.</p>`,
+  widget: 'derive'
+},
+{
+  id: 'tunel', phase: 4, title: 'El túnel cifrado',
+  packets: [{f: 'c', t: 's', l: 'paquete cifrado', enc: true}, {f: 's', t: 'c', l: 'paquete cifrado', enc: true}],
+  text: `
+<p>Desde aquí todo viaja cifrado con <strong>cifrado simétrico</strong>, en este caso <code>chacha20-poly1305</code>. Cada paquete se cifra y lleva una etiqueta de autenticación de 16 bytes. Si alguien cambia un solo bit por el camino, la etiqueta no cuadra y la conexión se cierra.</p>
+<p>El espía solo ve bytes aleatorios, su tamaño y en qué momento pasan.</p>
+<p class="note">Fíjate: el túnel cifrado existe <strong>antes</strong> de que el servidor sepa quién eres. Todavía no has iniciado sesión. De eso trata la fase siguiente.</p>`,
+  widget: 'cipher'
+},
+{
+  id: 'authoferta', phase: 5, title: 'El cliente se presenta con su clave pública',
+  packets: [
+    {f: 'c', t: 's', l: 'SERVICE_REQUEST ssh-userauth', enc: true},
+    {f: 's', t: 'c', l: 'SERVICE_ACCEPT', enc: true},
+    {f: 'c', t: 's', l: 'USERAUTH_REQUEST: usuario, publickey, id_ed25519.pub (sin firma)', enc: true},
+    {f: 's', t: 'c', l: 'USERAUTH_PK_OK', enc: true}
+  ],
+  text: `
+<p>Ya dentro del túnel, el cliente pide el servicio de autenticación y se presenta: «soy <code>usuario</code> y quiero entrar con esta clave pública». Primero pregunta <strong>sin firmar</strong>, para no gastar una firma si esa clave no sirve.</p>
+<p>El servidor busca esa clave pública en <code>/home/usuario/.ssh/authorized_keys</code>:</p>
+<ul>
+<li>Si está, responde <code>PK_OK</code>: «esa me vale, demuéstrame que tienes la privada».</li>
+<li>Si no está, el cliente prueba otro método. Como en la práctica desactivaste las contraseñas, no queda ninguno y aparece <code>Permission denied (publickey)</code>.</li>
+</ul>`
+},
+{
+  id: 'authfirma', phase: 5, title: 'El cliente firma el session_id con tu clave privada',
+  packets: [{f: 'c', t: 's', l: 'USERAUTH_REQUEST + firma', enc: true}],
+  text: `
+<p>El cliente firma con tu clave privada un bloque de datos que empieza por el <code>session_id</code>. Ese es el «reto» que te plantea el servidor. No es un mensaje aparte: es el identificador de esta conexión, que es único porque sale de las claves efímeras aleatorias de los dos lados.</p>
+<ul>
+<li>Tu clave privada <strong>no sale del portátil</strong>. Solo viaja la firma.</li>
+<li>El servidor la comprueba con la clave pública que tiene en <code>authorized_keys</code>.</li>
+<li>Esa firma no sirve para ninguna otra conexión, porque su <code>session_id</code> sería distinto.</li>
+</ul>`,
+  widget: 'usersign'
+},
+{
+  id: 'authok', phase: 5, title: 'Sesión iniciada',
+  packets: [
+    {f: 's', t: 'c', l: 'USERAUTH_SUCCESS', enc: true},
+    {f: 'c', t: 's', l: 'CHANNEL_OPEN session', enc: true},
+    {f: 'c', t: 's', l: 'pty-req + shell', enc: true}
+  ],
+  text: `
+<p>El servidor acepta. El cliente abre un canal dentro de la conexión, pide una terminal (<code>pty</code>) y una <code>shell</code>, y ya estás dentro. Es lo que ves en <code>ssh -v</code>:</p>`,
+  widget: 'verbose',
+  after: `
+<div class="note"><strong>¿Y si entraras con contraseña?</strong> También viajaría dentro del túnel, así que el espía no podría leerla. Pero el servidor la recibe <strong>tal cual</strong> y la compara con el hash de <code>/etc/shadow</code>. Si al otro lado hubiera un impostor, o un servidor comprometido, se quedaría con tu contraseña. Con un par de claves, el servidor solo ve tu clave pública y una firma que no sirve para ninguna otra conexión.</div>`
+},
+{
+  id: 'mitm1', phase: 6, mitm: true, title: 'Alguien se mete en medio',
+  packets: [
+    {f: 'c', t: 'm', l: 'KEX_ECDH_INIT: Q_C'},
+    {f: 'm', t: 's', l: 'KEX_ECDH_INIT: Q_A2'},
+    {f: 's', t: 'm', l: 'KEX_ECDH_REPLY: Q_S + K_S + firma(H₂)'},
+    {f: 'm', t: 'c', l: 'KEX_ECDH_REPLY: Q_A1 + ¿? + ¿?'}
+  ],
+  text: `
+<p>Otra conexión, otro día. Esta vez alguien se ha colocado entre tu portátil y el servidor, por ejemplo envenenando la tabla ARP de la wifi o controlando un router. Ya no se limita a escuchar: <strong>intercepta</strong> cada mensaje y puede cambiarlo. Suponemos que ya te habías conectado antes, así que la huella del servidor está en tu <code>known_hosts</code>.</p>
+<p>El atacante hace <strong>dos Diffie-Hellman</strong>:</p>
+<ul>
+<li>uno contigo, haciéndose pasar por el servidor, del que sale <code>K₁</code>;</li>
+<li>otro con el servidor, haciéndose pasar por ti, del que sale <code>K₂</code>.</li>
+</ul>
+<p>Si esto funcionara, descifraría todo con <code>K₁</code> y lo volvería a cifrar con <code>K₂</code> sin que nadie lo notara. Pero antes tiene que completar su respuesta: ¿qué clave de host y qué firma te manda?</p>`
+},
+{
+  id: 'mitmfirma', phase: 6, mitm: true, title: 'La firma y la huella lo delatan',
+  packets: [{f: 'm', t: 'c', l: 'KEX_ECDH_REPLY: Q_A1 + K_A + firma_A(H₁)'}],
+  text: `
+<p>El atacante tiene que mandarte una firma de <code>H₁</code>, el resumen de <strong>tu</strong> negociación con él. No puede reenviar la del servidor, porque es de <code>H₂</code>. Tampoco puede fabricar una nueva, porque no tiene la clave de host privada del servidor. Solo le quedan dos opciones, y las dos fallan:</p>
+<ol>
+<li>Mandarte <code>K_S</code> con una firma inventada: la verificación falla y tu cliente corta la conexión.</li>
+<li>Mandarte <strong>su propia</strong> clave de host, <code>K_A</code>, firmando con ella: la firma es válida, pero su huella no coincide con la guardada en <code>known_hosts</code>, y tu cliente se niega a seguir:</li>
+</ol>`,
+  widget: 'warning',
+  after: `<p class="note">Por eso nunca se borra una huella antigua con <code>ssh-keygen -R</code> sin saber el motivo del cambio.</p>`
+},
+{
+  id: 'mitmprimera', phase: 6, mitm: true, title: '¿Y si fuera la primera conexión?',
+  packets: [
+    {f: 'c', t: 'm', l: 'USERAUTH_REQUEST + firma(session_id₁)', enc: true},
+    {f: 'm', t: 's', l: 'USERAUTH_REQUEST + firma(session_id₁)', enc: true},
+    {f: 's', t: 'm', l: 'USERAUTH_FAILURE', enc: true}
+  ],
+  text: `
+<p>Sin huella guardada no hay nada con qué comparar: verías la pregunta de siempre, pero con la huella <strong>del atacante</strong>. Si respondes <code>yes</code> sin mirar, depende de cómo inicies sesión:</p>
+<ul>
+<li><strong>Con contraseña</strong>, la escribes dentro del túnel <code>K₁</code>. El atacante la descifra, la guarda y la usa para entrar en el servidor de verdad.</li>
+<li><strong>Con par de claves</strong>, tu firma incluye <code>session_id₁</code>, pero el servidor espera una firma sobre <code>session_id₂</code>. Al atacante no le sirve y no puede entrar en el servidor haciéndose pasar por ti. Aun así, podría engañarte a ti con un servidor falso.</li>
+</ul>
+<p class="note"><strong>Conclusión:</strong> la huella se comprueba la primera vez. Es justo lo que hiciste en la práctica antes de escribir <code>yes</code>.</p>`
+},
+{
+  id: 'resumen', phase: 7, hideStage: true, title: 'Resumen: cada tipo de criptografía hace un trabajo',
+  text: `<p>SSH no usa «el asimétrico para enviar la clave». Usa tres herramientas distintas, cada una para una cosa:</p>`,
+  widget: 'summary'
+}
+];
+
+const IDX = {};
+STEPS.forEach((s, i) => { IDX[s.id] = i; });
+
+/* ---------- Lo que sabe cada uno ----------
+   [quién, tipo, etiqueta, detalle, desde, hasta (exclusivo)] */
+const FACTS = [
+  ['c', 'priv', 'id_ed25519', 'tu clave privada · nunca sale del portátil', 'intro'],
+  ['c', 'pub', 'id_ed25519.pub', 'tu clave pública', 'intro'],
+  ['c', 'data', 'known_hosts', 'todavía sin 192.168.56.10', 'intro', 'huella'],
+  ['c', 'pub', 'known_hosts', '192.168.56.10 → ' + FP_SERVER.slice(0, 16) + '…', 'huella'],
+  ['c', 'data', 'V_C, V_S', 'las dos versiones', 'version', 'claves'],
+  ['c', 'data', 'I_C, I_S', 'los dos KEXINIT', 'kexinit', 'claves'],
+  ['c', 'data', 'Algoritmos', 'curve25519 · ed25519 · chacha20', 'kexinit', 'mitm1'],
+  ['c', 'priv', 'q_C', 'privada efímera X25519', 'dhreal', 'claves'],
+  ['c', 'pub', 'Q_C', 'pública efímera', 'dhreal', 'claves'],
+  ['c', 'pub', 'Q_S, K_S, firma', 'recibidos del servidor', 'dhreal', 'claves'],
+  ['c', 'secret', 'K', 'secreto compartido · nunca viaja', 'dhreal', 'mitm1'],
+  ['c', 'secret', 'H = session_id', 'resumen de toda la negociación', 'sinfirma', 'mitm1'],
+  ['c', 'ok', 'Firma del servidor', 'válida con K_S', 'firmahost', 'mitm1'],
+  ['c', 'ok', 'Huella de K_S', 'coincide con known_hosts', 'huella', 'mitm1'],
+  ['c', 'secret', 'Claves de sesión', '6 claves derivadas de K y H', 'claves', 'mitm1'],
+  ['c', 'ok', 'Sesión iniciada', 'usuario@debian-tuapellido', 'authok', 'mitm1'],
+  ['c', 'secret', 'K₁', 'cree que la comparte con el servidor', 'mitm1', 'resumen'],
+  ['c', 'bad', 'Huella de K_A', '≠ la de known_hosts → conexión cortada', 'mitmfirma', 'mitmprimera'],
+
+  ['s', 'priv', 'ssh_host_ed25519_key', 'clave de host privada', 'intro'],
+  ['s', 'pub', 'ssh_host_ed25519_key.pub', 'clave de host pública (K_S)', 'intro'],
+  ['s', 'pub', 'authorized_keys', 'contiene tu id_ed25519.pub', 'intro'],
+  ['s', 'data', 'V_C, V_S', 'las dos versiones', 'version', 'claves'],
+  ['s', 'data', 'I_C, I_S', 'los dos KEXINIT', 'kexinit', 'claves'],
+  ['s', 'data', 'Algoritmos', 'curve25519 · ed25519 · chacha20', 'kexinit', 'mitm1'],
+  ['s', 'priv', 'q_S', 'privada efímera X25519', 'dhreal', 'claves'],
+  ['s', 'pub', 'Q_S', 'pública efímera', 'dhreal', 'claves'],
+  ['s', 'pub', 'Q_C', 'recibida del cliente', 'dhreal', 'claves'],
+  ['s', 'secret', 'K', 'secreto compartido · nunca viaja', 'dhreal', 'mitm1'],
+  ['s', 'secret', 'H = session_id', 'resumen de toda la negociación', 'sinfirma', 'mitm1'],
+  ['s', 'secret', 'Claves de sesión', '6 claves derivadas de K y H', 'claves', 'mitm1'],
+  ['s', 'pub', 'id_ed25519.pub', 'está en authorized_keys', 'authoferta', 'mitm1'],
+  ['s', 'ok', 'Firma del usuario', 'válida con tu clave pública', 'authfirma', 'mitm1'],
+  ['s', 'ok', 'usuario autenticado', 'abre la shell', 'authok', 'mitm1'],
+  ['s', 'secret', 'K₂', 'cree que la comparte contigo', 'mitm1', 'resumen'],
+  ['s', 'bad', 'Firma sobre session_id₁', 'no vale para session_id₂ → rechazada', 'mitmprimera', 'resumen'],
+
+  ['e', 'data', 'IP ↔ 192.168.56.10:22', 'cabeceras TCP/IP', 'tcp', 'mitm1'],
+  ['e', 'data', 'Versiones', 'OpenSSH de cada lado', 'version', 'mitm1'],
+  ['e', 'data', 'KEXINIT', 'algoritmos elegidos', 'kexinit', 'mitm1'],
+  ['e', 'pub', 'Q_C, Q_S', 'públicas efímeras', 'dhreal', 'mitm1'],
+  ['e', 'pub', 'K_S y firma', 'clave de host pública y firma de H', 'dhreal', 'mitm1'],
+  ['e', 'bad', 'K, H', 'no puede calcularlos: le falta q_C o q_S', 'dhreal', 'mitm1'],
+  ['e', 'enc', 'Tráfico cifrado', 'solo ve tamaño y momento de cada paquete', 'tunel', 'mitm1'],
+
+  ['e', 'priv', 'ssh_host_ed25519_key propia', 'su clave de host (K_A), no la del servidor', 'mitm1', 'resumen'],
+  ['e', 'secret', 'K₁', 'compartida contigo', 'mitm1', 'resumen'],
+  ['e', 'secret', 'K₂', 'compartida con el servidor', 'mitm1', 'resumen'],
+  ['e', 'bad', 'Clave de host del servidor', 'no la tiene: no puede firmar H₁ como él', 'mitm1', 'resumen'],
+  ['e', 'bad', 'Tu firma', 'solo vale para session_id₁: no le sirve', 'mitmprimera', 'resumen']
+];
+
+/* ---------- Utilidades ---------- */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function modpow(base, exp, mod) {
+  let b = BigInt(base) % BigInt(mod), e = BigInt(exp), m = BigInt(mod), r = 1n;
+  while (e > 0n) { if (e & 1n) r = r * b % m; b = b * b % m; e >>= 1n; }
+  return Number(r);
+}
+function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function rgbToHex(c) { return '#' + c.map((v) => Math.round(v).toString(16).padStart(2, '0')).join(''); }
+function mix(...hexes) {
+  const cs = hexes.map(hexToRgb);
+  return rgbToHex([0, 1, 2].map((i) => cs.reduce((a, c) => a + c[i], 0) / cs.length));
+}
+function randHex(n) {
+  const a = new Uint8Array(n);
+  (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach((_, i) => { a[i] = Math.random() * 256; });
+  return Array.from(a, (b) => b.toString(16).padStart(2, '0')).join(' ');
+}
+
+/* ---------- Widgets ---------- */
+const WIDGETS = {
+kex() {
+  const rows = [
+    ['Intercambio de claves', ['curve25519-sha256', 'ecdh-sha2-nistp256', 'diffie-hellman-group16-sha512'], ['mlkem768x25519-sha256', 'curve25519-sha256', 'ecdh-sha2-nistp256'], 'curve25519-sha256'],
+    ['Clave de host', ['ssh-ed25519', 'ecdsa-sha2-nistp256', 'rsa-sha2-512'], ['rsa-sha2-512', 'ecdsa-sha2-nistp256', 'ssh-ed25519'], 'ssh-ed25519'],
+    ['Cifrado (cada sentido)', ['chacha20-poly1305@openssh.com', 'aes128-gcm@openssh.com', 'aes256-gcm@openssh.com'], ['aes256-gcm@openssh.com', 'chacha20-poly1305@openssh.com'], 'chacha20-poly1305@openssh.com'],
+    ['Compresión', ['none', 'zlib@openssh.com'], ['none', 'zlib@openssh.com'], 'none']
+  ];
+  const list = (arr, win) => arr.map((a) => `<div class="mono${a === win ? ' chosen' : ''}">${esc(a)}</div>`).join('');
+  return {html: `
+<div class="box">
+<h3>Ejemplo de negociación (listas recortadas)</h3>
+<div class="tbl"><table>
+<tr><th>Categoría</th><th>El cliente propone, en orden</th><th>El servidor admite</th><th>Elegido</th></tr>
+${rows.map((r) => `<tr><td>${r[0]}</td><td>${list(r[1], r[3])}</td><td>${list(r[2], r[3])}</td><td class="mono chosen">${esc(r[3])}</td></tr>`).join('')}
+</table></div>
+<p style="font-size:.85rem;color:var(--muted);margin:.6em 0 0">Fíjate en la clave de host: el servidor prefiere <code>rsa-sha2-512</code>, pero gana <code>ssh-ed25519</code> porque es la primera del cliente. Con <code>chacha20-poly1305</code> no se negocia MAC aparte, porque el propio algoritmo ya garantiza la integridad.</p>
+</div>
+<div class="term"><span class="cm"># Compruébalo en tu conexión: ssh -v usuario@192.168.56.10</span>
+debug1: kex: algorithm: <span class="hl">curve25519-sha256</span>
+debug1: kex: host key algorithm: <span class="hl">ssh-ed25519</span>
+debug1: kex: server->client cipher: <span class="hl">chacha20-poly1305@openssh.com</span> MAC: &lt;implicit&gt; compression: none
+debug1: kex: client->server cipher: <span class="hl">chacha20-poly1305@openssh.com</span> MAC: &lt;implicit&gt; compression: none</div>
+<p style="font-size:.85rem;color:var(--muted)">Si cliente y servidor son recientes, lo normal es que salga un algoritmo <strong>híbrido post-cuántico</strong> (<code>mlkem768x25519-sha256</code> o <code>sntrup761x25519-sha512</code>). Combina X25519 con otro algoritmo resistente a los ordenadores cuánticos, pero la idea de fondo es la misma que vas a ver ahora.</p>`};
+},
+
+paint() {
+  const st = {g: '#f2c230', a: '#d6453d', b: '#2f6fd6'};
+  const html = `
+<div class="box" id="paint">
+<div class="paint-row"><strong>Color común (público):</strong> <input type="color" id="pg" value="${st.g}" aria-label="Color común"></div>
+<div class="two">
+  <div>
+    <h3>Tu portátil</h3>
+    <div class="paint-row">Secreto: <input type="color" id="pa" value="${st.a}" aria-label="Color secreto del cliente"></div>
+    <div class="paint-row"><span class="sw" data-c="g"></span><span class="op">+</span><span class="sw" data-c="a"></span><span class="op">=</span><span class="sw" data-c="ga"></span> <span>→ lo envía</span></div>
+    <div class="paint-row"><span class="sw" data-c="gb"></span><span class="op">+</span><span class="sw" data-c="a"></span><span class="op">=</span><span class="sw" data-c="fin"></span> <strong>final</strong></div>
+  </div>
+  <div>
+    <h3>Servidor</h3>
+    <div class="paint-row">Secreto: <input type="color" id="pb" value="${st.b}" aria-label="Color secreto del servidor"></div>
+    <div class="paint-row"><span class="sw" data-c="g"></span><span class="op">+</span><span class="sw" data-c="b"></span><span class="op">=</span><span class="sw" data-c="gb"></span> <span>→ lo envía</span></div>
+    <div class="paint-row"><span class="sw" data-c="ga"></span><span class="op">+</span><span class="sw" data-c="b"></span><span class="op">=</span><span class="sw" data-c="fin"></span> <strong>final</strong></div>
+  </div>
+</div>
+<h3 style="margin-top:12px">El espía</h3>
+<div class="paint-row">Ve: <span class="sw" data-c="g"></span><span class="sw" data-c="ga"></span><span class="sw" data-c="gb"></span> <span class="op">→</span> <span class="sw q">?</span> <span>Si junta las dos mezclas obtiene</span> <span class="sw" data-c="spy"></span><span>, que no es la final: le sobra una parte de común y le falta separar los secretos.</span></div>
+<div class="result ok">✓ Los dos obtienen el mismo color final sin haberlo enviado nunca.</div>
+</div>`;
+  function bind() {
+    const upd = () => {
+      st.g = $('pg').value; st.a = $('pa').value; st.b = $('pb').value;
+      const c = {g: st.g, a: st.a, b: st.b, ga: mix(st.g, st.a), gb: mix(st.g, st.b), fin: mix(st.g, st.a, st.b)};
+      c.spy = mix(c.ga, c.gb);
+      document.querySelectorAll('#paint .sw[data-c]').forEach((el) => { el.style.background = c[el.dataset.c]; });
+    };
+    ['pg', 'pa', 'pb'].forEach((id) => $(id).addEventListener('input', upd));
+    upd();
+  }
+  return {html, bind};
+},
+
+dh() {
+  const PRIMES = [[23, 5], [47, 5], [97, 5], [101, 2], [1019, 2], [65537, 3]];
+  const html = `
+<div class="box" id="dhw">
+<h3>Público: lo sabe todo el mundo, espía incluido</h3>
+<div class="field">
+  <label for="dp">Primo <code>p</code></label>
+  <select id="dp">${PRIMES.map((x, i) => `<option value="${i}">${x[0]}</option>`).join('')}</select>
+  <span>Generador <code>g</code> = <strong id="dg"></strong></span>
+</div>
+<p style="font-size:.8rem;color:var(--muted);margin:.2em 0 .6em">Un generador es un número cuyas potencias módulo <code>p</code> recorren todos los valores de 1 a p−1.</p>
+<div class="dh-grid">
+  <div class="box" style="margin:0">
+    <h3>Tu portátil</h3>
+    <div class="field"><label for="da">Secreto <code>a</code></label> <input type="number" id="da" value="6"></div>
+    <div class="formula" id="dA"></div>
+    <div class="formula" id="dKc"></div>
+  </div>
+  <div class="box" style="margin:0">
+    <h3>Servidor</h3>
+    <div class="field"><label for="db">Secreto <code>b</code></label> <input type="number" id="db" value="15"></div>
+    <div class="formula" id="dB"></div>
+    <div class="formula" id="dKs"></div>
+  </div>
+</div>
+<div class="result" id="dres"></div>
+<div class="box" style="margin-bottom:0">
+  <h3>El espía</h3>
+  <div id="dspy"></div>
+  <button class="btn small" id="dbrute" style="margin-top:6px">Atacar por fuerza bruta</button>
+  <div id="dbres" style="margin-top:8px;font-size:.9rem"></div>
+</div>
+</div>`;
+  function bind() {
+    const sel = $('dp'), ia = $('da'), ib = $('db');
+    const calc = () => {
+      const [p, g] = PRIMES[+sel.value];
+      $('dg').textContent = g;
+      ia.min = ib.min = 2; ia.max = ib.max = p - 2;
+      const a = Number(ia.value), b = Number(ib.value);
+      const okA = Number.isInteger(a) && a >= 2 && a <= p - 2;
+      const okB = Number.isInteger(b) && b >= 2 && b <= p - 2;
+      ia.classList.toggle('err', !okA); ib.classList.toggle('err', !okB);
+      $('dbres').innerHTML = '';
+      if (!okA || !okB) {
+        ['dA', 'dB', 'dKc', 'dKs'].forEach((id) => { $(id).textContent = '—'; });
+        $('dres').className = 'result';
+        $('dres').innerHTML = `<span class="err-msg">Los secretos tienen que ser enteros entre 2 y ${p - 2}.</span>`;
+        $('dspy').textContent = '';
+        $('dbrute').disabled = true;
+        return null;
+      }
+      const A = modpow(g, a, p), B = modpow(g, b, p);
+      const Kc = modpow(B, a, p), Ks = modpow(A, b, p);
+      $('dA').innerHTML = `A = g<sup>a</sup> mod p = ${g}<sup>${a}</sup> mod ${p} = <span class="big">${A}</span> → lo envía`;
+      $('dB').innerHTML = `B = g<sup>b</sup> mod p = ${g}<sup>${b}</sup> mod ${p} = <span class="big">${B}</span> → lo envía`;
+      $('dKc').innerHTML = `K = B<sup>a</sup> mod p = ${B}<sup>${a}</sup> mod ${p} = <span class="big k secret">${Kc}</span>`;
+      $('dKs').innerHTML = `K = A<sup>b</sup> mod p = ${A}<sup>${b}</sup> mod ${p} = <span class="big k secret">${Ks}</span>`;
+      $('dres').className = 'result ' + (Kc === Ks ? 'ok' : 'bad');
+      $('dres').textContent = Kc === Ks ? `✓ Los dos obtienen K = ${Kc} y ese número no ha viajado por la red.` : '✗ Algo falla';
+      $('dspy').innerHTML = `Conoce <code>p = ${p}</code>, <code>g = ${g}</code>, <code>A = ${A}</code> y <code>B = ${B}</code>. Para calcular <code>K</code> necesita <code>a</code> o <code>b</code>, es decir, resolver <code>${g}<sup>x</sup> mod ${p} = ${A}</code>.`;
+      $('dbrute').disabled = false;
+      return {p, g, A, B, a};
+    };
+    [sel, ia, ib].forEach((el) => el.addEventListener('input', calc));
+    $('dbrute').addEventListener('click', () => {
+      const v = calc();
+      if (!v) return;
+      let x = 1, cur = v.g % v.p;
+      while (cur !== v.A) { cur = cur * v.g % v.p; x++; }
+      const K = modpow(v.B, x, v.p);
+      $('dbres').innerHTML = `Probando exponentes uno a uno, el espía encuentra <code>x = ${x}</code> tras <strong>${x.toLocaleString('es')}</strong> intentos, y calcula <code>K = ${v.B}<sup>${x}</sup> mod ${v.p} = ${K}</code>. Con un <code>p</code> tan pequeño es trivial.
+<p class="note" style="margin-bottom:0">En SSH real, el equivalente a <code>p</code> es 2<sup>255</sup> − 19, un número de 77 cifras. Con los mejores algoritmos conocidos harían falta del orden de 2<sup>125</sup> operaciones: un ordenador que hiciera mil billones (10<sup>15</sup>) por segundo tardaría unas cien mil veces la edad del universo.</p>`;
+      fit();
+    });
+    calc();
+  }
+  return {html, bind};
+},
+
+x25519() {
+  return {html: `
+<div class="box">
+<h3>Valores de ejemplo (32 bytes cada uno)</h3>
+<div class="hexrow">
+  <span class="k priv">q_C</span><span class="mono">${HEX.qc}</span>
+  <span class="k pub">Q_C</span><span class="mono">= X25519(q_C, 9) = ${HEX.Qc}</span>
+  <span class="k priv">q_S</span><span class="mono">${HEX.qs}</span>
+  <span class="k pub">Q_S</span><span class="mono">= X25519(q_S, 9) = ${HEX.Qs}</span>
+  <span class="k secret">K</span><span class="mono">= X25519(q_C, Q_S) = X25519(q_S, Q_C) = ${HEX.K}</span>
+</div>
+<p style="font-size:.85rem;color:var(--muted);margin:.6em 0 0">El 9 es el punto fijo de la curva, el equivalente a <code>g</code>. Compara con el paso anterior: <code>q</code> hace de <code>a</code> y <code>b</code>, <code>Q</code> de <code>A</code> y <code>B</code>. En la red solo viajan <code>Q_C</code> y <code>Q_S</code>.</p>
+</div>`};
+},
+
+hash() {
+  const parts = [['V_C, V_S', 'las dos versiones'], ['I_C, I_S', 'los dos KEXINIT'], ['K_S', 'la clave de host pública del servidor'], ['Q_C, Q_S', 'las dos públicas efímeras'], ['K', 'el secreto compartido']];
+  return {html: `
+<div class="box">
+<div class="formula">H = SHA-256( V_C ‖ V_S ‖ I_C ‖ I_S ‖ K_S ‖ Q_C ‖ Q_S ‖ <span class="k secret">K</span> )</div>
+<ul style="font-size:.85rem;margin:.4em 0 0">${parts.map((p) => `<li><code>${p[0]}</code>: ${p[1]}</li>`).join('')}</ul>
+<p style="font-size:.85rem;color:var(--muted);margin:.6em 0 0"><code>‖</code> significa «concatenado con». Todo lo de dentro ha viajado en claro salvo <code>K</code>, y basta con esa pieza para que el espía no pueda calcular <code>H</code>.</p>
+</div>`};
+},
+
+sign() {
+  return {html: `
+<div class="two">
+  <div class="box">
+    <h3>Servidor: firma</h3>
+    <div class="formula">firma = Ed25519_firmar( <span class="k priv">ssh_host_ed25519_key</span>, H )</div>
+  </div>
+  <div class="box">
+    <h3>Tu portátil: verifica</h3>
+    <div class="formula">Ed25519_verificar( <span class="k pub">K_S</span>, H, firma ) → <span class="k ok">✓ válida</span></div>
+  </div>
+</div>
+<p class="note">Con <code>ed25519</code> <strong>no existe «cifrar con la pública»</strong>: es un algoritmo solo de firma. Lo que se hace con la privada no es cifrar, es firmar.</p>`};
+},
+
+fingerprint() {
+  return {html: `
+<div class="two">
+  <div>
+    <strong>En tu portátil (PowerShell)</strong>
+    <div class="term"><span class="p">PS C:\\Users\\tu&gt;</span> ssh usuario@192.168.56.10
+The authenticity of host '192.168.56.10 (192.168.56.10)' can't be established.
+ED25519 key fingerprint is <span class="hl">${FP_SERVER}</span>.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.56.10' (ED25519) to the list of known hosts.</div>
+  </div>
+  <div>
+    <strong>Dentro del servidor (ventana de VirtualBox)</strong>
+    <div class="term"><span class="p">usuario@debian-tuapellido:~$</span> ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub
+256 <span class="hl">${FP_SERVER}</span> root@debian-tuapellido (ED25519)</div>
+  </div>
+</div>
+<div class="formula">huella = "SHA256:" + base64( SHA-256( <span class="k pub">K_S</span> ) )</div>`};
+},
+
+derive() {
+  const rows = [['A', 'IV', 'cliente → servidor'], ['B', 'IV', 'servidor → cliente'], ['C', 'clave de cifrado', 'cliente → servidor'], ['D', 'clave de cifrado', 'servidor → cliente'], ['E', 'clave de integridad', 'cliente → servidor'], ['F', 'clave de integridad', 'servidor → cliente']];
+  return {html: `
+<div class="box">
+<div class="tbl"><table>
+<tr><th>Cálculo</th><th>Para qué</th><th>Sentido</th></tr>
+${rows.map((r) => `<tr><td class="mono">SHA-256( <span class="k secret">K</span> ‖ H ‖ "${r[0]}" ‖ session_id )</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}
+</table></div>
+<p style="font-size:.85rem;color:var(--muted);margin:.6em 0 0">Cada algoritmo toma las que necesita. <code>chacha20-poly1305</code>, por ejemplo, no usa IV ni clave de integridad aparte. Las claves se renuevan cada cierto volumen de datos repitiendo el intercambio.</p>
+</div>`};
+},
+
+cipher() {
+  const keys = ['l', 's', '␣', '-', 'l', '↵'];
+  const html = `
+<div class="box">
+<h3>Escribes <code>ls -l</code> en la terminal</h3>
+<p style="font-size:.85rem;margin:.2em 0 .6em">En una sesión interactiva, cada tecla viaja en su propio paquete. Esto es lo que ve el espía:</p>
+<div class="hexrow" id="cph"></div>
+<button class="btn small" id="cpr" style="margin-top:8px">Cifrar otra vez</button>
+<p style="font-size:.85rem;color:var(--muted);margin:.6em 0 0">Las dos «l» salen distintas: cada paquete lleva un número de secuencia, así que el mismo texto nunca produce los mismos bytes cifrados.</p>
+</div>`;
+  function bind() {
+    const draw = () => { $('cph').innerHTML = keys.map((k) => `<span class="mono"><strong>${esc(k)}</strong> →</span><span class="mono">${randHex(20)} …</span>`).join(''); };
+    $('cpr').addEventListener('click', draw);
+    draw();
+  }
+  return {html, bind};
+},
+
+usersign() {
+  return {html: `
+<div class="two">
+  <div class="box">
+    <h3>Tu portátil: firma</h3>
+    <div class="formula">firma = Ed25519_firmar( <span class="k priv">id_ed25519</span>,<br>&nbsp;&nbsp;<span class="k secret">session_id</span> ‖ "usuario" ‖ "ssh-connection" ‖ "publickey" ‖ "ssh-ed25519" ‖ <span class="k pub">id_ed25519.pub</span> )</div>
+  </div>
+  <div class="box">
+    <h3>Servidor: verifica</h3>
+    <div class="formula">Ed25519_verificar( <span class="k pub">id_ed25519.pub</span> de authorized_keys, datos, firma ) → <span class="k ok">✓ válida</span></div>
+  </div>
+</div>`};
+},
+
+verbose() {
+  return {html: `
+<div class="term"><span class="cm"># ssh -v usuario@192.168.56.10 (extracto)</span>
+debug1: Server host key: ssh-ed25519 ${FP_SERVER}
+debug1: Host '192.168.56.10' is known and matches the ED25519 host key.
+debug1: Authentications that can continue: publickey
+debug1: Offering public key: C:\\Users\\tu/.ssh/id_ed25519 ED25519 SHA256:… explicit
+debug1: Server accepts key: C:\\Users\\tu/.ssh/id_ed25519 ED25519 SHA256:… explicit
+<span class="hl">debug1: Authenticated to 192.168.56.10 ([192.168.56.10]:22) using "publickey".</span></div>
+<p style="font-size:.85rem;color:var(--muted)"><em>Offering public key</em> es el paso de presentarse sin firmar, y <em>Server accepts key</em> es el <code>PK_OK</code>.</p>`};
+},
+
+warning() {
+  return {html: `
+<div class="term"><span class="red">@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@</span>
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the ED25519 key sent by the remote host is
+<span class="hl">${FP_ATTACK}</span>.
+Please contact your system administrator.
+Add correct host key in C:\\Users\\tu/.ssh/known_hosts to get rid of this message.
+Offending ED25519 key in C:\\Users\\tu/.ssh/known_hosts:1
+Host key for 192.168.56.10 has changed and you have requested strict checking.
+<span class="red">Host key verification failed.</span></div>
+<p style="font-size:.85rem;color:var(--muted)">Compara: la huella guardada era <code>${FP_SERVER}</code>.</p>`};
+},
+
+summary() {
+  return {html: `
+<div class="tbl"><table>
+<tr><th>Pieza</th><th>Tipo</th><th>Para qué sirve</th><th>Dónde está</th></tr>
+<tr><td><strong>Claves efímeras X25519</strong><br><span class="mono">q_C, Q_C, q_S, Q_S</span></td><td>Diffie-Hellman</td><td>Acordar el secreto <code>K</code> sin enviarlo nunca.</td><td>Se crean para cada conexión y se borran enseguida.</td></tr>
+<tr><td><strong>Clave de host</strong><br><span class="mono">ssh_host_ed25519_key</span></td><td>Asimétrica, <strong>firma</strong></td><td>Demostrar que el servidor es quien dice ser.</td><td>La privada, en el servidor. Su huella, en tu <code>known_hosts</code>.</td></tr>
+<tr><td><strong>Tu par de claves</strong><br><span class="mono">id_ed25519</span></td><td>Asimétrica, <strong>firma</strong></td><td>Demostrar que tú eres tú.</td><td>La privada, en tu portátil. La pública, en <code>authorized_keys</code>.</td></tr>
+<tr><td><strong>Claves de sesión</strong></td><td>Simétrica<br><span class="mono">chacha20-poly1305 / AES-GCM</span></td><td>Cifrar y proteger todo el tráfico.</td><td>Derivadas de <code>K</code> y <code>H</code>; solo en memoria, mientras dura la conexión.</td></tr>
+</table></div>
+<div class="two" style="margin-top:12px">
+  <div class="box">
+    <h3>Nunca viajan por la red</h3>
+    <ul style="margin:0;font-size:.9rem"><li>Tu clave privada y la clave de host privada.</li><li>Las privadas efímeras <code>q_C</code> y <code>q_S</code>.</li><li>El secreto <code>K</code> y las claves de sesión.</li></ul>
+  </div>
+  <div class="box">
+    <h3>Viajan por la red</h3>
+    <ul style="margin:0;font-size:.9rem"><li><strong>En claro:</strong> versiones, listas de algoritmos, <code>Q_C</code>, <code>Q_S</code>, <code>K_S</code> y la firma del servidor. Nada de eso sirve al espía.</li><li><strong>Cifrado:</strong> todo lo demás, incluidos tu nombre de usuario, tu firma o tu contraseña, y lo que escribes en la terminal.</li></ul>
+  </div>
+</div>
+<p class="note">Lo lento (Diffie-Hellman y las firmas) se usa una vez, al principio. Lo rápido (el cifrado simétrico) se usa para todo lo demás.</p>`};
+}
+};
+
+/* ---------- Render ---------- */
+let cur = 0;
+let animToken = 0;
+
+function renderPhases() {
+  const nav = $('phases');
+  nav.innerHTML = PHASES.map((p, i) => `<button type="button" data-p="${i}">${esc(p)}</button>`).join('');
+  nav.addEventListener('click', (ev) => {
+    const b = ev.target.closest('button');
+    if (!b) return;
+    const i = STEPS.findIndex((s) => s.phase === +b.dataset.p);
+    if (i >= 0) go(i);
+  });
+}
+
+function renderMem(step) {
+  const out = {c: [], s: [], e: []};
+  FACTS.forEach(([who, type, label, detail, from, to]) => {
+    const a = IDX[from], b = to === undefined ? Infinity : IDX[to];
+    if (cur >= a && cur < b) out[who].push({type, label, detail, fresh: cur === a && cur !== 0});
+  });
+  ['c', 's', 'e'].forEach((w) => {
+    const ul = $('mem-' + w);
+    ul.innerHTML = out[w].length
+      ? out[w].map((f) => `<li class="it ${f.type}${f.fresh ? ' new' : ''}"><b>${esc(f.label)}</b><small>${esc(f.detail)}</small></li>`).join('')
+      : '<li class="none">Todavía nada.</li>';
+  });
+  const mitm = !!step.mitm;
+  $('actor-e').classList.toggle('attacker', mitm);
+  $('e-title').textContent = mitm ? 'Atacante en medio' : 'Espía en la red';
+  $('e-sub').textContent = mitm
+    ? 'intercepta cada mensaje y puede cambiarlo'
+    : 've todo lo que viaja por la red, pero no lo que hay dentro de cada máquina';
+  $('node').hidden = !mitm;
+}
+
+const POS = {c: 0, m: 50, s: 100};
+const DIR = {cs: 'C→S', sc: 'S→C', cm: 'C→A', ms: 'A→S', sm: 'S→A', mc: 'A→C'};
+
+function renderLane(step) {
+  const pk = step.packets || [];
+  const ol = $('msgs');
+  ol.innerHTML = pk.length
+    ? pk.map((p) => `<li class="msg${p.enc ? ' enc' : ''}"><span class="dir">${DIR[p.f + p.t]}</span><span class="lbl">${esc(p.l)}</span></li>`).join('')
+    : '<li class="lane-empty">En este paso no viaja ningún mensaje.</li>';
+  animate(pk);
+}
+
+function animate(pk) {
+  const token = ++animToken;
+  const dot = $('dot');
+  const rows = Array.from(document.querySelectorAll('#msgs .msg'));
+  dot.classList.remove('show');
+  if (!pk.length) return;
+  if (reduceMotion) { rows.forEach((r) => r.classList.add('seen')); return; }
+  let i = 0;
+  const nextPacket = () => {
+    if (token !== animToken) return;
+    if (i > 0) { rows[i - 1].classList.remove('on'); rows[i - 1].classList.add('seen'); }
+    if (i >= pk.length) { dot.classList.remove('show'); return; }
+    const p = pk[i];
+    rows[i].classList.add('on');
+    dot.classList.toggle('enc', !!p.enc);
+    dot.style.transition = 'none';
+    dot.style.left = POS[p.f] + '%';
+    dot.classList.add('show');
+    void dot.offsetWidth;
+    dot.style.transition = '';
+    dot.style.left = POS[p.t] + '%';
+    i++;
+    setTimeout(nextPacket, 1250);
+  };
+  setTimeout(nextPacket, 250);
+}
+
+function go(i) {
+  cur = Math.max(0, Math.min(STEPS.length - 1, i));
+  const step = STEPS[cur];
+  try { history.replaceState(null, '', '#paso-' + (cur + 1)); } catch (e) { /* sin historial */ }
+
+  document.querySelectorAll('#phases button').forEach((b) => {
+    const p = +b.dataset.p;
+    b.classList.toggle('on', p === step.phase);
+    b.classList.toggle('done', p < step.phase);
+    b.setAttribute('aria-current', p === step.phase ? 'step' : 'false');
+  });
+  $('stage').hidden = !!step.hideStage;
+  $('legend').hidden = !!step.hideStage;
+  $('kicker').textContent = PHASES[step.phase];
+  $('title').textContent = step.title;
+  $('text').innerHTML = step.text;
+
+  let w = {html: ''};
+  if (step.widget) w = WIDGETS[step.widget]();
+  $('widget').innerHTML = w.html + (step.after || '');
+  if (w.bind) w.bind();
+
+  $('count').textContent = `Paso ${cur + 1} de ${STEPS.length}`;
+  $('prev').disabled = cur === 0;
+  $('next').disabled = cur === STEPS.length - 1;
+  $('replay').hidden = !(step.packets && step.packets.length) || !!step.hideStage;
+
+  renderMem(step);
+  renderLane(step);
+  fit();
+}
+
+/* ---------- Integración con la web (iframe) ---------- */
+function inFrame() { try { return window.self !== window.top; } catch (e) { return true; } }
+
+function fit() {
+  try {
+    const fe = window.frameElement;
+    if (fe) {
+      const borders = fe.offsetHeight - fe.clientHeight;
+      // body, no documentElement: el documento nunca es más bajo que el iframe y no encogería
+      fe.style.height = (document.body.offsetHeight + borders) + 'px';
+    }
+  } catch (e) { /* otro origen: la altura la fija el iframe */ }
+}
+
+function syncTheme() {
+  let theme = null;
+  try {
+    const pb = window.parent !== window ? window.parent.document.body : null;
+    const scheme = pb && pb.getAttribute('data-md-color-scheme');
+    if (scheme) theme = scheme === 'slate' ? 'dark' : 'light';
+  } catch (e) { /* sin acceso al padre */ }
+  if (theme) document.documentElement.setAttribute('data-theme', theme);
+  else document.documentElement.removeAttribute('data-theme');
+}
+
+function init() {
+  renderPhases();
+  $('prev').addEventListener('click', () => go(cur - 1));
+  $('next').addEventListener('click', () => go(cur + 1));
+  $('replay').addEventListener('click', () => renderLane(STEPS[cur]));
+  document.addEventListener('keydown', (ev) => {
+    if (ev.target.closest && ev.target.closest('input, select, textarea')) return;
+    if (ev.key === 'ArrowRight' || ev.key === 'PageDown') { ev.preventDefault(); go(cur + 1); }
+    else if (ev.key === 'ArrowLeft' || ev.key === 'PageUp') { ev.preventDefault(); go(cur - 1); }
+    else if (ev.key === 'r' || ev.key === 'R') renderLane(STEPS[cur]);
+  });
+
+  if (inFrame()) $('full').hidden = false;
+  syncTheme();
+  try {
+    const pb = window.parent !== window ? window.parent.document.body : null;
+    if (pb) new MutationObserver(syncTheme).observe(pb, {attributes: true, attributeFilter: ['data-md-color-scheme']});
+  } catch (e) { /* sin acceso al padre */ }
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(document.body);
+  window.addEventListener('resize', fit);
+
+  const m = /^#paso-(\d+)$/.exec(location.hash);
+  go(m ? Number(m[1]) - 1 : 0);
+}
+
+init();
+})();
+</script>
+</body>
+</html>
