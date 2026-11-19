@@ -1,42 +1,49 @@
 site_name: Despliegue de aplicaciones web
 site_description: Apuntes y prácticas del módulo 0614 - 2º DAW
-site_author: Dustin de Lara
+site_author: Dustin Randel de Lara García
 site_url: https://dustinrandel.github.io/despliegue-aplicaciones-web/
 repo_url: https://github.com/DustinRandel/despliegue-aplicaciones-web
-edit_uri: edit/main/docs/
+edit_uri: ""   # sin botón «editar»
 
 copyright: >
-  Material docente del módulo 0614. Contiene obras derivadas de terceros; ver la página de Créditos.
+  Dustin Randel de Lara García, Sant Josep Obrer. Material docente del módulo 0614.
+  Contiene obras derivadas de terceros; ver la página de Créditos.
 
 theme:
   name: material
+  custom_dir: overrides   # favicons de 48 px y .ico
   language: es
+  logo: assets/logo.png       # icono de Dustin (compás blanco con Ø)
+  favicon: assets/favicon.png
   font:
+    text: Carlito
     code: Roboto Mono
   icon:
     repo: fontawesome/brands/github
   palette:
     - media: "(prefers-color-scheme: light)"
-      primary: green
-      accent: blue
+      scheme: default
+      primary: custom
+      accent: custom
       toggle:
-        icon: material/toggle-switch-off-outline
+        icon: material/weather-night
         name: Cambiar a modo oscuro
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: black
-      accent: deep orange
+      primary: custom
+      accent: custom
       toggle:
-        icon: material/toggle-switch
+        icon: material/weather-sunny
         name: Cambiar a modo claro
   features:
     - navigation.top
     - navigation.footer
-    - toc.integrate
+    - navigation.indexes
+    - toc.follow
     - search.highlight
     - search.suggest
-    - content.code.annotate
     - content.code.copy
+    - content.code.annotate
     - content.tabs.link
 
 markdown_extensions:
@@ -59,6 +66,7 @@ markdown_extensions:
       alternate_style: true
   - toc:
       permalink: true
+      toc_depth: 3
 
 plugins:
   - search:
