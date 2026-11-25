@@ -92,7 +92,7 @@
 [data-md-color-scheme="slate"] .md-typeset :is(.definicion,.ejemplo,.ojo,.comprueba,.predice,.abstract) > .admonition-title { color: #E6E9ED; }
 
 /* Imágenes centradas y sin desbordar */
-.md-typeset img { display: block; margin: 1em auto; max-width: 100%; height: auto; }
+.md-typeset img { display: block; margin: 1em auto; max-width: min(100%, 520px); max-height: 380px; width: auto; height: auto; object-fit: contain; }
 
 /* Icono de la cabecera (compás blanco sobre fondo transparente) */
 .md-header__button.md-logo img { height: 2rem; width: 2rem; }
