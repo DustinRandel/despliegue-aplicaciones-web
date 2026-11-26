@@ -1,5 +1,11 @@
 ---
-title: 'Tema 2 - Arquitectura web'
+title: "Arquitectura web"
+subtitulo: "UT2. Dosier de apuntes"
+modulo: "0614. Despliegue de aplicaciones web"
+curso: "2026-2027"
+profesor: "Dustin Randel de Lara García"
+centro: "Sant Josep Obrer"
+ut: "UT2"
 ---
 
 <!--
@@ -24,18 +30,19 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
   1 servidor web, 2 arquitectura, 3 HTTP | 4 virtual hosts, 5 Apache/Nginx, 6 Nginx por dentro, 7 FTP/SFTP
   -> P2.1 | 8 HTTPS -> P2.2 | P2.3-2.5. El recuadro SNI pasó de virtual hosts a HTTPS (se explica tras TLS).
   Las diapositivas siguen el mismo orden, con una diapositiva "Ahora toca" en cada práctica.
-- Prácticas 2.2 (HTTPS), 2.3 (autenticación), 2.4 (proxy inverso) y 2.5 (balanceo): pendientes de
-  adaptar (parten de old.P1.2 a old.P1.5). Cuando existan, enlazarlas en la tabla de bloques y en los
-  recuadros "Ahora toca".
+- Prácticas 2.2 a 2.5 publicadas y validadas en VM (15/11/2026). En Classroom: P2.3 entrega 1/12;
+  P2.4 y P2.5 en borrador.
 - Corregido 05/10/2026: la frase "un servicio es un programa que escucha en un puerto" no estaba en el
   Tema 1 (ahora enlaza con el puerto 22 de SSH); los métodos de las API REST son GET, POST, PUT, PATCH y
   DELETE; aclarado por qué HTTP/2 y HTTP/3 van cifrados; example.com no resolvía en la red del centro y
   se sustituye por github.com en los ejemplos.
 -->
 
-# Tema 2 - Arquitectura web: implantación y administración de servidores web
+# Cómo se usa este dosier {.nobreak}
 
-!!! abstract "Qué vas a aprender en este tema"
+Este dosier es la teoría de la unidad. Las prácticas 2.1 a 2.5 están en páginas aparte y se enlazan al final de cada bloque.
+
+!!! abstract "Qué vas a aprender en esta UT"
     - Qué es exactamente un servidor web y qué lugar ocupa en la arquitectura de una aplicación.
     - Cómo es por dentro una conversación HTTP: peticiones, respuestas, códigos de estado, cabeceras y tipos MIME.
     - Cómo un solo servidor puede alojar muchas webs distintas (*virtual hosts*).
@@ -53,8 +60,6 @@ La teoría y las prácticas van intercaladas, en cuatro bloques. Cada bloque ter
 | 2. Montar un servidor web | Apartados 4, 5, 6 y 7 | [Práctica 2.1](T2-practica-nginx.md): Nginx, sitios virtuales y SFTP |
 | 3. Cifrar | Apartado 8 | [Práctica 2.2](T2-practica-https.md): HTTPS y redirección |
 | 4. Proteger y escalar | Repaso de los apartados 1 y 3.3 | Prácticas [2.3](T2-practica-autenticacion.md), [2.4](T2-practica-proxy.md) y [2.5](T2-practica-balanceo.md) |
-
----
 
 ## 1. Qué es un servidor web
 
@@ -91,7 +96,7 @@ Un servidor web es excelente sirviendo contenido estático. Para el dinámico se
 | **Autenticación** | Pedir usuario y contraseña para una zona de la web | Práctica 2.3 |
 | **Proxy inverso** | Recibir la petición y reenviarla a otro servidor que está detrás | Práctica 2.4 y Tema 3 |
 | **Balanceo de carga** | Repartir las peticiones entre varios servidores | Práctica 2.5 |
-| **Caché y compresión** | Guardar respuestas ya generadas y comprimir lo que se envía | — |
+| **Caché y compresión** | Guardar respuestas ya generadas y comprimir lo que se envía | no aplica |
 
 ## 2. La arquitectura de una aplicación web
 
@@ -251,7 +256,6 @@ El problema que resuelve HTTP/3 se llama **bloqueo de cabeza de línea** (*head-
 
 Hoy los navegadores y los grandes sitios usan sobre todo HTTP/2 y HTTP/3, y lo negocian solos. HTTP/1.1 sigue siendo el idioma común que todos entienden, y es el que verás con `curl` en tus prácticas.
 
----
 
 ## Cierre del bloque 1
 
@@ -269,7 +273,6 @@ Hoy los navegadores y los grandes sitios usan sobre todo HTTP/2 y HTTP/3, y lo n
     3. `curl.exe -I https://github.com/noexiste-xyz-123`. ¿Qué código devuelve, y de quién es el error, del cliente o del servidor?
     4. En el navegador, abre <https://www.wikipedia.org>, pulsa **F12 → Red** y recarga. ¿Cuántas peticiones ha hecho para una sola página? Busca un fichero `text/css` y una imagen. Vuelve a recargar: ¿aparece algún `304`?
 
----
 
 ## 4. Virtual hosts: muchas webs en un solo servidor
 
@@ -516,7 +519,6 @@ Clientes habituales: **FileZilla** y **WinSCP** (gráficos), y los comandos **`s
 !!! info "Y en el mundo real…"
     Subir ficheros a mano es cada vez menos habitual. Lo normal es que el código viva en un repositorio **Git** (Tema 5) y que el despliegue se haga desde ahí, de forma automática, con un sistema de **integración y despliegue continuo** (Tema 7). En la práctica 2.1 harás un sitio de cada forma: uno clonando un repositorio y otro subiéndolo por SFTP.
 
----
 
 ## Cierre del bloque 2
 
@@ -529,7 +531,6 @@ Clientes habituales: **FileZilla** y **WinSCP** (gráficos), y los comandos **`s
 !!! example "Ahora toca: Práctica 2.1 - Servidor web Nginx"
     **[Ir a la práctica 2.1](T2-practica-nginx.md).** Instalarás Nginx en tu máquina virtual, montarás dos sitios virtuales con tu apellido (uno clonado de Git y otro subido por SFTP) y diagnosticarás errores con los registros. Usa los apartados 4, 6 y 7.
 
----
 
 ## 8. HTTPS: HTTP sobre TLS
 
@@ -597,7 +598,6 @@ Un certificado autofirmado cifra **exactamente igual de bien** que uno de una CA
 !!! info "Virtual hosts con HTTPS: SNI"
     Con HTTPS hay un problema: el servidor tiene que presentar el certificado del sitio **antes** de recibir la petición HTTP y, por tanto, antes de ver la cabecera `Host`. Se resuelve con **SNI** (*Server Name Indication*): el cliente anuncia el nombre del sitio en el primer mensaje del saludo TLS, y así el servidor sabe qué certificado enviar.
 
----
 
 ## Cierre del bloque 3
 
@@ -610,7 +610,6 @@ Un certificado autofirmado cifra **exactamente igual de bien** que uno de una CA
 !!! example "Ahora toca: Práctica 2.2 - HTTPS en Nginx"
     **[Ir a la práctica 2.2](T2-practica-https.md).** Generarás un certificado autofirmado, pondrás tus dos sitios en HTTPS y redirigirás automáticamente las peticiones HTTP a HTTPS.
 
----
 
 ## Bloque 4: proteger y escalar
 
@@ -621,7 +620,6 @@ Este bloque es práctico. Usa lo que ya sabes de los códigos de estado (apartad
     - **[Práctica 2.4, proxy inverso](T2-practica-proxy.md):** un Nginx delante que reenvía las peticiones a otro servidor (código `502` si el de detrás no responde).
     - **[Práctica 2.5, balanceo de carga](T2-practica-balanceo.md):** repartir las peticiones entre varios servidores y comprobar qué pasa cuando uno se cae.
 
----
 
 ??? info "Para saber más: más allá de tu propio servidor"
     **CDN (*Content Delivery Network*).** Una red de servidores repartidos por todo el mundo que guardan copias del contenido de una web. El usuario recibe el contenido del nodo más cercano, lo que reduce la latencia: la luz tarda unos 50 ms solo en recorrer la fibra entre Europa y la costa oeste de Estados Unidos, y una página hace decenas de peticiones. Cloudflare, Akamai o Fastly son CDN. Además de acercar el contenido, absorben ataques de denegación de servicio y terminan las conexiones TLS cerca del usuario.
@@ -634,10 +632,10 @@ Este bloque es práctico. Usa lo que ya sabes de los códigos de estado (apartad
 
 ## Referencias
 
-- [MDN — Una visión general de HTTP](https://developer.mozilla.org/es/docs/Web/HTTP/Guides/Overview)
-- [MDN — Códigos de estado de respuesta HTTP](https://developer.mozilla.org/es/docs/Web/HTTP/Reference/Status)
-- [Documentación de Nginx — Beginner's Guide](https://nginx.org/en/docs/beginners_guide.html)
-- [Documentación de Nginx — Cómo procesa Nginx una petición](https://nginx.org/en/docs/http/request_processing.html)
-- [Cloudflare — ¿Qué ocurre en un protocolo de enlace TLS?](https://www.cloudflare.com/es-es/learning/ssl/what-happens-in-a-tls-handshake/)
-- [W3Techs — Usage statistics of web servers](https://w3techs.com/technologies/overview/web_server)
-- [Let's Encrypt — Cómo funciona](https://letsencrypt.org/es/how-it-works/)
+- [MDN: una visión general de HTTP](https://developer.mozilla.org/es/docs/Web/HTTP/Guides/Overview)
+- [MDN: códigos de estado de respuesta HTTP](https://developer.mozilla.org/es/docs/Web/HTTP/Reference/Status)
+- [Documentación de Nginx: Beginner's Guide](https://nginx.org/en/docs/beginners_guide.html)
+- [Documentación de Nginx: cómo procesa Nginx una petición](https://nginx.org/en/docs/http/request_processing.html)
+- [Cloudflare: qué ocurre en un protocolo de enlace TLS](https://www.cloudflare.com/es-es/learning/ssl/what-happens-in-a-tls-handshake/)
+- [W3Techs: usage statistics of web servers](https://w3techs.com/technologies/overview/web_server)
+- [Let's Encrypt: cómo funciona](https://letsencrypt.org/es/how-it-works/)

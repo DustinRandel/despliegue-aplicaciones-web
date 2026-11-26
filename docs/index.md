@@ -12,13 +12,13 @@ protege, cómo se versiona el código y cómo se automatiza todo el proceso.
 
 ## Contenidos
 
-1. **Introducción** — el escenario del despliegue: VPS, máquinas virtuales y SSH
-2. **Arquitectura web** — implantación y administración de servidores web
+1. **Introducción**: el escenario del despliegue (VPS, máquinas virtuales y SSH)
+2. **Arquitectura web**: implantación y administración de servidores web
 3. **Servidores de aplicaciones**
 4. **Servicios de red** implicados en el despliegue: DNS
-5. **Control de versiones** — Git y GitHub
-6. **Contenedores** — Docker
-7. **CI/CD** — integración y despliegue continuo
+5. **Control de versiones**: Git y GitHub
+6. **Contenedores**: Docker
+7. **CI/CD**: integración y despliegue continuo
 
 !!! tip "Cómo se trabaja en este módulo"
     Apenas trabajarás en tu propio ordenador. Todo ocurre sobre una **máquina virtual** que
