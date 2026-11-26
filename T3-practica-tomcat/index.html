@@ -1,0 +1,3378 @@
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Apuntes y prácticas del módulo 0614 - 2º DAW">
+      
+      
+        <meta name="author" content="Dustin Randel de Lara García">
+      
+      
+        <link rel="canonical" href="https://dustinrandel.github.io/despliegue-aplicaciones-web/T3-practica-tomcat/">
+      
+      
+        <link rel="prev" href="../T3-servidores-aplicaciones/">
+      
+      
+        <link rel="next" href="../T3-practica-node/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
+    
+    
+      
+        <title>Práctica 3.1 - Aplicación Java en Tomcat - Despliegue de aplicaciones web</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Carlito:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Carlito";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <link rel="icon" type="image/png" sizes="48x48" href="../assets/favicon-48.png">
+  <link rel="icon" sizes="any" href="../assets/favicon.ico">
+  <link rel="apple-touch-icon" href="../assets/logo.png">
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#practica-31-aplicacion-java-en-tomcat-detras-de-nginx" class="md-skip">
+          Saltar a contenido
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Cabecera">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-header__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Despliegue de aplicaciones web
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Práctica 3.1 - Aplicación Java en Tomcat
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Cambiar a modo oscuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo oscuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Cambiar a modo claro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Cambiar a modo claro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Búsqueda" placeholder="Búsqueda" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Buscar">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Limpiar" aria-label="Limpiar" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inicializando búsqueda
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navegación" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Despliegue de aplicaciones web" class="md-nav__button md-logo" aria-label="Despliegue de aplicaciones web" data-md-component="logo">
+      
+  <img src="../assets/logo.png" alt="logo">
+
+    </a>
+    Despliegue de aplicaciones web
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/DustinRandel/despliegue-aplicaciones-web" title="Ir al repositorio" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Inicio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 1
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 1
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-introduccion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introducción
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T1-practica-maquina-virtual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 1.1 - Instalación y configuración de nuestra máquina virtual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 2
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 2
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-arquitectura-web/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitectura web
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-nginx/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.1 - Servidor web Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-https/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.2 - HTTPS en Nginx
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-autenticacion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.3 - Autenticación y control de acceso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-proxy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.4 - Proxy inverso
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T2-practica-balanceo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 2.5 - Balanceo de carga
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 3
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 3
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T3-servidores-aplicaciones/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Servidores de aplicaciones
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 3.1 - Aplicación Java en Tomcat
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 3.1 - Aplicación Java en Tomcat
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-que-vas-a-montar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Qué vas a montar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-instalar-java-maven-y-tomcat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Instalar Java, Maven y Tomcat
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-crear-el-proyecto-maven" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Crear el proyecto Maven
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Crear el proyecto Maven">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#el-pomxml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El pom.xml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#el-servlet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El servlet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-pagina-estatica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La página estática
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-construir-el-war" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Construir el WAR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-desplegar-en-tomcat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Desplegar en Tomcat
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-publicar-con-nginx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Publicar con Nginx
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Publicar con Nginx">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#el-sitio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El sitio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-ip-real-en-tomcat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La IP real en Tomcat
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-que-nadie-se-salte-el-proxy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Que nadie se salte el proxy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-cuando-tomcat-no-responde-502" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Cuando Tomcat no responde: 502
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-desplegar-una-version-nueva-y-volver-atras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Desplegar una versión nueva (y volver atrás)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-haz-la-instantanea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Haz la instantánea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuestiones-finales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuestiones finales
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entrega" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entrega
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Entrega">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parte-1-documento-de-evidencias-40" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 1 — Documento de evidencias (40 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parte-2-demostracion-en-clase-60" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 2 — Demostración en clase (60 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#criterios-de-evaluacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Criterios de evaluación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#antes-de-entregar-comprueba-que" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antes de entregar, comprueba que…
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referencias
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T3-practica-node/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 3.2 - Aplicación Node.js con Express
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T3-practica-flask/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 3.3 - Aplicación Flask con Gunicorn
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 4
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 4
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_1" id="__nav_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T4-dns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Servicios de red (DNS)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T4-practica-bind/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 4.1: BIND9 en la máquina virtual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 5
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 5
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_1" id="__nav_6_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T5-git/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Control de versiones (Git y GitHub)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_6_2" id="__nav_6_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_6_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T5-practica-github/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 5.1: Git y GitHub
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 6
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 6
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_1" id="__nav_7_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T6-docker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contenedores (Docker)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_7_2" id="__nav_7_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T6-practica-compose/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 6.1: Nginx y una app con Compose
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tema 7
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tema 7
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Teoría
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Teoría
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T7-cicd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_8_2" id="__nav_8_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prácticas
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prácticas
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../T7-practica-actions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Práctica 7.1: Actions y GitHub Pages
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../creditos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Créditos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Tabla de contenidos">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Tabla de contenidos
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-que-vas-a-montar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Qué vas a montar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-instalar-java-maven-y-tomcat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Instalar Java, Maven y Tomcat
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-crear-el-proyecto-maven" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Crear el proyecto Maven
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Crear el proyecto Maven">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#el-pomxml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El pom.xml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#el-servlet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El servlet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-pagina-estatica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La página estática
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-construir-el-war" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Construir el WAR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-desplegar-en-tomcat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Desplegar en Tomcat
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-publicar-con-nginx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Publicar con Nginx
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Publicar con Nginx">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#el-sitio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        El sitio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-ip-real-en-tomcat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La IP real en Tomcat
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-que-nadie-se-salte-el-proxy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Que nadie se salte el proxy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-cuando-tomcat-no-responde-502" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Cuando Tomcat no responde: 502
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-desplegar-una-version-nueva-y-volver-atras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Desplegar una versión nueva (y volver atrás)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-haz-la-instantanea" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Haz la instantánea
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cuestiones-finales" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cuestiones finales
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entrega" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entrega
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Entrega">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#parte-1-documento-de-evidencias-40" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 1 — Documento de evidencias (40 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parte-2-demostracion-en-clase-60" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parte 2 — Demostración en clase (60 %)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#criterios-de-evaluacion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Criterios de evaluación
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#antes-de-entregar-comprueba-que" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Antes de entregar, comprueba que…
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#referencias" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Referencias
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="practica-31-aplicacion-java-en-tomcat-detras-de-nginx">Práctica 3.1 - Aplicación Java en Tomcat detrás de Nginx<a class="headerlink" href="#practica-31-aplicacion-java-en-tomcat-detras-de-nginx" title="Permanent link">&para;</a></h1>
+<div class="admonition tip">
+<p class="admonition-title">Cuándo se hace</p>
+<p>Al terminar el <strong>bloque 2</strong> de la <a href="../T3-servidores-aplicaciones/">teoría del Tema 3</a>, con las prácticas del Tema 2 terminadas. Se hace en la <strong>máquina principal</strong> (<code>192.168.56.10</code>); no necesitas los clones.</p>
+</div>
+<div class="admonition abstract">
+<p class="admonition-title">Objetivos</p>
+<p>Al terminar esta práctica deberás ser capaz de:</p>
+<ol>
+<li>Instalar un entorno Java (JDK, Maven y Tomcat) desde los repositorios de Debian.</li>
+<li>Crear un proyecto Maven y construir con él un WAR.</li>
+<li>Desplegar el WAR en Tomcat y seguir el despliegue en el registro.</li>
+<li>Publicar Tomcat a través de Nginx y pasarle la IP real del cliente.</li>
+<li>Hacer que Tomcat solo acepte conexiones locales.</li>
+<li>Desplegar una versión nueva y saber volver a la anterior.</li>
+</ol>
+</div>
+<hr />
+<h2 id="1-que-vas-a-montar">1. Qué vas a montar<a class="headerlink" href="#1-que-vas-a-montar" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a> Tu ordenador         debian-tuapellido (192.168.56.10)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a> 192.168.56.1  ───►   Nginx :80  ──── java.tuapellido.test ───►  Tomcat 127.0.0.1:8080
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                                                                   └── /saludo/  (saludo.war)
+</code></pre></div>
+<p>Una aplicación Java mínima: una página estática y un servlet en <code>/saludo/api/saludo</code> que responde en JSON con un saludo, el nombre del servidor, la hora y la IP del cliente. Lo importante no es la aplicación, sino el camino completo: código → Maven → WAR → Tomcat → Nginx → navegador.</p>
+<p>En los ejemplos, el apellido es <code>garcia</code>. Usa el tuyo en todos los nombres.</p>
+<h2 id="2-instalar-java-maven-y-tomcat">2. Instalar Java, Maven y Tomcat<a class="headerlink" href="#2-instalar-java-maven-y-tomcat" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>sudo<span class="w"> </span>apt<span class="w"> </span>update
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>default-jdk-headless<span class="w"> </span>maven<span class="w"> </span>tomcat10
+</code></pre></div>
+<ul>
+<li><code>default-jdk-headless</code>: el JDK de Debian 13 (OpenJDK 21) sin librerías gráficas. El JDK incluye la JVM y el compilador <code>javac</code>.</li>
+<li><code>maven</code>: la herramienta de construcción.</li>
+<li><code>tomcat10</code>: Tomcat 10.1, ya instalado como servicio y arrancado.</li>
+</ul>
+<p>Son 64 paquetes: unos 155 MB de descarga y 350 MB en disco. Ten paciencia; al terminar, Tomcat tarda todavía un poco en arrancar la primera vez.</p>
+<p>Comprueba las versiones y el servicio:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>java<span class="w"> </span>-version
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>mvn<span class="w"> </span>-v<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>systemctl<span class="w"> </span>status<span class="w"> </span>tomcat10
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>openjdk version "21.0.13" 2026-10-20
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>OpenJDK Runtime Environment (build 21.0.13+9-1-deb13u2-Debian)
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>OpenJDK 64-Bit Server VM (build 21.0.13+9-1-deb13u2-Debian, mixed mode, sharing)
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Apache Maven 3.9.9
+</code></pre></div>
+<p>Las versiones exactas pueden ser algo más nuevas en tu máquina: Debian publica actualizaciones de seguridad. En <code>systemctl status</code> debes ver <code>active (running)</code> y, en la línea <code>Memory</code>, unos 90 MB: es lo que ocupa una JVM con Tomcat sin nada tuyo desplegado, y subirá a unos 150 MB con tu aplicación. Compara con <code>systemctl status nginx</code>: unos 6 MB.</p>
+<p>Ahora mismo Tomcat escucha en el puerto 8080 de <strong>todas</strong> las interfaces. Entra desde tu navegador en <code>http://192.168.56.10:8080</code>: verás la página <code>It works !</code> de Tomcat. Lo cerrarás en el apartado 7.</p>
+<h2 id="3-crear-el-proyecto-maven">3. Crear el proyecto Maven<a class="headerlink" href="#3-crear-el-proyecto-maven" title="Permanent link">&para;</a></h2>
+<p>Trabaja en tu carpeta personal. Crea la estructura de carpetas que espera Maven:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>~/saludo/src/main/java/es/sjo/daw<span class="w"> </span>~/saludo/src/main/webapp
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">cd</span><span class="w"> </span>~/saludo
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>saludo/
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>├── pom.xml
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>└── src/main/
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>    ├── java/es/sjo/daw/SaludoServlet.java   ← código Java
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    └── webapp/index.html                    ← ficheros web estáticos
+</code></pre></div>
+<h3 id="el-pomxml">El <code>pom.xml</code><a class="headerlink" href="#el-pomxml" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>nano<span class="w"> </span>pom.xml
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">&lt;project</span><span class="w"> </span><span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">         </span><span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">         </span><span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"</span><span class="nt">&gt;</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="nt">&lt;groupId&gt;</span>es.sjo.daw<span class="nt">&lt;/groupId&gt;</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="nt">&lt;artifactId&gt;</span>saludo<span class="nt">&lt;/artifactId&gt;</span>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="nt">&lt;version&gt;</span>1.0<span class="nt">&lt;/version&gt;</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="nt">&lt;packaging&gt;</span>war<span class="nt">&lt;/packaging&gt;</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">  </span><span class="nt">&lt;properties&gt;</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">    </span><span class="nt">&lt;maven.compiler.release&gt;</span>21<span class="nt">&lt;/maven.compiler.release&gt;</span>
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">    </span><span class="nt">&lt;project.build.sourceEncoding&gt;</span>UTF-8<span class="nt">&lt;/project.build.sourceEncoding&gt;</span>
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">  </span><span class="nt">&lt;/properties&gt;</span>
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">  </span><span class="nt">&lt;dependencies&gt;</span>
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">    </span><span class="nt">&lt;dependency&gt;</span>
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">      </span><span class="nt">&lt;groupId&gt;</span>jakarta.servlet<span class="nt">&lt;/groupId&gt;</span>
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="w">      </span><span class="nt">&lt;artifactId&gt;</span>jakarta.servlet-api<span class="nt">&lt;/artifactId&gt;</span>
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="w">      </span><span class="nt">&lt;version&gt;</span>6.0.0<span class="nt">&lt;/version&gt;</span>
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="w">      </span><span class="nt">&lt;scope&gt;</span>provided<span class="nt">&lt;/scope&gt;</span>
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="w">    </span><span class="nt">&lt;/dependency&gt;</span>
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="w">  </span><span class="nt">&lt;/dependencies&gt;</span>
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>
+<a id="__codelineno-7-26" name="__codelineno-7-26" href="#__codelineno-7-26"></a><span class="w">  </span><span class="nt">&lt;build&gt;</span>
+<a id="__codelineno-7-27" name="__codelineno-7-27" href="#__codelineno-7-27"></a><span class="w">    </span><span class="nt">&lt;finalName&gt;</span>saludo<span class="nt">&lt;/finalName&gt;</span>
+<a id="__codelineno-7-28" name="__codelineno-7-28" href="#__codelineno-7-28"></a><span class="w">  </span><span class="nt">&lt;/build&gt;</span>
+<a id="__codelineno-7-29" name="__codelineno-7-29" href="#__codelineno-7-29"></a><span class="nt">&lt;/project&gt;</span>
+</code></pre></div>
+<ul>
+<li><code>packaging</code> <code>war</code>: el artefacto será un WAR.</li>
+<li><code>maven.compiler.release</code> <code>21</code>: compila para Java 21, la versión que tienes instalada.</li>
+<li><code>jakarta.servlet-api</code> 6.0.0 es la versión de servlets de Tomcat 10.1. Con <code>provided</code>, Maven la usa para compilar pero no la mete en el WAR: en el servidor la pone Tomcat.</li>
+<li><code>finalName</code>: el WAR se llamará <code>saludo.war</code> (sin esto, <code>saludo-1.0.war</code>). Recuerda que el nombre del WAR decide la URL.</li>
+</ul>
+<h3 id="el-servlet">El servlet<a class="headerlink" href="#el-servlet" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>nano<span class="w"> </span>src/main/java/es/sjo/daw/SaludoServlet.java
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">package</span><span class="w"> </span><span class="nn">es.sjo.daw</span><span class="p">;</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.servlet.annotation.WebServlet</span><span class="p">;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.servlet.http.HttpServlet</span><span class="p">;</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.servlet.http.HttpServletRequest</span><span class="p">;</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.servlet.http.HttpServletResponse</span><span class="p">;</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.IOException</span><span class="p">;</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.net.InetAddress</span><span class="p">;</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.time.LocalTime</span><span class="p">;</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.time.temporal.ChronoUnit</span><span class="p">;</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="nd">@WebServlet</span><span class="p">(</span><span class="s">"/api/saludo"</span><span class="p">)</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">SaludoServlet</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">HttpServlet</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="nd">@Override</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">doGet</span><span class="p">(</span><span class="n">HttpServletRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">HttpServletResponse</span><span class="w"> </span><span class="n">resp</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="na">getParameter</span><span class="p">(</span><span class="s">"nombre"</span><span class="p">);</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nombre</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">nombre</span><span class="p">.</span><span class="na">isBlank</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">            </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"mundo"</span><span class="p">;</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">        </span><span class="p">}</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">        </span><span class="n">nombre</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nombre</span><span class="p">.</span><span class="na">replaceAll</span><span class="p">(</span><span class="s">"[^\\p{L}\\p{N} ]"</span><span class="p">,</span><span class="w"> </span><span class="s">""</span><span class="p">);</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">        </span><span class="n">resp</span><span class="p">.</span><span class="na">setContentType</span><span class="p">(</span><span class="s">"application/json;charset=UTF-8"</span><span class="p">);</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="w">        </span><span class="n">resp</span><span class="p">.</span><span class="na">getWriter</span><span class="p">().</span><span class="na">printf</span><span class="p">(</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">            </span><span class="s">"{\"mensaje\": \"Hola, %s\", \"servidor\": \"%s\", \"hora\": \"%s\", \"cliente\": \"%s\"}%n"</span><span class="p">,</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26" href="#__codelineno-9-26"></a><span class="w">            </span><span class="n">nombre</span><span class="p">,</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27" href="#__codelineno-9-27"></a><span class="w">            </span><span class="n">InetAddress</span><span class="p">.</span><span class="na">getLocalHost</span><span class="p">().</span><span class="na">getHostName</span><span class="p">(),</span>
+<a id="__codelineno-9-28" name="__codelineno-9-28" href="#__codelineno-9-28"></a><span class="w">            </span><span class="n">LocalTime</span><span class="p">.</span><span class="na">now</span><span class="p">().</span><span class="na">truncatedTo</span><span class="p">(</span><span class="n">ChronoUnit</span><span class="p">.</span><span class="na">SECONDS</span><span class="p">),</span>
+<a id="__codelineno-9-29" name="__codelineno-9-29" href="#__codelineno-9-29"></a><span class="w">            </span><span class="n">req</span><span class="p">.</span><span class="na">getRemoteAddr</span><span class="p">());</span>
+<a id="__codelineno-9-30" name="__codelineno-9-30" href="#__codelineno-9-30"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-9-31" name="__codelineno-9-31" href="#__codelineno-9-31"></a><span class="p">}</span>
+</code></pre></div>
+<ul>
+<li><code>@WebServlet("/api/saludo")</code>: la ruta que atiende, <strong>dentro</strong> del contexto. La URL completa será <code>/saludo/api/saludo</code>.</li>
+<li><code>req.getParameter("nombre")</code>: lee el <code>?nombre=</code> de la URL. La línea del <code>replaceAll</code> deja solo letras, números y espacios: nunca metas en una respuesta lo que te manda el cliente sin limpiarlo.</li>
+<li><code>req.getRemoteAddr()</code>: la IP de quien se conecta a Tomcat. Fíjate en ella en los apartados 6 y 7.</li>
+</ul>
+<h3 id="la-pagina-estatica">La página estática<a class="headerlink" href="#la-pagina-estatica" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>nano<span class="w"> </span>src/main/webapp/index.html
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">"es"</span><span class="p">&gt;</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;&lt;</span><span class="nt">meta</span> <span class="na">charset</span><span class="o">=</span><span class="s">"utf-8"</span><span class="p">&gt;&lt;</span><span class="nt">title</span><span class="p">&gt;</span>Saludo · Tomcat<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="p">&lt;</span><span class="nt">body</span> <span class="na">style</span><span class="o">=</span><span class="s">"font-family:sans-serif;background:#fdf0dc;text-align:center;padding-top:12%"</span><span class="p">&gt;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Aplicación Java en Tomcat<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Esta página es estática. La parte dinámica está en <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"api/saludo?nombre=Ana"</span><span class="p">&gt;</span>api/saludo<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+<h2 id="4-construir-el-war">4. Construir el WAR<a class="headerlink" href="#4-construir-el-war" title="Permanent link">&para;</a></h2>
+<p>Desde <code>~/saludo</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>mvn<span class="w"> </span>package
+</code></pre></div>
+<p>La primera vez, Maven descarga de Maven Central sus propios plugins y la librería de servlets: verás más de doscientas líneas <code>Downloading from central</code>. Se guardan en <code>~/.m2/repository</code> y las siguientes construcciones ya no descargan nada. El final debe ser este:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>[INFO] --- compiler:3.13.0:compile (default-compile) @ saludo ---
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>[INFO] Recompiling the module because of changed dependency.
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>[INFO] Compiling 1 source file with javac [debug release 21] to target/classes
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>[INFO] 
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>[INFO] --- resources:3.3.1:testResources (default-testResources) @ saludo ---
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>[INFO] skip non existing resourceDirectory /home/garcia/saludo/src/test/resources
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>[INFO] 
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ saludo ---
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>[INFO] No sources to compile
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>[INFO] 
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>[INFO] --- surefire:2.17:test (default-test) @ saludo ---
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>[INFO] No tests to run.
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a>[INFO] 
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>[INFO] --- war:3.4.0:war (default-war) @ saludo ---
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>[INFO] Packaging webapp
+<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a>[INFO] Assembling webapp [saludo] in [/home/garcia/saludo/target/saludo]
+<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>[INFO] Processing war project
+<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a>[INFO] Copying webapp resources [/home/garcia/saludo/src/main/webapp]
+<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a>[INFO] Building war: /home/garcia/saludo/target/saludo.war
+<a id="__codelineno-13-20" name="__codelineno-13-20" href="#__codelineno-13-20"></a>[INFO] ------------------------------------------------------------------------
+<a id="__codelineno-13-21" name="__codelineno-13-21" href="#__codelineno-13-21"></a>[INFO] BUILD SUCCESS
+<a id="__codelineno-13-22" name="__codelineno-13-22" href="#__codelineno-13-22"></a>[INFO] ------------------------------------------------------------------------
+</code></pre></div>
+<p>Fíjate en las fases del ciclo de vida, en orden: <code>compile</code>, <code>test</code> (no hay pruebas) y <code>war</code>, que es la fase <code>package</code> de un proyecto WAR. Mira qué hay dentro del WAR (<code>unzip</code> no viene instalado en Debian, pero el JDK trae <code>jar</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>jar<span class="w"> </span>tf<span class="w"> </span>target/saludo.war
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>META-INF/
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>META-INF/MANIFEST.MF
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>WEB-INF/
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>WEB-INF/classes/
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>WEB-INF/classes/es/
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>WEB-INF/classes/es/sjo/
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>WEB-INF/classes/es/sjo/daw/
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>WEB-INF/classes/es/sjo/daw/SaludoServlet.class
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>index.html
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>META-INF/maven/es.sjo.daw/saludo/pom.xml
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>META-INF/maven/es.sjo.daw/saludo/pom.properties
+</code></pre></div>
+<p>El <code>.java</code> no está: en el servidor solo va el <code>.class</code> compilado. Y no hay ninguna librería en <code>WEB-INF/lib</code>: la de servlets era <code>provided</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Si Maven falla</p>
+<p><code>BUILD FAILURE</code> con <code>cannot find symbol</code> es un error de Java: revisa el código y los <code>import</code>. Si el error habla de <code>release 21</code>, comprueba con <code>java -version</code> que tienes el JDK 21.</p>
+</div>
+<h2 id="5-desplegar-en-tomcat">5. Desplegar en Tomcat<a class="headerlink" href="#5-desplegar-en-tomcat" title="Permanent link">&para;</a></h2>
+<p>Desplegar es copiar el WAR a la carpeta de aplicaciones de Tomcat:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>target/saludo.war<span class="w"> </span>/var/lib/tomcat10/webapps/
+</code></pre></div>
+<p>Tomcat revisa esa carpeta cada pocos segundos. Sigue el despliegue en su registro:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w"> </span>tomcat10<span class="w"> </span>-n<span class="w"> </span><span class="m">3</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>Nov 15 16:40:44 debian-garcia tomcat10[2635]: Deploying web application archive [/var/lib/tomcat10/webapps/saludo.war]
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>Nov 15 16:40:45 debian-garcia tomcat10[2635]: At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>Nov 15 16:40:45 debian-garcia tomcat10[2635]: Deployment of web application archive [/var/lib/tomcat10/webapps/saludo.war] has finished in [1,104] ms
+</code></pre></div>
+<p>El aviso de los TLD es informativo, no un error. Si en vez de esas líneas ves las del arranque de Tomcat (<code>Server startup in ...</code>), es que todavía no ha revisado la carpeta: espera unos segundos y repite. Mira la carpeta:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>ls<span class="w"> </span>-l<span class="w"> </span>/var/lib/tomcat10/webapps/
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>total 12
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>drwxr-xr-x 3 root   root   4096 Nov 15 16:38 ROOT
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>drwxr-x--- 4 tomcat tomcat 4096 Nov 15 16:40 saludo
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>-rw-r--r-- 1 root   root   3204 Nov 15 16:40 saludo.war
+</code></pre></div>
+<p>Tomcat ha descomprimido el WAR en la carpeta <code>saludo/</code> (de su propiedad) y lo ha publicado en el contexto <code>/saludo</code>. <code>ROOT</code> es la aplicación de bienvenida, en <code>/</code>. Prueba la aplicación desde la propia máquina:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>curl<span class="w"> </span><span class="s2">"http://127.0.0.1:8080/saludo/api/saludo?nombre=Ana"</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>{"mensaje": "Hola, Ana", "servidor": "debian-garcia", "hora": "16:40:55", "cliente": "127.0.0.1"}
+</code></pre></div>
+<h2 id="6-publicar-con-nginx">6. Publicar con Nginx<a class="headerlink" href="#6-publicar-con-nginx" title="Permanent link">&para;</a></h2>
+<h3 id="el-sitio">El sitio<a class="headerlink" href="#el-sitio" title="Permanent link">&para;</a></h3>
+<p>En la práctica 2.4 escribiste a mano cuatro <code>proxy_set_header</code>. Debian trae esas mismas cuatro líneas en un fichero que puedes incluir:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>grep<span class="w"> </span>-v<span class="w"> </span><span class="s1">'^#'</span><span class="w"> </span>/etc/nginx/proxy_params<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>.
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>proxy_set_header Host $host;
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>proxy_set_header X-Real-IP $remote_addr;
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>proxy_set_header X-Forwarded-Proto $scheme;
+</code></pre></div>
+<p>Crea el sitio:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/nginx/sites-available/java.garcia.test
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">80</span><span class="p">;</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="s">[::]:80</span><span class="p">;</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">    </span><span class="kn">server_name</span><span class="w"> </span><span class="s">java.garcia.test</span><span class="p">;</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">    </span><span class="kn">access_log</span><span class="w"> </span><span class="s">/var/log/nginx/java.access.log</span><span class="p">;</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">    </span><span class="kn">error_log</span><span class="w">  </span><span class="s">/var/log/nginx/java.error.log</span><span class="p">;</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">    </span><span class="kn">location</span><span class="w"> </span><span class="s">/</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">        </span><span class="kn">proxy_pass</span><span class="w"> </span><span class="s">http://127.0.0.1:8080</span><span class="p">;</span>
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">        </span><span class="kn">include</span><span class="w"> </span><span class="s">proxy_params</span><span class="p">;</span>
+<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="p">}</span>
+</code></pre></div>
+<p>Actívalo, comprueba y recarga, como siempre:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>sudo<span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span>/etc/nginx/sites-available/java.garcia.test<span class="w"> </span>/etc/nginx/sites-enabled/
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>sudo<span class="w"> </span>nginx<span class="w"> </span>-t
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>nginx
+</code></pre></div>
+<p>En el fichero <code>hosts</code> de tu ordenador, añade el nombre a la línea de la <code>.10</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>192.168.56.10    web1.garcia.test    web2.garcia.test    app.garcia.test    java.garcia.test
+</code></pre></div>
+<p>Entra en <code>http://java.garcia.test/saludo/</code> y pulsa el enlace. Desde PowerShell:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="s2">"http://java.garcia.test/saludo/api/saludo?nombre=Ana"</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>{"mensaje": "Hola, Ana", "servidor": "debian-garcia", "hora": "16:41:07", "cliente": "127.0.0.1"}
+</code></pre></div>
+<p>Funciona, pero el cliente es <code>127.0.0.1</code>: para Tomcat, quien se conecta es Nginx. Es el mismo problema de la práctica 2.4.</p>
+<h3 id="la-ip-real-en-tomcat">La IP real en Tomcat<a class="headerlink" href="#la-ip-real-en-tomcat" title="Permanent link">&para;</a></h3>
+<p>En Tomcat, lo que hacía el módulo <code>realip</code> de Nginx lo hace una <strong>válvula</strong> (<em>valve</em>), un componente que procesa la petición antes de que llegue a la aplicación. Edita la configuración:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/tomcat10/server.xml
+</code></pre></div>
+<p>Busca, casi al final, la válvula <code>AccessLogValve</code> (dentro del bloque <code>&lt;Host&gt;</code>) y añade <strong>encima</strong> esta línea:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="w">        </span><span class="nt">&lt;Valve</span><span class="w"> </span><span class="na">className=</span><span class="s">"org.apache.catalina.valves.RemoteIpValve"</span><span class="w"> </span><span class="nt">/&gt;</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">        </span><span class="nt">&lt;Valve</span><span class="w"> </span><span class="na">className=</span><span class="s">"org.apache.catalina.valves.AccessLogValve"</span><span class="w"> </span><span class="na">directory=</span><span class="s">"logs"</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="w">               </span><span class="na">prefix=</span><span class="s">"localhost_access_log"</span><span class="w"> </span><span class="na">suffix=</span><span class="s">".txt"</span>
+</code></pre></div>
+<p><code>RemoteIpValve</code> lee la cabecera <code>X-Forwarded-For</code> y la usa como IP del cliente, pero <strong>solo</strong> si la conexión viene de una dirección interna, como <code>127.0.0.1</code>: es el equivalente de <code>set_real_ip_from</code>. Tomcat no lee su configuración en caliente; reinícialo:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>tomcat10
+</code></pre></div>
+<p>El comando vuelve enseguida, pero Tomcat tarda unos segundos en estar listo: si la petición siguiente da <code>502</code>, espera y repite (lo verás con calma en el apartado 8).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="s2">"http://java.garcia.test/saludo/api/saludo?nombre=Ana"</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>{"mensaje": "Hola, Ana", "servidor": "debian-garcia", "hora": "16:41:35", "cliente": "192.168.56.1"}
+</code></pre></div>
+<p>En el navegador, <code>http://java.garcia.test/saludo/api/saludo?nombre=Ana</code>:</p>
+<p><img alt="" src="../img/T3-tomcat-api.png" /></p>
+<h2 id="7-que-nadie-se-salte-el-proxy">7. Que nadie se salte el proxy<a class="headerlink" href="#7-que-nadie-se-salte-el-proxy" title="Permanent link">&para;</a></h2>
+<p>Tomcat sigue respondiendo directamente a cualquiera en el 8080:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-s</span> <span class="n">-o</span> <span class="n">NUL</span> <span class="n">-w</span> <span class="s2">"%{http_code}\n"</span> <span class="n">http</span><span class="p">://</span><span class="n">192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">56</span><span class="p">.</span><span class="n">10</span><span class="p">:</span><span class="n">8080</span><span class="p">/</span><span class="n">saludo</span><span class="p">/</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>200
+</code></pre></div>
+<p>En la práctica 2.4 lo resolviste con una regla en el servidor de detrás. Aquí es más sencillo, porque Tomcat está en la misma máquina que Nginx: basta con que <strong>escuche solo en local</strong>. En <code>/etc/tomcat10/server.xml</code>, busca el conector del puerto 8080 y añade <code>address="127.0.0.1"</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="w">    </span><span class="nt">&lt;Connector</span><span class="w"> </span><span class="na">port=</span><span class="s">"8080"</span><span class="w"> </span><span class="na">protocol=</span><span class="s">"HTTP/1.1"</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="w">               </span><span class="na">address=</span><span class="s">"127.0.0.1"</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="w">               </span><span class="na">connectionTimeout=</span><span class="s">"20000"</span>
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="w">               </span><span class="na">redirectPort=</span><span class="s">"8443"</span>
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="w">               </span><span class="na">maxParameterCount=</span><span class="s">"1000"</span>
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="w">               </span><span class="nt">/&gt;</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>tomcat10
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>sudo<span class="w"> </span>ss<span class="w"> </span>-tlnp<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="m">8080</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>LISTEN 0      100    [::ffff:127.0.0.1]:8080            *:*    users:(("java",pid=3300,fd=39))
+</code></pre></div>
+<p><code>[::ffff:127.0.0.1]</code> es la forma en que Java escribe la <code>127.0.0.1</code> cuando escucha en IPv6: solo local. Prueba las dos rutas desde tu ordenador:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-s</span> <span class="n">-o</span> <span class="n">NUL</span> <span class="n">-w</span> <span class="s2">"%{http_code}\n"</span> <span class="n">http</span><span class="p">://</span><span class="n">192</span><span class="p">.</span><span class="n">168</span><span class="p">.</span><span class="n">56</span><span class="p">.</span><span class="n">10</span><span class="p">:</span><span class="n">8080</span><span class="p">/</span><span class="n">saludo</span><span class="p">/</span>
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="n">curl</span><span class="p">.</span><span class="n">exe</span> <span class="n">-s</span> <span class="n">-o</span> <span class="n">NUL</span> <span class="n">-w</span> <span class="s2">"%{http_code}\n"</span> <span class="n">http</span><span class="p">://</span><span class="n">java</span><span class="p">.</span><span class="n">garcia</span><span class="p">.</span><span class="n">test</span><span class="p">/</span><span class="n">saludo</span><span class="p">/</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>000
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>200
+</code></pre></div>
+<p><code>000</code> significa que <code>curl</code> ni siquiera ha conseguido conectar: no hay nadie escuchando en esa dirección. El primero tarda un par de segundos porque Windows reintenta la conexión antes de rendirse. A través del proxy, <code>200</code>.</p>
+<h2 id="8-cuando-tomcat-no-responde-502">8. Cuando Tomcat no responde: 502<a class="headerlink" href="#8-cuando-tomcat-no-responde-502" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>stop<span class="w"> </span>tomcat10
+</code></pre></div>
+<p>Recarga <code>http://java.garcia.test/saludo/</code>:</p>
+<p><img alt="" src="../img/T3-tomcat-502.png" /></p>
+<p>La página de error es de Nginx, no de Tomcat. En el registro de errores del sitio:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>/var/log/nginx/java.error.log
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>2026/11/15 16:44:32 [error] 3090#3090: *13 connect() failed (111: Connection refused) while connecting to upstream, client: 192.168.56.1, server: java.garcia.test, request: "GET /saludo/ HTTP/1.1", upstream: "http://127.0.0.1:8080/saludo/", host: "java.garcia.test"
+</code></pre></div>
+<p>El mismo <code>Connection refused</code> de la práctica 2.4: Nginx funciona, pero no hay nadie en <code>127.0.0.1:8080</code>. Vuelve a arrancarlo:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>tomcat10
+</code></pre></div>
+<p>Tomcat tarda unos segundos en arrancar y desplegar las aplicaciones; durante ese tiempo, seguirás viendo el <code>502</code>.</p>
+<h2 id="9-desplegar-una-version-nueva-y-volver-atras">9. Desplegar una versión nueva (y volver atrás)<a class="headerlink" href="#9-desplegar-una-version-nueva-y-volver-atras" title="Permanent link">&para;</a></h2>
+<p>Antes de sustituir nada, guarda la versión que funciona:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>cp<span class="w"> </span>/var/lib/tomcat10/webapps/saludo.war<span class="w"> </span>~/saludo-1.0.war
+</code></pre></div>
+<p>Cambia la aplicación: en <code>src/main/webapp/index.html</code>, cambia el encabezado por <code>&lt;h1&gt;Aplicación Java en Tomcat · versión 2&lt;/h1&gt;</code>, y en el <code>pom.xml</code>, pon <code>&lt;version&gt;2.0&lt;/version&gt;</code>. Construye y despliega:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>mvn<span class="w"> </span>package
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a>sudo<span class="w"> </span>cp<span class="w"> </span>target/saludo.war<span class="w"> </span>/var/lib/tomcat10/webapps/
+<a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a>sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w"> </span>tomcat10<span class="w"> </span>-n<span class="w"> </span><span class="m">4</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>Nov 15 16:48:13 debian-garcia tomcat10[3445]: Undeploying context [/saludo]
+<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a>Nov 15 16:48:13 debian-garcia tomcat10[3445]: Deploying web application archive [/var/lib/tomcat10/webapps/saludo.war]
+<a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a>Nov 15 16:48:15 debian-garcia tomcat10[3445]: At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+<a id="__codelineno-49-4" name="__codelineno-49-4" href="#__codelineno-49-4"></a>Nov 15 16:48:15 debian-garcia tomcat10[3445]: Deployment of web application archive [/var/lib/tomcat10/webapps/saludo.war] has finished in [1,268] ms
+</code></pre></div>
+<p>Tomcat ha detectado el WAR nuevo, ha retirado la versión anterior (<code>Undeploying</code>) y ha desplegado la nueva, <strong>sin reiniciar</strong>. Como en el apartado 5, si el registro aún no lo muestra, espera unos segundos. Recarga <code>http://java.garcia.test/saludo/</code>:</p>
+<p><img alt="" src="../img/T3-tomcat-saludo.png" /></p>
+<p>Ahora imagina que la versión 2 tiene un fallo grave. Volver atrás es un solo comando:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>~/saludo-1.0.war<span class="w"> </span>/var/lib/tomcat10/webapps/saludo.war
+</code></pre></div>
+<p>Comprueba en el registro y en el navegador que vuelve la versión 1. Después, despliega otra vez la 2 para dejarla como versión final.</p>
+<div class="admonition info">
+<p class="admonition-title">En el mundo real</p>
+<p>Nadie guarda las versiones en su carpeta personal: los artefactos de cada versión se guardan en un repositorio de artefactos (Nexus, Artifactory, GitHub Packages), que es justo adonde los sube <code>mvn deploy</code>. Y el despliegue lo hace un sistema automático (Tema 7).</p>
+</div>
+<h2 id="10-haz-la-instantanea">10. Haz la instantánea<a class="headerlink" href="#10-haz-la-instantanea" title="Permanent link">&para;</a></h2>
+<p>Apaga la máquina y toma una instantánea: <code>p3.1-tomcat</code>.</p>
+<hr />
+<h2 id="cuestiones-finales">Cuestiones finales<a class="headerlink" href="#cuestiones-finales" title="Permanent link">&para;</a></h2>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 1</p>
+<p>¿Qué hace exactamente <code>mvn package</code>? Nombra las fases que ha ejecutado en tu proyecto y di dónde ha dejado el resultado. ¿Qué haría además <code>mvn install</code>?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 2</p>
+<p>¿Por qué la URL de tu servlet es <code>/saludo/api/saludo</code> y no <code>/api/saludo</code>? ¿Qué harías para que la aplicación respondiera en la raíz de <code>java.tuapellido.test</code>?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 3</p>
+<p>Antes de añadir <code>RemoteIpValve</code>, la aplicación decía que el cliente era <code>127.0.0.1</code>. ¿Por qué? ¿Qué riesgo habría si la válvula creyera la cabecera <code>X-Forwarded-For</code> viniera de quien viniera?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 4</p>
+<p>En la práctica 2.4 cerraste el servidor de detrás con una regla <code>if</code> en Nginx. Aquí has usado <code>address="127.0.0.1"</code>. ¿Por qué aquí se puede y allí no?</p>
+</div>
+<div class="admonition question">
+<p class="admonition-title">Cuestión 5</p>
+<p>Tras sustituir el WAR, Tomcat despliega la versión nueva sin reiniciar; tras editar <code>server.xml</code>, hay que reiniciarlo. ¿Qué diferencia hay entre los dos cambios?</p>
+</div>
+<h2 id="entrega">Entrega<a class="headerlink" href="#entrega" title="Permanent link">&para;</a></h2>
+<p>Igual que en las prácticas anteriores: <strong>documento de evidencias (40 %)</strong> y <strong>demostración en clase (60 %)</strong>.</p>
+<h3 id="parte-1-documento-de-evidencias-40">Parte 1 — Documento de evidencias (40 %)<a class="headerlink" href="#parte-1-documento-de-evidencias-40" title="Permanent link">&para;</a></h3>
+<p>Un <strong>PDF</strong> llamado <code>P3.1-Apellido-Nombre.pdf</code> con portada, las evidencias (en texto, con comando y <em>prompt</em>) y las respuestas a las cuestiones.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Qué hay que demostrar</th>
+<th>Dónde</th>
+<th>Comando cuya salida se pega</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Las versiones instaladas</td>
+<td>Principal</td>
+<td><code>java -version</code> y <code>mvn -v</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>El proyecto Maven</td>
+<td>Principal</td>
+<td><code>cat ~/saludo/pom.xml</code> y <code>find ~/saludo/src -type f</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>La construcción</td>
+<td>Principal</td>
+<td>Las últimas líneas de <code>mvn package</code> (desde <code>--- war</code>)</td>
+</tr>
+<tr>
+<td>4</td>
+<td>El contenido del WAR</td>
+<td>Principal</td>
+<td><code>jar tf ~/saludo/target/saludo.war</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>El despliegue</td>
+<td>Principal</td>
+<td><code>sudo journalctl -u tomcat10 -n 4</code> tras copiar el WAR</td>
+</tr>
+<tr>
+<td>6</td>
+<td>La configuración de Nginx</td>
+<td>Principal</td>
+<td><code>cat /etc/nginx/sites-available/java.tuapellido.test</code></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Los cambios en Tomcat</td>
+<td>Principal</td>
+<td><code>sudo grep -n -e 'address=' -e 'RemoteIpValve' /etc/tomcat10/server.xml</code> (la línea con <code>::1</code> es del conector AJP, que viene comentado)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Tomcat solo escucha en local</td>
+<td>Principal</td>
+<td><code>sudo ss -tlnp</code> (las líneas de los puertos 80 y 8080)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>La aplicación, con la IP real, a través del proxy</td>
+<td>Tu ordenador</td>
+<td><code>curl.exe "http://java.tuapellido.test/saludo/api/saludo?nombre=TuNombre"</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td>El 8080 no es accesible desde fuera</td>
+<td>Tu ordenador</td>
+<td>Los dos <code>curl.exe</code> del apartado 7</td>
+</tr>
+<tr>
+<td>11</td>
+<td>El <code>502</code> y su causa</td>
+<td>Principal</td>
+<td>La última línea de <code>java.error.log</code> con Tomcat parado</td>
+</tr>
+<tr>
+<td>12</td>
+<td>El cambio de versión</td>
+<td>Principal</td>
+<td><code>sudo journalctl -u tomcat10 -n 4</code> tras desplegar la versión 2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="parte-2-demostracion-en-clase-60">Parte 2 — Demostración en clase (60 %)<a class="headerlink" href="#parte-2-demostracion-en-clase-60" title="Permanent link">&para;</a></h3>
+<p>Mini entrevista individual en la mesa del profesor, con la máquina encendida: muestras la aplicación en <code>java.tuapellido.test</code>, haces la tarea que se te pida (por ejemplo, un cambio en la aplicación y su despliegue) y explicas una decisión o un concepto.</p>
+<h3 id="criterios-de-evaluacion">Criterios de evaluación<a class="headerlink" href="#criterios-de-evaluacion" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Criterio</th>
+<th>Peso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Documento</td>
+<td>Las doce evidencias están completas, en texto y explicadas</td>
+<td>25 %</td>
+</tr>
+<tr>
+<td>Documento</td>
+<td>Las cinco cuestiones están respondidas con corrección y criterio propio</td>
+<td>15 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>La aplicación responde en <code>java.tuapellido.test</code> con la IP real, y el 8080 no es accesible desde fuera</td>
+<td>20 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Realizas la tarea que se te pide y explicas lo que haces</td>
+<td>20 %</td>
+</tr>
+<tr>
+<td>Demostración</td>
+<td>Explicas una decisión o un concepto con tus palabras</td>
+<td>20 %</td>
+</tr>
+</tbody>
+</table>
+<h3 id="antes-de-entregar-comprueba-que">Antes de entregar, comprueba que…<a class="headerlink" href="#antes-de-entregar-comprueba-que" title="Permanent link">&para;</a></h3>
+<ul>
+<li>☐ <code>mvn package</code> termina en <code>BUILD SUCCESS</code> y <code>target/saludo.war</code> existe.</li>
+<li>☐ <code>http://java.tuapellido.test/saludo/</code> muestra la versión 2 de la página.</li>
+<li>☐ <code>api/saludo</code> devuelve tu IP real (<code>192.168.56.1</code>) como cliente.</li>
+<li>☐ <code>http://192.168.56.10:8080</code> no responde desde tu ordenador.</li>
+<li>☐ Tienes guardado <code>~/saludo-1.0.war</code>.</li>
+<li>☐ Existe la instantánea <code>p3.1-tomcat</code>.</li>
+<li>☐ El archivo se llama <code>P3.1-Apellido-Nombre.pdf</code>.</li>
+</ul>
+<h2 id="referencias">Referencias<a class="headerlink" href="#referencias" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://tomcat.apache.org/tomcat-10.1-doc/deployer-howto.html">Apache Tomcat 10.1 — Despliegue de aplicaciones</a></li>
+<li><a href="https://tomcat.apache.org/tomcat-10.1-doc/config/http.html">Apache Tomcat 10.1 — El conector HTTP</a></li>
+<li><a href="https://tomcat.apache.org/tomcat-10.1-doc/config/valve.html#Remote_IP_Valve">Apache Tomcat 10.1 — <code>RemoteIpValve</code></a></li>
+<li><a href="https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html">Apache Maven — Maven en 5 minutos</a></li>
+<li><a href="https://jakarta.ee/specifications/servlet/6.0/">Jakarta Servlet 6.0</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Volver al principio
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Pie" >
+        
+          
+          <a href="../T3-servidores-aplicaciones/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Servidores de aplicaciones">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Servidores de aplicaciones
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../T3-practica-node/" class="md-footer__link md-footer__link--next" aria-label="Siguiente: Práctica 3.2 - Aplicación Node.js con Express">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Siguiente
+              </span>
+              <div class="md-ellipsis">
+                Práctica 3.2 - Aplicación Node.js con Express
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Dustin Randel de Lara García, Sant Josep Obrer. Material docente del módulo 0614. Contiene obras derivadas de terceros; ver la página de Créditos.
+
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.footer", "navigation.indexes", "toc.follow", "search.highlight", "search.suggest", "content.code.copy", "content.code.annotate", "content.tabs.link"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copiado al portapapeles", "clipboard.copy": "Copiar al portapapeles", "search.result.more.one": "1 m\u00e1s en esta p\u00e1gina", "search.result.more.other": "# m\u00e1s en esta p\u00e1gina", "search.result.none": "No se encontraron documentos", "search.result.one": "1 documento encontrado", "search.result.other": "# documentos encontrados", "search.result.placeholder": "Teclee para comenzar b\u00fasqueda", "search.result.term.missing": "Falta", "select.version": "Seleccionar versi\u00f3n"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>
