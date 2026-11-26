@@ -21,6 +21,11 @@ nav:
         - T3-practica-tomcat.md
         - T3-practica-node.md
         - T3-practica-flask.md
+    - Tema 4:
+      - Teoría:
+        - T4-dns.md
+      - Prácticas:
+        - T4-practica-bind.md
     - Créditos: creditos.md
 
 # Cómo funciona este fichero:
