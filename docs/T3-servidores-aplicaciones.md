@@ -1,5 +1,11 @@
 ---
-title: 'Tema 3 - Servidores de aplicaciones'
+title: "Servidores de aplicaciones"
+subtitulo: "UT3. Dosier de apuntes"
+modulo: "0614. Despliegue de aplicaciones web"
+curso: "2026-2027"
+profesor: "Dustin Randel de Lara García"
+centro: "Sant Josep Obrer"
+ut: "UT3"
 ---
 
 <!--
@@ -53,9 +59,11 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
     con python3-pip instalado. Texto corregido y salida completa real.
 -->
 
-# Tema 3 - Servidores de aplicaciones: despliegue de aplicaciones web
+# Cómo se usa este dosier {.nobreak}
 
-!!! abstract "Qué vas a aprender en este tema"
+Este dosier es la teoría de la unidad. Las prácticas 3.1 a 3.3 están en páginas aparte y se enlazan al final de cada bloque.
+
+!!! abstract "Qué vas a aprender en esta UT"
     - Qué es un servidor de aplicaciones y por qué casi siempre tiene un Nginx delante.
     - Cómo se comunican el servidor web y el de aplicaciones: HTTP, sockets Unix, FastCGI y WSGI.
     - Qué significa desplegar una aplicación y qué pasos se repiten en cualquier tecnología.
@@ -81,7 +89,6 @@ Las tres prácticas se hacen en tu máquina principal (`192.168.56.10`), la del 
  192.168.56.1    192.168.56.10    └──► Gunicorn  /run/flask/flask.sock   flask.tuapellido.test
 ```
 
----
 
 ## 1. Qué es un servidor de aplicaciones
 
@@ -189,7 +196,7 @@ Las tres prácticas siguen **el mismo guion**, con herramientas distintas:
 | 1. Entorno de ejecución | `apt install default-jdk-headless maven tomcat10` | `apt install nodejs npm` | `apt install python3-venv` |
 | 2. Código | Proyecto Maven | `package.json` + `app.js` | `requirements.txt` + `app.py` |
 | 3. Dependencias | Maven, al construir | `npm ci --omit=dev` | `pip install -r requirements.txt` |
-| 4. Artefacto | `mvn package` → `saludo.war` | — | — |
+| 4. Artefacto | `mvn package` → `saludo.war` | no hay (se ejecuta el código) | no hay (se ejecuta el código) |
 | 5. Servicio | Lo trae el paquete: `tomcat10` | Lo escribes tú: `node-app.service` | Lo escribes tú: `flask-app.service` |
 | 6. Publicar | Nginx → `127.0.0.1:8080` | Nginx → `127.0.0.1:3000` | Nginx → socket Unix |
 | 7. Comprobar | `curl`, `journalctl`, registros de Nginx | Igual | Igual |
@@ -259,7 +266,6 @@ Nov 15 18:44:20 debian-garcia node[14728]: Escuchando en http://127.0.0.1:3000
 - **Los secretos, fuera del código.** Contraseñas y claves van en variables de entorno o ficheros de configuración del servidor, nunca en el repositorio.
 - **Despliega cuando haya poco uso y alguien pueda arreglarlo.** Un viernes por la tarde no es buen momento.
 
----
 
 ## Cierre del bloque 1
 
@@ -276,7 +282,6 @@ Nov 15 18:44:20 debian-garcia node[14728]: Escuchando en http://127.0.0.1:3000
     2. `systemctl cat nginx`. Localiza `ExecStart`. ¿Por qué Nginx no necesita `User=`? (Pista: busca la directiva `user` en `/etc/nginx/nginx.conf` y mira con qué usuario corren sus procesos con `ps -o user,cmd -C nginx`).
     3. `sudo journalctl -u nginx -n 5` y `systemctl is-enabled ssh`.
 
----
 
 ## 4. Aplicaciones Java: servlets, Maven y Tomcat
 
@@ -379,7 +384,6 @@ Nov 15 16:48:15 debian-garcia tomcat10[3445]: Deployment of web application arch
 
 Hoy muchos proyectos Java usan **Spring Boot**, que da la vuelta al modelo: en lugar de instalar un Tomcat y desplegar WAR dentro, cada aplicación **lleva su Tomcat embebido** en un único `.jar` ejecutable que se arranca con `java -jar app.jar`. Es el mismo modelo de Node.js y de Gunicorn: un servicio de `systemd` por aplicación y un Nginx delante. El modelo del WAR sigue muy presente en empresas con un servidor que aloja muchas aplicaciones, y es el que entenderás primero.
 
----
 
 ## Cierre del bloque 2
 
@@ -392,7 +396,6 @@ Hoy muchos proyectos Java usan **Spring Boot**, que da la vuelta al modelo: en l
 !!! example "Ahora toca: Práctica 3.1 - Aplicación Java en Tomcat"
     **[Ir a la práctica 3.1](T3-practica-tomcat.md).** Construirás un WAR con Maven, lo desplegarás en Tomcat, lo publicarás en `java.tuapellido.test` a través de Nginx y harás que Tomcat solo acepte conexiones locales. Usa los apartados 2, 3 y 4.
 
----
 
 ## 5. Node.js y Express
 
@@ -479,7 +482,6 @@ const PORT = process.env.PORT || 3000;
 
 `NODE_ENV=production` es una convención: Express y muchas librerías la leen para desactivar mensajes de depuración y activar cachés. En el servicio de `systemd` se ponen con `Environment=`.
 
----
 
 ## Cierre del bloque 3
 
@@ -492,7 +494,6 @@ const PORT = process.env.PORT || 3000;
 !!! example "Ahora toca: Práctica 3.2 - Aplicación Node.js con Express"
     **[Ir a la práctica 3.2](T3-practica-node.md).** Crearás una aplicación con Express, la convertirás en un servicio de `systemd` con el usuario `www-data` y la publicarás en `node.tuapellido.test`. Usa los apartados 3 y 5.
 
----
 
 ## 6. Python: Flask, WSGI y Gunicorn
 
@@ -605,7 +606,6 @@ location / {
 [crit] 15478#15478: *71 connect() to unix:/run/flask/flask.sock failed (2: No such file or directory) while connecting to upstream, client: 192.168.56.1, server: flask.garcia.test, request: "GET /api/hora HTTP/1.1", upstream: "http://unix:/run/flask/flask.sock:/api/hora", host: "flask.garcia.test"
 ```
 
----
 
 ## Cierre del bloque 4
 
@@ -618,7 +618,6 @@ location / {
 !!! example "Ahora toca: Práctica 3.3 - Aplicación Flask con Gunicorn"
     **[Ir a la práctica 3.3](T3-practica-flask.md).** Crearás un entorno virtual, instalarás Flask y Gunicorn, convertirás Gunicorn en un servicio que escucha en un socket Unix y lo publicarás en `flask.tuapellido.test`. Usa los apartados 2, 3 y 6.
 
----
 
 ??? info "Para saber más: PHP-FPM, PaaS y lo que viene"
     **PHP-FPM.** PHP sigue el mismo modelo con otro protocolo. PHP-FPM (*FastCGI Process Manager*) mantiene un grupo de procesos PHP ya arrancados, y Nginx le pasa cada petición a un fichero `.php` por **FastCGI** (`fastcgi_pass unix:/run/php/php8.4-fpm.sock;`) en vez de por HTTP. Es la *P* de LEMP. Con Apache existía además `mod_php`, que mete el intérprete dentro de los propios procesos de Apache.
@@ -633,13 +632,13 @@ location / {
 
 ## Referencias
 
-- [Apache Tomcat 10.1 — Documentación](https://tomcat.apache.org/tomcat-10.1-doc/index.html)
-- [Apache Maven — Introducción al ciclo de vida](https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html)
-- [Jakarta EE — Jakarta Servlet 6.0](https://jakarta.ee/specifications/servlet/6.0/)
-- [Node.js — Introducción](https://nodejs.org/es/learn/getting-started/introduction-to-nodejs)
-- [Express — Guía de enrutamiento](https://expressjs.com/es/guide/routing.html)
-- [npm — `npm ci`](https://docs.npmjs.com/cli/commands/npm-ci)
-- [Flask — Despliegue en producción](https://flask.palletsprojects.com/en/stable/deploying/)
-- [Gunicorn — Diseño (maestro y trabajadores)](https://docs.gunicorn.org/en/stable/design.html)
-- [PEP 668 — Entornos gestionados externamente](https://peps.python.org/pep-0668/)
-- [`systemd.service` — Manual](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html)
+- [Apache Tomcat 10.1: documentación](https://tomcat.apache.org/tomcat-10.1-doc/index.html)
+- [Apache Maven: introducción al ciclo de vida](https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html)
+- [Jakarta EE: Jakarta Servlet 6.0](https://jakarta.ee/specifications/servlet/6.0/)
+- [Node.js: introducción](https://nodejs.org/es/learn/getting-started/introduction-to-nodejs)
+- [Express: guía de enrutamiento](https://expressjs.com/es/guide/routing.html)
+- [npm: `npm ci`](https://docs.npmjs.com/cli/commands/npm-ci)
+- [Flask: despliegue en producción](https://flask.palletsprojects.com/en/stable/deploying/)
+- [Gunicorn: diseño (maestro y trabajadores)](https://docs.gunicorn.org/en/stable/design.html)
+- [PEP 668: entornos gestionados externamente](https://peps.python.org/pep-0668/)
+- [`systemd.service`: manual](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html)
