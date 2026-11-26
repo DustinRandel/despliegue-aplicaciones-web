@@ -26,6 +26,21 @@ nav:
         - T4-dns.md
       - Prácticas:
         - T4-practica-bind.md
+    - Tema 5:
+      - Teoría:
+        - T5-git.md
+      - Prácticas:
+        - T5-practica-github.md
+    - Tema 6:
+      - Teoría:
+        - T6-docker.md
+      - Prácticas:
+        - T6-practica-compose.md
+    - Tema 7:
+      - Teoría:
+        - T7-cicd.md
+      - Prácticas:
+        - T7-practica-actions.md
     - Créditos: creditos.md
 
 # Cómo funciona este fichero:
