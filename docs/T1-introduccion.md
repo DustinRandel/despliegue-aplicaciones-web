@@ -1,5 +1,11 @@
 ---
-title: 'Tema 1 - Introducción'
+title: "Introducción"
+subtitulo: "UT1. Dosier de apuntes"
+modulo: "0614. Despliegue de aplicaciones web"
+curso: "2026-2027"
+profesor: "Dustin Randel de Lara García"
+centro: "Sant Josep Obrer"
+ut: "UT1"
 ---
 
 <!--
@@ -13,16 +19,17 @@ NOTA PARA EL PROFESOR (no se muestra al alumnado):
 - Animación paso a paso: animaciones/ssh.html, incrustada en el apartado 6 con un iframe.
 -->
 
-# Tema 1 - Introducción: el escenario del despliegue
+# Cómo se usa este dosier {.nobreak}
 
-!!! abstract "Qué vas a aprender en este tema"
+Este dosier es la teoría de la unidad. La práctica 1.1 (máquina virtual) está en una página aparte.
+
+!!! abstract "Qué vas a aprender en esta UT"
     - Dónde vive realmente una aplicación web cuando deja tu ordenador.
     - Qué es un VPS y en qué se diferencia de un hosting compartido, de la nube y de un PaaS.
     - Por qué en este módulo trabajaremos sobre una máquina virtual y no sobre tu portátil.
     - Cómo conectarse de forma remota y segura a un servidor mediante SSH.
     - Qué son el cifrado simétrico y el asimétrico, qué es Diffie-Hellman y cómo los combina SSH.
 
----
 
 ## 1. El problema: tu aplicación funciona… en tu ordenador
 
@@ -98,7 +105,7 @@ Aplicaciones habituales de SSH:
 - Hacer copias de seguridad remotas.
 - Conectar dos ordenadores con cifrado de extremo a extremo.
 
-Antes de SSH se usaba **Telnet**, que hacía lo mismo pero enviando todo —incluida tu contraseña— en texto plano por la red. Hoy está completamente descartado para administrar servidores.
+Antes de SSH se usaba **Telnet**, que hacía lo mismo pero enviando todo, incluida tu contraseña, en texto plano por la red. Hoy está completamente descartado para administrar servidores.
 
 ## 6. El fondo del asunto: cifrado simétrico y asimétrico
 
@@ -174,7 +181,6 @@ Hay dos formas habituales de demostrarle al servidor que eres tú:
 
     Inmediatamente después configuraremos un **par de claves**, por comodidad (no tener que teclear la contraseña cada vez) y sobre todo por seguridad. Y al final desactivaremos el acceso por contraseña, que es exactamente lo que se hace en un servidor real.
 
----
 
 ## Para repasar
 
@@ -194,4 +200,4 @@ Hay dos formas habituales de demostrarle al servidor que eres tú:
 
 - [¿Qué es un VPS? Todo lo que necesitas saber sobre servidores virtuales](https://www.hostinger.es/tutoriales/que-es-un-vps)
 - [Documentación de OpenSSH](https://www.openssh.com/manual.html)
-- [Debian — The Universal Operating System](https://www.debian.org/)
+- [Debian: The Universal Operating System](https://www.debian.org/)
